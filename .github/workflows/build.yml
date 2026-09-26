@@ -5,6 +5,9 @@ on:
   pull_request:
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -22,3 +25,31 @@ jobs:
         with:
           name: UltraCore-plugin
           path: target/UltraCore-*.jar
+
+      # Publica uma Release com o .jar sempre que a versão do pom.xml ainda não tiver release.
+      # Para lançar uma nova versão, basta aumentar <version> no pom.xml.
+      - name: Publicar release (se versão nova)
+        if: github.event_name == 'push' && !startsWith(github.ref, 'refs/tags/')
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          VERSION=$(mvn -q -DforceStdout help:evaluate -Dexpression=project.version)
+          TAG="v$VERSION"
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            echo "Release $TAG já existe, nada a fazer."
+            exit 0
+          fi
+          cat > notes.md <<NOTES
+          Plugin tudo-em-um para **Paper 1.21+** (Java 21).
+
+          ### Como instalar
+          1. Baixe o arquivo **UltraCore-$VERSION.jar** abaixo (em *Assets*).
+          2. Coloque na pasta \`plugins/\` do servidor.
+          3. Inicie o servidor, entre como OP e digite **/painel**.
+
+          Veja o README para a lista de módulos, comandos e permissões.
+          NOTES
+          gh release create "$TAG" target/UltraCore-*.jar \
+            --target "$GITHUB_SHA" \
+            --title "UltraCore $TAG" \
+            --notes-file notes.md
