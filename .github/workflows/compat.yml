@@ -65,6 +65,7 @@ jobs:
       fail-fast: false
       matrix:
         mc: ${{ fromJson(needs.versions.outputs.list) }}
+        vault: [false, true]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/download-artifact@v4
@@ -79,5 +80,5 @@ jobs:
         with:
           distribution: temurin
           java-version: ${{ steps.java.outputs.v }}
-      - name: Testar servidor Paper ${{ matrix.mc }}
-        run: bash .github/scripts/test-server.sh "${{ matrix.mc }}" "$(ls jar/UltraCore-*.jar)"
+      - name: Testar servidor Paper ${{ matrix.mc }} (Vault=${{ matrix.vault }})
+        run: bash .github/scripts/test-server.sh "${{ matrix.mc }}" "$(ls jar/UltraCore-*.jar)" "${{ matrix.vault && 'vault' || '' }}"

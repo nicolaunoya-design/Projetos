@@ -1,16 +1,22 @@
 #!/usr/bin/env bash
 # Liga um servidor Paper real com o UltraCore, executa comandos no console e procura erros.
-# Uso: test-server.sh <versão-do-minecraft> <caminho-do-jar-do-plugin>
+# Uso: test-server.sh <versão-do-minecraft> <caminho-do-jar-do-plugin> [vault]
 set -uo pipefail
 
 VERSION="$1"
 PLUGIN_JAR="$2"
+WITH_VAULT="${3:-}"
 UA="UltraCore-CI (github.com/nicolaunoya-design/Projetos)"
-DIR="server-$VERSION"
+DIR="server-$VERSION${WITH_VAULT:+-vault}"
+LABEL="$VERSION$([ -n "$WITH_VAULT" ] && echo ' + Vault' || echo ' (sem Vault)')"
 
 mkdir -p "$DIR/plugins"
 cp "$PLUGIN_JAR" "$DIR/plugins/"
 cd "$DIR"
+
+if [ -n "$WITH_VAULT" ]; then
+  curl -fsSL -A "$UA" -o plugins/Vault.jar https://github.com/MilkBowl/Vault/releases/download/1.7.3/Vault.jar
+fi
 
 URL=$(curl -fsSL -A "$UA" "https://fill.papermc.io/v3/projects/paper/versions/$VERSION/builds/latest" \
   | jq -r '.downloads["server:default"].url')
@@ -44,10 +50,15 @@ done
 if grep -q "Done (" server.log; then
   for cmd in "painel lista" "painel desativar scoreboard" "painel ativar scoreboard" \
              "painel desativar sleep" "painel ativar sleep" "painel reload" \
-             "money Ninguem" "broadcast teste de compatibilidade" "limparitens" "painel lista"; do
+             "money Ninguem" "eco give Ninguem 10" "broadcast teste de compatibilidade" "limparitens" \
+             "painel desativar economy" "painel ativar economy" "painel lista"; do
     echo "$cmd" >&3
     sleep 2
   done
+  if [ -n "$WITH_VAULT" ]; then
+    echo "vault-info" >&3
+    sleep 3
+  fi
   sleep 3
   echo "stop" >&3
 fi
@@ -60,7 +71,7 @@ done
 kill -9 $PID 2>/dev/null
 exec 3>&-
 
-echo "================ LOG DO SERVIDOR ($VERSION) ================"
+echo "================ LOG DO SERVIDOR ($LABEL) ================"
 cat server.log
 echo "============================================================"
 
@@ -83,10 +94,22 @@ if ! grep -q "Módulos:" server.log; then
   FAIL=1
 fi
 
-if [ $FAIL -eq 0 ]; then
-  echo "[$VERSION] OK - UltraCore funcionando"
-  echo "| $VERSION | ✅ OK |" >> "$GITHUB_STEP_SUMMARY"
+if [ -n "$WITH_VAULT" ]; then
+  if ! grep -q "Economia do UltraCore registrada" server.log || ! grep -q "Economy: UltraCore" server.log; then
+    echo "::error::[$LABEL] a economia do UltraCore não foi registrada no Vault"
+    FAIL=1
+  fi
 else
-  echo "| $VERSION | ❌ Falhou |" >> "$GITHUB_STEP_SUMMARY"
+  if grep -q "Economia do UltraCore registrada" server.log; then
+    echo "::error::[$LABEL] tentou registrar no Vault sem o Vault instalado"
+    FAIL=1
+  fi
+fi
+
+if [ $FAIL -eq 0 ]; then
+  echo "[$LABEL] OK - UltraCore funcionando"
+  echo "| $LABEL | ✅ OK |" >> "$GITHUB_STEP_SUMMARY"
+else
+  echo "| $LABEL | ❌ Falhou |" >> "$GITHUB_STEP_SUMMARY"
 fi
 exit $FAIL

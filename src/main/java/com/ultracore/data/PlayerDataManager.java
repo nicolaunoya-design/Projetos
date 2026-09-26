@@ -51,6 +51,11 @@ public final class PlayerDataManager implements Listener {
         return d != null ? d : load(uuid, nameOf(uuid));
     }
 
+    /** Se o jogador já tem dados salvos em disco. */
+    public boolean exists(UUID uuid) {
+        return new File(folder, uuid + ".yml").exists();
+    }
+
     public boolean isLoaded(UUID uuid) {
         return cache.containsKey(uuid);
     }

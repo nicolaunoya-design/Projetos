@@ -11,6 +11,7 @@ Testado automaticamente ligando um **servidor Paper real** de cada versão com o
 
 - Paper 1.21.x usa **Java 21**; Paper 26.x usa **Java 25**. O mesmo `.jar` serve para todas.
 - A cada envio de código, o GitHub descobre sozinho as versões novas do Paper e testa de novo.
+- Cada versão é testada **sem Vault** e **com Vault** (confirmando que o Vault reconhece a economia do UltraCore).
 - Se algum módulo falhar numa versão futura, ele é desligado sozinho e o resto do plugin continua funcionando.
 
 ## Plugins necessários
@@ -29,11 +30,12 @@ O que você precisa ter:
 | Plugin | Para quê | Obrigatório? |
 |---|---|---|
 | [LuckPerms](https://luckperms.net/) | Criar grupos (VIP, Mod, Admin) e dar as permissões `ultracore.vip`, `ultracore.staff`, `ultracore.admin` e as tags do chat. Sem ele, só dá pra separar "jogador" e "OP". | Não, mas **muito recomendado** |
+| [Vault](https://www.spigotmc.org/resources/vault.34315/) | Deixar plugins de loja, leilão, `/sell`, ranks pagos etc. usarem o dinheiro do UltraCore. Se o Vault estiver instalado, o UltraCore se registra nele **sozinho**; sem ele, a economia funciona normalmente só com os comandos do UltraCore. | Não (só se algum plugin pedir) |
 | [PlaceholderAPI](https://modrinth.com/plugin/placeholderapi) | Usar placeholders `%...%` de outros plugins no scoreboard, na tab, no chat e nos anúncios. O UltraCore detecta sozinho se estiver instalado. | Não |
 
-### Não compatível (ainda)
+### Atenção
 
-- **Vault:** a economia do UltraCore ainda não se conecta ao Vault. Plugins de loja/leilão que usam o Vault não vão enxergar o dinheiro do UltraCore.
+- **Outra economia + Vault:** se você tiver outro plugin de economia (ex: EssentialsX Economy), só um deve cuidar do dinheiro. Desligue o módulo **Economia** no `/painel` ou a economia do outro plugin.
 - **EssentialsX:** dá pra usar junto, mas os dois têm comandos iguais (`/home`, `/spawn`, `/tpa`, `/money`...). O melhor é usar só um dos dois, ou desligar pelo `/painel` os módulos do UltraCore que já existem no Essentials.
 
 ## Como instalar

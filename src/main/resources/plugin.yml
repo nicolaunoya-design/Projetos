@@ -4,7 +4,7 @@ main: com.ultracore.UltraCore
 api-version: '1.21'
 description: Plugin tudo-em-um com módulos que podem ser ligados/desligados pelo /painel.
 authors: [UltraCore]
-softdepend: [PlaceholderAPI]
+softdepend: [Vault, PlaceholderAPI]
 
 commands:
   painel:
