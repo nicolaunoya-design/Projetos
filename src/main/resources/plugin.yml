@@ -1,0 +1,252 @@
+name: UltraCore
+version: '${project.version}'
+main: com.ultracore.UltraCore
+api-version: '1.21'
+description: Plugin tudo-em-um com módulos que podem ser ligados/desligados pelo /painel.
+authors: [UltraCore]
+softdepend: [PlaceholderAPI]
+
+commands:
+  painel:
+    description: Abre o painel de configuração do UltraCore.
+    aliases: [ultracore, uc, config]
+  # Spawn
+  spawn:
+    description: Vai para o spawn.
+  setspawn:
+    description: Define o spawn.
+  # Homes
+  sethome:
+    description: Define uma home.
+    aliases: [definircasa]
+  home:
+    description: Vai para uma home.
+    aliases: [casa]
+  delhome:
+    description: Remove uma home.
+    aliases: [delcasa]
+  homes:
+    description: Lista suas homes.
+    aliases: [casas]
+  # Warps
+  warp:
+    description: Vai para uma warp.
+  warps:
+    description: Menu de warps.
+  setwarp:
+    description: Cria uma warp.
+  delwarp:
+    description: Remove uma warp.
+  # TPA
+  tpa:
+    description: Pede para teleportar até um jogador.
+  tpahere:
+    description: Pede para um jogador vir até você.
+    aliases: [tpaqui]
+  tpaccept:
+    description: Aceita um pedido de teleporte.
+    aliases: [tpaceitar, tpyes]
+  tpdeny:
+    description: Nega um pedido de teleporte.
+    aliases: [tpnegar, tpno]
+  tptoggle:
+    description: Liga/desliga o recebimento de pedidos.
+  back:
+    description: Volta para o local anterior.
+    aliases: [voltar]
+  rtp:
+    description: Teleporte aleatório.
+    aliases: [wild, aleatorio]
+  # Economia
+  money:
+    description: Mostra o saldo.
+    aliases: [bal, balance, dinheiro, saldo, coins]
+  pay:
+    description: Paga um jogador.
+    aliases: [pagar]
+  baltop:
+    description: Ranking dos mais ricos.
+    aliases: [moneytop, topmoney, ricos]
+  eco:
+    description: Administra a economia.
+    aliases: [economia]
+  # Kits
+  kit:
+    description: Pega um kit.
+    aliases: [kits]
+  createkit:
+    description: Cria um kit com seu inventário.
+    aliases: [criarkit]
+  delkit:
+    description: Remove um kit.
+  # Chat
+  clearchat:
+    description: Limpa o chat.
+    aliases: [limparchat, cc]
+  broadcast:
+    description: Envia um anúncio.
+    aliases: [bc, anunciar]
+  staffchat:
+    description: Chat da staff.
+    aliases: [sc]
+  msg:
+    description: Mensagem privada.
+    aliases: [tell, w, m, whisper, pm]
+  r:
+    description: Responde a última mensagem privada.
+    aliases: [reply, responder]
+  socialspy:
+    description: Espia mensagens privadas.
+    aliases: [spy]
+  # Moderação
+  ban:
+    description: Bane um jogador.
+    aliases: [banir]
+  tempban:
+    description: Bane temporariamente.
+    aliases: [tempbanir]
+  unban:
+    description: Desbane um jogador.
+    aliases: [desbanir, pardon]
+  kick:
+    description: Expulsa um jogador.
+    aliases: [expulsar]
+  mute:
+    description: Silencia um jogador.
+    aliases: [mutar, tempmute]
+  unmute:
+    description: Remove o silêncio.
+    aliases: [desmutar]
+  # Staff
+  fly:
+    description: Liga/desliga o voo.
+    aliases: [voar]
+  heal:
+    description: Cura.
+    aliases: [curar]
+  feed:
+    description: Sacia a fome.
+    aliases: [comer, alimentar]
+  gm:
+    description: Muda o modo de jogo.
+    aliases: [gamemode, modo]
+  god:
+    description: Modo deus.
+    aliases: [deus]
+  vanish:
+    description: Fica invisível.
+    aliases: [v, invisivel]
+  invsee:
+    description: Vê o inventário de um jogador.
+  ecsee:
+    description: Vê o baú do fim de um jogador.
+  clearinv:
+    description: Limpa o inventário.
+    aliases: [ci, limparinv]
+  speed:
+    description: Muda sua velocidade.
+    aliases: [velocidade]
+  tphere:
+    description: Puxa um jogador até você.
+    aliases: [s, puxar]
+  # Utilidades
+  craft:
+    description: Abre uma mesa de trabalho.
+    aliases: [bancada, workbench, wb]
+  enderchest:
+    description: Abre seu baú do fim.
+    aliases: [ec, echest]
+  hat:
+    description: Coloca o item da mão na cabeça.
+    aliases: [chapeu]
+  ping:
+    description: Mostra o ping.
+  lixo:
+    description: Abre a lixeira.
+    aliases: [lixeira, trash, disposal]
+  regras:
+    description: Mostra as regras.
+    aliases: [rules]
+  afk:
+    description: Fica AFK.
+    aliases: [ausente]
+  limparitens:
+    description: Remove itens do chão agora.
+    aliases: [clearlag, lagg]
+
+permissions:
+  ultracore.player:
+    description: Comandos básicos de jogador.
+    default: true
+    children:
+      ultracore.spawn: true
+      ultracore.home: true
+      ultracore.warp: true
+      ultracore.tpa: true
+      ultracore.back: true
+      ultracore.rtp: true
+      ultracore.money: true
+      ultracore.pay: true
+      ultracore.baltop: true
+      ultracore.kit: true
+      ultracore.msg: true
+      ultracore.ping: true
+      ultracore.afk: true
+      ultracore.regras: true
+      ultracore.lixo: true
+  ultracore.vip:
+    description: Vantagens de VIP (dê via LuckPerms).
+    default: false
+    children:
+      ultracore.craft: true
+      ultracore.enderchest: true
+      ultracore.hat: true
+      ultracore.chat.color: true
+      ultracore.fly: true
+      ultracore.tag.vip: true
+  ultracore.staff:
+    description: Ferramentas de moderação (dê via LuckPerms).
+    default: op
+    children:
+      ultracore.player: true
+      ultracore.vip: true
+      ultracore.kick: true
+      ultracore.mute: true
+      ultracore.ban: true
+      ultracore.staffchat: true
+      ultracore.clearchat: true
+      ultracore.socialspy: true
+      ultracore.vanish: true
+      ultracore.vanish.see: true
+      ultracore.invsee: true
+      ultracore.tphere: true
+      ultracore.gamemode: true
+      ultracore.heal: true
+      ultracore.feed: true
+      ultracore.chat.bypass: true
+      ultracore.bypass.delay: true
+      ultracore.afk.bypass: true
+      ultracore.tag.mod: true
+  ultracore.admin:
+    description: Acesso total, incluindo o /painel.
+    default: op
+    children:
+      ultracore.staff: true
+      ultracore.setspawn: true
+      ultracore.setwarp: true
+      ultracore.eco: true
+      ultracore.createkit: true
+      ultracore.broadcast: true
+      ultracore.clearlag: true
+      ultracore.god: true
+      ultracore.god.others: true
+      ultracore.fly.others: true
+      ultracore.heal.others: true
+      ultracore.feed.others: true
+      ultracore.gamemode.others: true
+      ultracore.clearinv: true
+      ultracore.clearinv.others: true
+      ultracore.speed: true
+      ultracore.homes.unlimited: true
+      ultracore.bypass.cooldown: true
+      ultracore.tag.admin: true
