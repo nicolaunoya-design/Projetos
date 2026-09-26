@@ -13,6 +13,29 @@ Testado automaticamente ligando um **servidor Paper real** de cada versão com o
 - A cada envio de código, o GitHub descobre sozinho as versões novas do Paper e testa de novo.
 - Se algum módulo falhar numa versão futura, ele é desligado sozinho e o resto do plugin continua funcionando.
 
+## Plugins necessários
+
+**Nenhum.** O UltraCore funciona sozinho: é só colocar o `.jar` na pasta `plugins/`. Ele não depende de nenhum outro plugin.
+
+O que você precisa ter:
+
+| Item | Versão |
+|---|---|
+| Servidor **Paper** (ou fork, como Purpur) | 1.21 até 26.x |
+| **Java** | 21 para Paper 1.21.x · 25 para Paper 26.x |
+
+### Plugins opcionais (recomendados)
+
+| Plugin | Para quê | Obrigatório? |
+|---|---|---|
+| [LuckPerms](https://luckperms.net/) | Criar grupos (VIP, Mod, Admin) e dar as permissões `ultracore.vip`, `ultracore.staff`, `ultracore.admin` e as tags do chat. Sem ele, só dá pra separar "jogador" e "OP". | Não, mas **muito recomendado** |
+| [PlaceholderAPI](https://modrinth.com/plugin/placeholderapi) | Usar placeholders `%...%` de outros plugins no scoreboard, na tab, no chat e nos anúncios. O UltraCore detecta sozinho se estiver instalado. | Não |
+
+### Não compatível (ainda)
+
+- **Vault:** a economia do UltraCore ainda não se conecta ao Vault. Plugins de loja/leilão que usam o Vault não vão enxergar o dinheiro do UltraCore.
+- **EssentialsX:** dá pra usar junto, mas os dois têm comandos iguais (`/home`, `/spawn`, `/tpa`, `/money`...). O melhor é usar só um dos dois, ou desligar pelo `/painel` os módulos do UltraCore que já existem no Essentials.
+
 ## Como instalar
 
 1. Baixe o `UltraCore-1.0.0.jar`:
@@ -81,8 +104,6 @@ Tempos nos comandos aceitam `30s`, `10m`, `2h`, `7d`, `1w` (ex: `/tempban Fulano
 | `ultracore.admin` | OP | tudo + `/painel`, setspawn, setwarp, eco, createkit, god, speed... |
 
 Outras úteis: `ultracore.homes.unlimited`, `ultracore.bypass.delay`, `ultracore.bypass.cooldown`, `ultracore.kit.<nome>`, `ultracore.warp.<nome>`, `ultracore.tag.<dono|admin|mod|vip>`.
-
-Recomendado usar junto: **LuckPerms** (grupos/permissões) e, se quiser, **PlaceholderAPI**.
 
 ## Estrutura do código
 
