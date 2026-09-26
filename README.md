@@ -6,7 +6,8 @@ Cada recurso é um **módulo** que pode ser **ativado, desativado e configurado 
 ## Como instalar
 
 1. Baixe o `UltraCore-1.0.0.jar`:
-   - Na aba **Actions** do GitHub → último build com ✅ → seção *Artifacts* → `UltraCore-plugin`; **ou**
+   - Na página **Releases** do GitHub (lado direito do repositório) → versão mais recente → *Assets* → `UltraCore-x.y.z.jar`; **ou**
+   - Na aba **Actions** → último build com ✅ → seção *Artifacts* → `UltraCore-plugin`; **ou**
    - Compile você mesmo: `mvn package` (precisa de Java 21 e Maven). O jar sai em `target/`.
 2. Coloque o `.jar` na pasta `plugins/` do servidor Paper 1.21+.
 3. Inicie o servidor. Entre como OP e digite **`/painel`**.
