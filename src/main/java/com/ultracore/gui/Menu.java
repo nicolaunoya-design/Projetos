@@ -53,7 +53,7 @@ public abstract class Menu implements InventoryHolder {
     }
 
     protected void closeLater(Player p) {
-        Bukkit.getScheduler().runTask(UltraCore.get(), p::closeInventory);
+        Bukkit.getScheduler().runTask(UltraCore.get(), () -> p.closeInventory());
     }
 
     protected static void click(Player p) {
