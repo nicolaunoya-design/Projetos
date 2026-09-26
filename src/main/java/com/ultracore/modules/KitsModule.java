@@ -134,11 +134,11 @@ public class KitsModule extends Module {
         Player p = (Player) s;
         if (a.length < 2 || !a[0].matches("[A-Za-z0-9_-]{1,24}")) {
             send(p, "&cUso: /createkit <nome> <cooldown>");
-            send(p, "&7Cooldown: &f0 &7(sem espera), &f-1 &7(uso único) ou tempo como &f1d&7, &f12h&7, &f30m&7.");
+            send(p, "&7Cooldown: &f0 &7(sem espera), &f-1 &7(uso único), segundos (&f300&7) ou tempo como &f1d&7, &f12h&7, &f30m&7.");
             return;
         }
         long cooldownSec;
-        if (a[1].equals("-1") || a[1].equals("0")) cooldownSec = Long.parseLong(a[1]);
+        if (a[1].matches("-1|\\d+")) cooldownSec = Long.parseLong(a[1]); // número puro = segundos
         else {
             long ms = TimeUtil.parse(a[1]);
             if (ms < 0) {

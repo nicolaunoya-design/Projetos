@@ -35,10 +35,8 @@ public final class ModuleManager implements TabExecutor {
 
     /** Grava valores padrão no config, liga os comandos e ativa os módulos. */
     public void init() {
-        FileConfiguration cfg = plugin.getConfig();
+        applyDefaults();
         for (Module m : modules) {
-            cfg.addDefault(m.path("enabled"), m.isDefaultEnabled());
-            for (Setting s : m.getSettings()) cfg.addDefault(m.path(s.getKey()), s.getDefaultValue());
             for (ModuleCommand c : m.getCommands()) {
                 commands.put(c.getName(), c);
                 PluginCommand pc = plugin.getCommand(c.getName());
@@ -50,14 +48,26 @@ public final class ModuleManager implements TabExecutor {
                 pc.setTabCompleter(this);
             }
         }
+        FileConfiguration cfg = plugin.getConfig();
+        for (Module m : modules) if (cfg.getBoolean(m.path("enabled"))) m.enable();
+    }
+
+    /** Registra os valores padrão e grava no config.yml as chaves que estiverem faltando. */
+    private void applyDefaults() {
+        FileConfiguration cfg = plugin.getConfig();
+        cfg.addDefault("prefix", "&8[&bUltraCore&8] &7");
+        for (Module m : modules) {
+            cfg.addDefault(m.path("enabled"), m.isDefaultEnabled());
+            for (Setting s : m.getSettings()) cfg.addDefault(m.path(s.getKey()), s.getDefaultValue());
+        }
         cfg.options().copyDefaults(true);
         plugin.saveConfig();
-        for (Module m : modules) if (cfg.getBoolean(m.path("enabled"))) m.enable();
     }
 
     /** Relê o config.yml e aplica o estado de cada módulo. */
     public void reloadAll() {
         plugin.reloadConfig();
+        applyDefaults();
         FileConfiguration cfg = plugin.getConfig();
         for (Module m : modules) {
             boolean should = cfg.getBoolean(m.path("enabled"), m.isDefaultEnabled());

@@ -129,7 +129,9 @@ public final class PlayerDataManager implements Listener {
         PlayerData d = cache.get(p.getUniqueId());
         if (d != null) save(d);
         Bukkit.getScheduler().runTask(plugin, () -> {
-            if (!p.isOnline()) cache.remove(p.getUniqueId());
+            if (p.isOnline()) return;
+            PlayerData removed = cache.remove(p.getUniqueId());
+            if (removed != null) save(removed); // salva o que mudou depois do quit (ex: pagamento via Vault)
         });
     }
 

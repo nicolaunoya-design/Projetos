@@ -63,7 +63,7 @@ public class AfkModule extends Module {
         long now = System.currentTimeMillis();
         long auto = getInt("auto-afk-minutes") * 60_000L;
         long kick = getInt("kick-minutes") * 60_000L;
-        for (Player p : Bukkit.getOnlinePlayers()) {
+        for (Player p : new java.util.ArrayList<>(Bukkit.getOnlinePlayers())) {
             long idle = now - lastActive.getOrDefault(p.getUniqueId(), now);
             if (auto > 0 && idle >= auto && !afk.contains(p.getUniqueId())) setAfk(p, true);
             if (kick > 0 && idle >= kick && !p.hasPermission("ultracore.afk.bypass")) {
