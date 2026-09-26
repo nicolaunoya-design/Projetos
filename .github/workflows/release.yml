@@ -4,6 +4,12 @@ on:
   push:
     tags:
       - 'v*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Versão (ex: v1.0.0)'
+        required: true
+        default: 'v1.0.0'
 
 permissions:
   contents: write
@@ -23,9 +29,10 @@ jobs:
       - name: Publicar release
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          TAG: ${{ github.ref_name }}
+          TAG: ${{ inputs.version || github.ref_name }}
         run: |
           gh release create "$TAG" target/UltraCore-*.jar \
+            --target "$GITHUB_SHA" \
             --title "UltraCore $TAG" \
             --notes "Plugin tudo-em-um para **Paper 1.21+** (Java 21).
 
