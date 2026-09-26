@@ -1,7 +1,17 @@
 # UltraCore — plugin tudo-em-um para servidores de Minecraft
 
-Plugin para **Paper 1.21+** (e forks como Purpur) que junta num só lugar os recursos mais usados em servidores.
+Plugin para **Paper 1.21 até 26.x** (e forks como Purpur) que junta num só lugar os recursos mais usados em servidores.
 Cada recurso é um **módulo** que pode ser **ativado, desativado e configurado dentro do jogo** pelo comando `/painel` — sem precisar mexer em arquivos nem reiniciar.
+
+## Versões suportadas
+
+Testado automaticamente ligando um **servidor Paper real** de cada versão com o plugin (workflow *Compatibilidade Paper*):
+
+**1.21, 1.21.1, 1.21.3, 1.21.4, 1.21.5, 1.21.6, 1.21.7, 1.21.8, 1.21.9, 1.21.10, 1.21.11, 26.1.1, 26.1.2, 26.2 e 26.3** ✅
+
+- Paper 1.21.x usa **Java 21**; Paper 26.x usa **Java 25**. O mesmo `.jar` serve para todas.
+- A cada envio de código, o GitHub descobre sozinho as versões novas do Paper e testa de novo.
+- Se algum módulo falhar numa versão futura, ele é desligado sozinho e o resto do plugin continua funcionando.
 
 ## Como instalar
 
