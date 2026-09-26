@@ -106,7 +106,7 @@ public final class ModuleManager implements TabExecutor {
         }
         try {
             c.getHandler().execute(sender, args);
-        } catch (Exception e) {
+        } catch (Throwable e) {
             Msg.send(sender, "&cOcorreu um erro ao executar o comando.");
             plugin.getLogger().log(Level.SEVERE, "Erro no comando /" + c.getName(), e);
         }

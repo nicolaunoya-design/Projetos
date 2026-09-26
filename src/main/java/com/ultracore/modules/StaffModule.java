@@ -6,6 +6,10 @@ import com.ultracore.util.Msg;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
+import org.bukkit.Registry;
+import org.bukkit.attribute.Attribute;
+import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -47,7 +51,7 @@ public class StaffModule extends Module {
         command("heal", "ultracore.heal", (s, a) -> {
             Player t = self(s, a, 0, "ultracore.heal.others");
             if (t == null) return;
-            t.setHealth(t.getMaxHealth());
+            t.setHealth(maxHealth(t));
             t.setFoodLevel(20);
             t.setSaturation(20f);
             t.setFireTicks(0);
@@ -149,6 +153,20 @@ public class StaffModule extends Module {
             t.teleport((Player) s);
             send(s, "&f" + t.getName() + " &afoi puxado até você.");
         }).playerOnly().tab((s, a) -> a.length == 1 ? onlineNames(a[0]) : none);
+    }
+
+    /** Vida máxima sem depender de nomes de atributo que mudaram entre versões. */
+    private static double maxHealth(Player p) {
+        for (String key : new String[]{"max_health", "generic.max_health"}) {
+            try {
+                Attribute attr = Registry.ATTRIBUTE.get(NamespacedKey.minecraft(key));
+                if (attr == null) continue;
+                AttributeInstance inst = p.getAttribute(attr);
+                if (inst != null) return inst.getValue();
+            } catch (Throwable ignored) {
+            }
+        }
+        return 20.0;
     }
 
     /** Retorna o alvo: o próprio jogador, ou args[index] se tiver a permissão de "outros". */

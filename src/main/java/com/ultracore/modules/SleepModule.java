@@ -30,14 +30,36 @@ public class SleepModule extends Module {
     @Override
     protected void onDisable() {
         for (World w : Bukkit.getWorlds()) {
-            if (w.getEnvironment() == World.Environment.NORMAL) w.setGameRule(GameRule.PLAYERS_SLEEPING_PERCENTAGE, 100);
+            if (w.getEnvironment() == World.Environment.NORMAL) set(w, 100);
         }
     }
 
     private void apply(World w) {
-        if (w.getEnvironment() == World.Environment.NORMAL) {
-            w.setGameRule(GameRule.PLAYERS_SLEEPING_PERCENTAGE, getInt("percentage"));
+        if (w.getEnvironment() == World.Environment.NORMAL) set(w, getInt("percentage"));
+    }
+
+    private static void set(World w, int value) {
+        GameRule<Integer> rule = sleepRule();
+        if (rule == null) throw new IllegalStateException("Gamerule de porcentagem de sono não encontrada nesta versão.");
+        w.setGameRule(rule, value);
+    }
+
+    /** O nome da gamerule mudou entre versões (camelCase até 1.21.10, snake_case depois). */
+    @SuppressWarnings("unchecked")
+    private static GameRule<Integer> sleepRule() {
+        for (String name : new String[]{"playersSleepingPercentage", "players_sleeping_percentage", "minecraft:players_sleeping_percentage"}) {
+            try {
+                GameRule<?> r = GameRule.getByName(name);
+                if (r != null && r.getType() == Integer.class) return (GameRule<Integer>) r;
+            } catch (Throwable ignored) {
+            }
         }
+        try {
+            Object r = GameRule.class.getField("PLAYERS_SLEEPING_PERCENTAGE").get(null);
+            if (r instanceof GameRule<?> g && g.getType() == Integer.class) return (GameRule<Integer>) g;
+        } catch (Throwable ignored) {
+        }
+        return null;
     }
 
     @EventHandler

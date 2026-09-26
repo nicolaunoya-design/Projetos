@@ -57,8 +57,10 @@ public abstract class Module implements Listener {
         Bukkit.getPluginManager().registerEvents(this, plugin);
         try {
             onEnable();
-        } catch (Exception e) {
-            plugin.getLogger().log(Level.SEVERE, "Erro ao ativar o módulo " + id, e);
+        } catch (Throwable e) {
+            plugin.getLogger().log(Level.SEVERE, "Erro ao ativar o módulo " + id
+                    + " (pode ser incompatível com esta versão do servidor). O módulo foi desligado.", e);
+            disable();
         }
     }
 
@@ -70,7 +72,7 @@ public abstract class Module implements Listener {
         tasks.clear();
         try {
             onDisable();
-        } catch (Exception e) {
+        } catch (Throwable e) {
             plugin.getLogger().log(Level.SEVERE, "Erro ao desativar o módulo " + id, e);
         }
     }
