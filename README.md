@@ -106,7 +106,7 @@ Textos aceitam cores `&a`, `&l`... e hex `&#FF8800`.
 | Mortes | Coordenadas da morte, cabeça do jogador em PvP | — |
 | Limpeza de Itens | Remove itens do chão com aviso | `/limparitens` |
 | **Discord** 🆕 | Envia punições, denúncias, staffchat e mais para um canal do Discord (desligado por padrão) | — |
-| **Bot do WhatsApp** 🆕 | Envia os mesmos avisos para o seu bot do WhatsApp; com a ponte, o bot também executa comandos no servidor (desligado por padrão) | — |
+| **Bot do WhatsApp** 🆕 | Envia os mesmos avisos para o seu bot do WhatsApp, além do **feed do jogo** (chat, conquistas e mortes); com a ponte, o bot também executa comandos no servidor (desligado por padrão) | — |
 
 A maioria dos comandos também aceita apelidos em português: `/casa`, `/pagar`, `/voar`, `/curar`, `/avisar`, `/denunciar`, `/diario`, `/apelido`...
 
@@ -138,7 +138,7 @@ A URL do webhook funciona como uma senha: não mostre para ninguém.
 ### Bot do WhatsApp (Baileys)
 
 Tem uma ponte pronta para bots de WhatsApp feitos em Node.js com Baileys, em [`integracoes/whatsapp-bot`](integracoes/whatsapp-bot):
-- **Servidor → WhatsApp:** punições, denúncias, staffchat, "servidor ligou" etc. chegam num grupo.
+- **Servidor → WhatsApp:** punições, denúncias, staffchat, "servidor ligou" etc. chegam num grupo; o feed do jogo (chat, conquistas, mortes) pode ir para outro grupo.
 - **WhatsApp → Servidor:** `!online`, `!anunciar <texto>` e `!cmd <comando>` (só admins) rodam no servidor pelo RCON.
 
 O passo a passo está no [README da ponte](integracoes/whatsapp-bot/README.md).

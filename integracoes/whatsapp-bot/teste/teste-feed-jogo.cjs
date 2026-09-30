@@ -1,0 +1,70 @@
+/*
+ * Teste de ponta a ponta do "feed do jogo" (GitHub Actions):
+ * servidor Paper real + UltraCore + um jogador-robô (mineflayer).
+ * Confere se chat, conquista e morte saem do plugin para o webhook.
+ * Variáveis: RCON_PORTA, RCON_SENHA, HTTP_PORTA, TOKEN, MC_VERSAO
+ */
+'use strict'
+const http = require('node:http')
+const { Rcon } = require('../minecraft-bridge.cjs')
+const mineflayer = require('mineflayer')
+
+const recebidos = []
+const espera = (ms) => new Promise((r) => setTimeout(r, ms))
+async function aguardar (cond, ms, passo = 500) {
+  const fim = Date.now() + ms
+  while (Date.now() < fim) { if (await cond()) return true; await espera(passo) }
+  return false
+}
+let falhas = 0
+function checar (ok, nome) { console.log((ok ? '✔ ' : '✘ ') + nome); if (!ok) falhas++ }
+
+const receptor = http.createServer((req, res) => {
+  let b = ''
+  req.on('data', (c) => { b += c })
+  req.on('end', () => {
+    if (req.headers.authorization !== 'Bearer ' + process.env.TOKEN) { res.writeHead(401).end(); return }
+    const d = JSON.parse(b); recebidos.push(d); console.log('  [webhook]', d.event, '->', d.message)
+    res.writeHead(204).end()
+  })
+})
+
+async function main () {
+  await new Promise((r) => receptor.listen(Number(process.env.HTTP_PORTA), '127.0.0.1', r))
+  const rcon = new Rcon({ host: '127.0.0.1', porta: Number(process.env.RCON_PORTA), senha: process.env.RCON_SENHA })
+  const ligado = await aguardar(async () => { try { await rcon.comando('list'); return true } catch { return false } }, 6 * 60 * 1000, 3000)
+  checar(ligado, 'servidor ligou (RCON)')
+  if (!ligado) process.exit(1)
+
+  const bot = mineflayer.createBot({ host: '127.0.0.1', port: 25565, username: 'Robo', version: process.env.MC_VERSAO, auth: 'offline' })
+  bot.on('error', (e) => console.log('  [bot] erro:', e.message))
+  bot.on('kicked', (r) => console.log('  [bot] expulso:', JSON.stringify(r)))
+  const entrou = await new Promise((resolve) => { bot.once('spawn', () => resolve(true)); setTimeout(() => resolve(false), 60000) })
+  checar(entrou, 'jogador-robô entrou no servidor')
+  if (!entrou) process.exit(1)
+  await espera(2000)
+
+  const tem = (ev, fn) => recebidos.some((r) => r.event === ev && fn(r.message))
+
+  bot.chat('ola do robo pelo zap')
+  checar(await aguardar(() => tem('chat', (m) => m.includes('Robo') && m.includes('ola do robo pelo zap')), 15000),
+    'mensagem do chat do jogo chegou no webhook')
+
+  await rcon.comando('advancement grant Robo only minecraft:story/mine_stone')
+  checar(await aguardar(() => tem('advancements', (m) => m.includes('Robo')), 15000), 'conquista chegou no webhook')
+  const conquista = recebidos.find((r) => r.event === 'advancements')
+  checar(conquista && /Stone Age/i.test(conquista.message), 'conquista veio com o nome traduzido ("Stone Age"), não com código interno')
+
+  await rcon.comando('advancement grant Robo only minecraft:recipes/misc/charcoal')
+  await espera(3000)
+  checar(!recebidos.some((r) => r.event === 'advancements' && /charcoal|recipes/i.test(r.message)), 'receitas (conquistas ocultas) não são enviadas')
+
+  await rcon.comando('kill Robo')
+  checar(await aguardar(() => tem('deaths', (m) => m.includes('Robo')), 15000), 'morte chegou no webhook')
+
+  bot.quit(); rcon.comando('stop').catch(() => {})
+  await espera(1000); receptor.close()
+  console.log(falhas ? `\n${falhas} TESTE(S) FALHARAM` : '\nTODOS OS TESTES PASSARAM')
+  process.exit(falhas ? 1 : 0)
+}
+main().catch((e) => { console.error('FALHOU:', e); process.exit(1) })

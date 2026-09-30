@@ -8,7 +8,11 @@ import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
+import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
+import org.bukkit.event.player.PlayerAdvancementDoneEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
@@ -35,6 +39,8 @@ public abstract class NotifierModule extends Module {
         bool("staffchat", false, Material.SHIELD, "Chat da staff", "Envia as mensagens do /staffchat.");
         bool("join-quit", false, Material.OAK_DOOR, "Entrada e saída", "Avisa quando jogadores entram e saem.");
         bool("chat", false, Material.OAK_SIGN, "Chat do jogo", "Envia todas as mensagens do chat (pode gerar muito volume).");
+        bool("advancements", true, Material.GOLD_BLOCK, "Conquistas", "Envia as conquistas que aparecem no chat do jogo.");
+        bool("deaths", true, Material.SKELETON_SKULL, "Mortes", "Envia as mensagens de morte dos jogadores.");
         bool("server-start", true, Material.BEACON, "Servidor ligado", "Avisa quando o servidor liga.");
     }
 
@@ -80,6 +86,32 @@ public abstract class NotifierModule extends Module {
     @EventHandler(priority = EventPriority.MONITOR)
     public void onQuit(PlayerQuitEvent e) {
         post("join-quit", Lang.get("notify.quit", "player", e.getPlayer().getName()));
+    }
+
+    private static String plain(Component c) {
+        return c == null ? "" : PlainTextComponentSerializer.plainText().serialize(c).trim();
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void onAdvancement(PlayerAdvancementDoneEvent e) {
+        // Só as conquistas que o próprio jogo anuncia no chat (ignora receitas e as ocultas)
+        Component anuncio = e.message();
+        if (anuncio == null) return;
+        String titulo;
+        try {
+            titulo = plain(e.getAdvancement().displayName());
+        } catch (Throwable t) {
+            titulo = "";
+        }
+        String texto = titulo.isEmpty() ? plain(anuncio)
+                : Lang.get("notify.advancement", "player", e.getPlayer().getName(), "advancement", titulo);
+        post("advancements", texto);
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void onDeath(PlayerDeathEvent e) {
+        String msg = plain(e.deathMessage());
+        if (!msg.isEmpty()) post("deaths", Lang.get("notify.death", "message", msg));
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)

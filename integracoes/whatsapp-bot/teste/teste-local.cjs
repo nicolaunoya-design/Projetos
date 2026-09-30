@@ -79,6 +79,24 @@ async function main () {
   assert.strictEqual(sock.enviados.length, 1)
   console.log('✔ aviso com token errado é recusado')
 
+  // 1b) feed do jogo: vai pro grupoChat, agrupado, sem emoji repetido
+  const ponteFeed = criarPonte({ http: { host: '127.0.0.1', porta: 0, caminho: '/ultracore', token: 't' }, rcon: {},
+    grupoAvisos: GRUPO, grupoChat: 'chat@g.us', intervaloFeedMs: 150, log: () => {} })
+  await new Promise((r) => ponteFeed.servidor.once('listening', r))
+  const sockFeed = sockFalso(); ponteFeed.conectar(sockFeed)
+  const postFeed = (corpo) => fetch(`http://127.0.0.1:${ponteFeed.servidor.address().port}/ultracore`, {
+    method: 'POST', headers: { Authorization: 'Bearer t' }, body: JSON.stringify(corpo) })
+  await postFeed({ event: 'chat', message: '💬 Steve: oi' })
+  await postFeed({ event: 'deaths', message: '💀 Alex was slain by Zombie' })
+  await postFeed({ event: 'punishments', message: 'Bob foi banido' })
+  await espera(300)
+  assert.deepStrictEqual(sockFeed.enviados, [
+    { jid: GRUPO, texto: '🔨 Bob foi banido' },
+    { jid: 'chat@g.us', texto: '💬 Steve: oi\n💀 Alex was slain by Zombie' }
+  ])
+  ponteFeed.fechar()
+  console.log('✔ feed do jogo vai pro grupoChat agrupado; punições pro grupoAvisos')
+
   // 2) WhatsApp -> Servidor
   sock.ev.emit('messages.upsert', { type: 'notify', messages: [msg('!online', 'qualquer@s.whatsapp.net')] }); await espera(400)
   assert.match(ultimo(), /There are 2 of a max of 20 players online: Steve, Alex/)

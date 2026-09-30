@@ -156,8 +156,13 @@ const EMOJIS = {
   staffchat: '🛡️',
   'join-quit': '🚪',
   chat: '💬',
+  advancements: '🏆',
+  deaths: '💀',
   'server-start': ''
 }
+
+/** Eventos do "feed do jogo": vão para o grupoChat (se configurado) e são agrupados. */
+const FEED = new Set(['chat', 'advancements', 'deaths', 'join-quit'])
 
 function textoDaMensagem (m) {
   const msg = m.message || {}
@@ -184,6 +189,8 @@ function criarPonte (config = {}) {
     http: { host: '0.0.0.0', porta: 3000, caminho: '/ultracore', token: '', ...(config.http || {}) },
     rcon: { host: '127.0.0.1', porta: 25575, senha: '', ...(config.rcon || {}) },
     grupoAvisos: config.grupoAvisos || '',
+    grupoChat: config.grupoChat || '',
+    intervaloFeedMs: config.intervaloFeedMs ?? 4000,
     admins: config.admins || [],
     comandosPublicos: config.comandosPublicos || ['online', 'ajuda'],
     prefixo: config.prefixo || '!',
@@ -214,6 +221,28 @@ function criarPonte (config = {}) {
 
   // ---------- Servidor -> WhatsApp ----------
 
+  // O feed do jogo (chat, conquistas, mortes) é juntado em uma mensagem a cada
+  // poucos segundos, para não mandar dezenas de mensagens seguidas (risco de ban do número).
+  const filas = new Map()
+  function enfileirar (jid, linha) {
+    let f = filas.get(jid)
+    if (!f) { f = { linhas: [], timer: null }; filas.set(jid, f) }
+    f.linhas.push(linha)
+    if (f.linhas.length >= 25) return despejar(jid)
+    if (!f.timer) f.timer = setTimeout(() => despejar(jid), cfg.intervaloFeedMs)
+  }
+  async function despejar (jid) {
+    const f = filas.get(jid)
+    if (!f) return
+    clearTimeout(f.timer)
+    filas.delete(jid)
+    try {
+      await enviar(jid, f.linhas.join('\n'))
+    } catch (err) {
+      cfg.log('Não consegui mandar o feed no WhatsApp:', err.message)
+    }
+  }
+
   const servidor = http.createServer((req, res) => {
     const caminho = (req.url || '').split('?')[0]
     if (req.method !== 'POST' || caminho !== cfg.http.caminho) {
@@ -240,13 +269,18 @@ function criarPonte (config = {}) {
         return
       }
       res.writeHead(204).end()
-      if (!cfg.grupoAvisos) {
+      const feed = FEED.has(dados.event)
+      const alvo = (feed && cfg.grupoChat) || cfg.grupoAvisos
+      if (!alvo) {
         cfg.log('Aviso recebido, mas "grupoAvisos" não está configurado. Use !grupoid no grupo para descobrir o ID.')
         return
       }
-      const emoji = EMOJIS[dados.event] || '📢'
+      const msg = String(dados.message || '').trim()
+      // não repete o emoji se a mensagem já começa com um (ex: "💬 Steve: oi")
+      const texto = /^[\p{L}\p{N}*_]/u.test(msg) ? `${EMOJIS[dados.event] ?? '📢'} ${msg}`.trim() : msg
+      if (feed) return enfileirar(alvo, texto)
       try {
-        await enviar(cfg.grupoAvisos, `${emoji} ${dados.message}`.trim())
+        await enviar(alvo, texto)
       } catch (err) {
         cfg.log('Não consegui mandar o aviso no WhatsApp:', err.message)
       }

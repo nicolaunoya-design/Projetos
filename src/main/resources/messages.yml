@@ -235,3 +235,5 @@ notify:
   join: ➕ {player} entrou no servidor.
   quit: ➖ {player} saiu do servidor.
   chat: '💬 {player}: {message}'
+  advancement: '🏆 {player} conquistou {advancement}'
+  death: '💀 {message}'

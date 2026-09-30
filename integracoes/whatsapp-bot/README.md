@@ -4,7 +4,7 @@ Liga o seu bot de WhatsApp (Node.js + Baileys) ao servidor de Minecraft com o Ul
 
 | Sentido | O que acontece |
 |---|---|
-| **Servidor → WhatsApp** | Bans, mutes, avisos, denúncias (`/report`), staffchat, "servidor ligou", entradas/saídas... chegam num grupo do WhatsApp. |
+| **Servidor → WhatsApp** | Bans, mutes, avisos, denúncias (`/report`), staffchat e "servidor ligou" chegam num grupo do WhatsApp. O **feed do jogo** (chat, conquistas, mortes, entradas/saídas) pode ir para outro grupo (`grupoChat`), juntado em uma mensagem a cada poucos segundos. |
 | **WhatsApp → Servidor** | Comandos no WhatsApp são executados no servidor: `!online`, `!anunciar`, `!cmd <qualquer comando>`. |
 
 É um arquivo só (`minecraft-bridge.cjs`), **sem dependências**, que você pluga no bot que já tem.
@@ -46,7 +46,8 @@ Mensagens enviadas pelo próprio número do bot contam como admin (`"aceitarDeMi
    - `http.token`: a mesma senha do painel;
    - `rcon.host` / `rcon.senha`: IP do servidor de Minecraft e senha do RCON;
    - `admins`: seu número com DDI e DDD, só números (ex: `5511999999999`);
-   - `grupoAvisos`: deixe vazio por enquanto.
+   - `grupoAvisos`: deixe vazio por enquanto;
+   - `grupoChat` (opcional): grupo separado para o feed do jogo (chat, conquistas, mortes). Vazio = vai para o `grupoAvisos`.
 3. No código do bot, **crie a ponte uma vez** e **conecte a cada socket**:
 
    ```js
@@ -66,6 +67,8 @@ Mensagens enviadas pelo próprio número do bot contam como admin (`"aceitarDeMi
 
    Se o seu bot já trata as mensagens num `messages.upsert` próprio e você prefere controlar tudo por lá, use `"ouvirMensagens": false` no config e chame `await ponte.processarMensagem(msg)` dentro do seu handler (retorna `true` se era um comando da ponte).
 4. Reinicie o bot. No grupo onde quer receber os avisos, mande `!grupoid`, copie o ID (termina em `@g.us`) para `grupoAvisos` e reinicie o bot de novo.
+
+No `/painel` do servidor, em **Bot do WhatsApp**, ligue as categorias que quiser: *Chat do jogo* vem desligado; *Conquistas* e *Mortes* vêm ligadas.
 
 Pronto: teste com `!online` e, no jogo, `/staffchat oi` (se a categoria "Chat da staff" estiver ligada) ou `/warn`.
 

@@ -11,8 +11,14 @@
     "senha": "SENHA-DO-RCON"
   },
   "grupoAvisos": "",
-  "admins": ["5511999999999"],
-  "comandosPublicos": ["online", "ajuda"],
+  "grupoChat": "",
+  "admins": [
+    "5511999999999"
+  ],
+  "comandosPublicos": [
+    "online",
+    "ajuda"
+  ],
   "prefixo": "!",
   "aceitarDeMim": true
 }
