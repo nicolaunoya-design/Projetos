@@ -33,24 +33,24 @@ public class HomesModule extends Module {
         Player p = (Player) s;
         String name = a.length > 0 ? a[0].toLowerCase() : "casa";
         if (!name.matches("[a-z0-9_-]{1,16}")) {
-            send(p, "&cNome inválido. Use letras, números, _ ou - (até 16 caracteres).");
+            msg(p, "homes.invalid-name");
             return;
         }
         Map<String, String> homes = plugin.data().get(p).getHomes();
         int max = getInt("max-homes");
         if (!homes.containsKey(name) && homes.size() >= max && !p.hasPermission("ultracore.homes.unlimited")) {
-            send(p, "&cVocê atingiu o limite de &f" + max + " &chomes. Use /delhome para liberar espaço.");
+            msg(p, "homes.limit", "max", max);
             return;
         }
         homes.put(name, LocUtil.serialize(p.getLocation()));
-        send(p, "&aHome &f" + name + " &adefinida!");
+        msg(p, "homes.set", "name", name);
     }
 
     private void home(CommandSender s, String[] a) {
         Player p = (Player) s;
         Map<String, String> homes = plugin.data().get(p).getHomes();
         if (homes.isEmpty()) {
-            send(p, "&cVocê não tem nenhuma home. Use &f/sethome [nome]&c.");
+            msg(p, "homes.none");
             return;
         }
         String name;
@@ -63,13 +63,13 @@ public class HomesModule extends Module {
         }
         String raw = homes.get(name);
         if (raw == null) {
-            send(p, "&cHome &f" + name + " &cnão existe.");
+            msg(p, "homes.not-found", "name", name);
             listHomes(p);
             return;
         }
         Location loc = LocUtil.deserialize(raw);
         if (loc == null) {
-            send(p, "&cO mundo dessa home não existe mais.");
+            msg(p, "homes.world-missing");
             return;
         }
         plugin.teleporter().teleport(p, loc, getInt("delay"));
@@ -78,21 +78,21 @@ public class HomesModule extends Module {
     private void delHome(CommandSender s, String[] a) {
         Player p = (Player) s;
         if (a.length == 0) {
-            send(p, "&cUso: /delhome <nome>");
+            msg(p, "common.usage", "usage", "/delhome <nome>");
             return;
         }
         PlayerData d = plugin.data().get(p);
-        if (d.getHomes().remove(a[0].toLowerCase()) != null) send(p, "&aHome &f" + a[0] + " &aremovida.");
-        else send(p, "&cHome não encontrada.");
+        if (d.getHomes().remove(a[0].toLowerCase()) != null) msg(p, "homes.deleted", "name", a[0]);
+        else msg(p, "homes.not-found", "name", a[0]);
     }
 
     private void listHomes(Player p) {
         Map<String, String> homes = plugin.data().get(p).getHomes();
         if (homes.isEmpty()) {
-            send(p, "&7Você não tem homes.");
+            msg(p, "homes.list-empty");
             return;
         }
-        send(p, "&fSuas homes (&b" + homes.size() + "&f): &a" + String.join("&7, &a", homes.keySet()));
+        msg(p, "homes.list", "count", homes.size(), "homes", String.join("&7, &a", homes.keySet()));
     }
 
     private List<String> tabHomes(CommandSender s, String[] a) {

@@ -119,6 +119,9 @@ public final class PlayerDataManager implements Listener {
         Player p = e.getPlayer();
         PlayerData d = get(p);
         d.setName(p.getName());
+        if (p.getAddress() != null && p.getAddress().getAddress() != null) {
+            d.setLastIp(p.getAddress().getAddress().getHostAddress());
+        }
         names.get().set(p.getName().toLowerCase(), p.getUniqueId().toString());
         names.save();
     }

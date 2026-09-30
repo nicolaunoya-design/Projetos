@@ -8,6 +8,7 @@ import com.ultracore.data.PlayerDataManager;
 import com.ultracore.gui.MenuListener;
 import com.ultracore.module.ModuleManager;
 import com.ultracore.modules.*;
+import com.ultracore.util.Lang;
 import com.ultracore.util.Msg;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
@@ -37,6 +38,7 @@ public final class UltraCore extends JavaPlugin {
         instance = this;
         getConfig().addDefault("prefix", "&8[&bUltraCore&8] &7");
 
+        Lang.load(this);
         dataManager = new PlayerDataManager(this);
         teleporter = new Teleporter(this);
         chatInput = new ChatInput(this);
@@ -73,6 +75,10 @@ public final class UltraCore extends JavaPlugin {
         moduleManager.register(new HarvestModule(this));
         moduleManager.register(new DeathModule(this));
         moduleManager.register(new ClearLagModule(this));
+        moduleManager.register(new ShopModule(this));
+        moduleManager.register(new RewardsModule(this));
+        moduleManager.register(new NickModule(this));
+        moduleManager.register(new DiscordModule(this));
 
         for (Player p : Bukkit.getOnlinePlayers()) dataManager.get(p); // suporte a /reload
         moduleManager.init();
@@ -142,5 +148,11 @@ public final class UltraCore extends JavaPlugin {
     public Teleporter teleporter() { return teleporter; }
     public ChatInput chatInput() { return chatInput; }
     public EconomyModule economy() { return moduleManager.get(EconomyModule.class); }
+
+    /** Envia um aviso para o Discord (se o módulo Discord estiver ligado e a categoria ativada). */
+    public void discord(String category, String text) {
+        DiscordModule d = moduleManager == null ? null : moduleManager.get(DiscordModule.class);
+        if (d != null) d.post(category, text);
+    }
     public SpawnModule spawn() { return moduleManager.get(SpawnModule.class); }
 }

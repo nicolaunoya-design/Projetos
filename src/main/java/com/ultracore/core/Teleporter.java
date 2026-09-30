@@ -28,7 +28,7 @@ public final class Teleporter implements Listener {
     public void teleport(Player p, Location dest, int delaySeconds) {
         cancel(p);
         if (dest == null || dest.getWorld() == null) {
-            Msg.send(p, "&cDestino inválido (o mundo existe?).");
+            Msg.tell(p, "teleport.invalid");
             return;
         }
         if (delaySeconds <= 0 || p.hasPermission("ultracore.bypass.delay")) {
@@ -36,7 +36,7 @@ public final class Teleporter implements Listener {
             return;
         }
         Location start = p.getLocation().clone();
-        Msg.send(p, "&7Teleportando em &f" + delaySeconds + "s&7... não se mova!");
+        Msg.tell(p, "teleport.countdown", "seconds", delaySeconds);
         BukkitTask task = new BukkitRunnable() {
             int ticks = delaySeconds * 20;
 
@@ -50,7 +50,7 @@ public final class Teleporter implements Listener {
                 Location now = p.getLocation();
                 if (now.getWorld() != start.getWorld() || now.getBlockX() != start.getBlockX()
                         || now.getBlockY() != start.getBlockY() || now.getBlockZ() != start.getBlockZ()) {
-                    Msg.send(p, "&cTeleporte cancelado porque você se moveu.");
+                    Msg.tell(p, "teleport.cancelled");
                     cancel();
                     pending.remove(p.getUniqueId());
                     return;
@@ -69,7 +69,7 @@ public final class Teleporter implements Listener {
     private void doTeleport(Player p, Location dest) {
         p.teleport(dest);
         p.playSound(p.getLocation(), Sound.ENTITY_ENDERMAN_TELEPORT, 0.7f, 1.2f);
-        Msg.send(p, "&aTeleportado!");
+        Msg.tell(p, "teleport.done");
     }
 
     public void cancel(Player p) {

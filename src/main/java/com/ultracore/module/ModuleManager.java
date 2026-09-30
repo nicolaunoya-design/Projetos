@@ -67,6 +67,7 @@ public final class ModuleManager implements TabExecutor {
     /** Relê o config.yml e aplica o estado de cada módulo. */
     public void reloadAll() {
         plugin.reloadConfig();
+        com.ultracore.util.Lang.load(plugin);
         applyDefaults();
         FileConfiguration cfg = plugin.getConfig();
         for (Module m : modules) {
@@ -103,21 +104,21 @@ public final class ModuleManager implements TabExecutor {
         ModuleCommand c = commands.get(cmd.getName().toLowerCase());
         if (c == null) return false;
         if (!c.getModule().isEnabled()) {
-            Msg.send(sender, "&cEste recurso está desativado no servidor.");
+            Msg.tell(sender, "common.module-disabled");
             return true;
         }
         if (c.getPermission() != null && !sender.hasPermission(c.getPermission())) {
-            Msg.send(sender, "&cVocê não tem permissão para isso.");
+            Msg.tell(sender, "common.no-permission");
             return true;
         }
         if (c.isPlayerOnly() && !(sender instanceof Player)) {
-            Msg.send(sender, "&cApenas jogadores podem usar este comando.");
+            Msg.tell(sender, "common.player-only");
             return true;
         }
         try {
             c.getHandler().execute(sender, args);
         } catch (Throwable e) {
-            Msg.send(sender, "&cOcorreu um erro ao executar o comando.");
+            Msg.tell(sender, "common.error");
             plugin.getLogger().log(Level.SEVERE, "Erro no comando /" + c.getName(), e);
         }
         return true;

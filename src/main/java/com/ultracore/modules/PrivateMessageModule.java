@@ -33,7 +33,7 @@ public class PrivateMessageModule extends Module {
 
         command("msg", "ultracore.msg", (s, a) -> {
             if (a.length < 2) {
-                send(s, "&cUso: /msg <jogador> <mensagem>");
+                msg(s, "common.usage", "usage", "/msg <jogador> <mensagem>");
                 return;
             }
             Player t = online(s, a[0]);
@@ -43,13 +43,13 @@ public class PrivateMessageModule extends Module {
         command("r", "ultracore.msg", (s, a) -> {
             if (!(s instanceof Player p)) return;
             if (a.length == 0) {
-                send(p, "&cUso: /r <mensagem>");
+                msg(p, "common.usage", "usage", "/r <mensagem>");
                 return;
             }
             UUID partner = lastPartner.get(p.getUniqueId());
             Player t = partner == null ? null : Bukkit.getPlayer(partner);
             if (t == null) {
-                send(p, "&cNinguém para responder.");
+                msg(p, "privatemsg.no-reply");
                 return;
             }
             deliver(p, t, Msg.join(a, 0));
@@ -57,17 +57,17 @@ public class PrivateMessageModule extends Module {
 
         command("socialspy", "ultracore.socialspy", (s, a) -> {
             Player p = (Player) s;
-            if (spies.remove(p.getUniqueId())) send(p, "&cSocialSpy desativado.");
+            if (spies.remove(p.getUniqueId())) msg(p, "privatemsg.spy-off");
             else {
                 spies.add(p.getUniqueId());
-                send(p, "&aSocialSpy ativado.");
+                msg(p, "privatemsg.spy-on");
             }
         }).playerOnly();
     }
 
     private void deliver(CommandSender from, Player to, String message) {
         if (from == to) {
-            send(from, "&cVocê não pode mandar mensagem para si mesmo.");
+            msg(from, "privatemsg.self");
             return;
         }
         String sender = from.getName();

@@ -31,7 +31,7 @@ public class SpawnModule extends Module {
             Player p = (Player) s;
             Location loc = getSpawn();
             if (loc == null) {
-                send(p, "&cO spawn ainda não foi definido. Use /setspawn.");
+                msg(p, "spawn.not-set");
                 return;
             }
             plugin.teleporter().teleport(p, loc, getInt("delay"));
@@ -42,7 +42,7 @@ public class SpawnModule extends Module {
             file.get().set("spawn", LocUtil.serialize(p.getLocation()));
             file.save();
             p.getWorld().setSpawnLocation(p.getLocation());
-            send(p, "&aSpawn definido na sua posição!");
+            msg(p, "spawn.set");
         }).playerOnly();
     }
 

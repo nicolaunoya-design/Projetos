@@ -2,6 +2,7 @@ package com.ultracore.modules;
 
 import com.ultracore.UltraCore;
 import com.ultracore.module.Module;
+import com.ultracore.util.Lang;
 import com.ultracore.util.Msg;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -24,7 +25,7 @@ public class ClearLagModule extends Module {
 
         command("limparitens", "ultracore.clearlag", (s, a) -> {
             int n = clear();
-            Msg.send(s, "&aForam removidas &f" + n + " &aentidades.");
+            Msg.tell(s, "clearlag.manual", "count", n);
         });
     }
 
@@ -35,11 +36,11 @@ public class ClearLagModule extends Module {
             remaining--;
             int warn = getInt("warning");
             if (warn > 0 && remaining == warn) {
-                Msg.broadcast(Msg.prefix() + "&eOs itens no chão serão removidos em &f" + warn + " segundos&e!");
+                Msg.broadcast(Msg.prefix() + Lang.get("clearlag.warning", "seconds", warn));
             }
             if (remaining <= 0) {
                 int n = clear();
-                Msg.broadcast(Msg.prefix() + "&aLimpeza concluída: &f" + n + " &aitens removidos.");
+                Msg.broadcast(Msg.prefix() + Lang.get("clearlag.done", "count", n));
                 remaining = getInt("interval");
             }
         });

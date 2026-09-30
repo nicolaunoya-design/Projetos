@@ -37,10 +37,10 @@ public class TpaModule extends Module {
         command("tpdeny", "ultracore.tpa", this::deny).playerOnly();
         command("tptoggle", "ultracore.tpa", (s, a) -> {
             Player p = (Player) s;
-            if (disabled.remove(p.getUniqueId())) send(p, "&aAgora você recebe pedidos de teleporte.");
+            if (disabled.remove(p.getUniqueId())) msg(p, "tpa.toggle-on");
             else {
                 disabled.add(p.getUniqueId());
-                send(p, "&cVocê não receberá mais pedidos de teleporte.");
+                msg(p, "tpa.toggle-off");
             }
         }).playerOnly();
     }
@@ -48,23 +48,23 @@ public class TpaModule extends Module {
     private void request(CommandSender s, String[] a, boolean here) {
         Player p = (Player) s;
         if (a.length == 0) {
-            send(p, "&cUso: /" + (here ? "tpahere" : "tpa") + " <jogador>");
+            msg(p, "common.usage", "usage", "/" + (here ? "tpahere" : "tpa") + " <jogador>");
             return;
         }
         Player t = online(p, a[0]);
         if (t == null) return;
         if (t == p) {
-            send(p, "&cVocê não pode enviar um pedido para si mesmo.");
+            msg(p, "tpa.self");
             return;
         }
         if (disabled.contains(t.getUniqueId())) {
-            send(p, "&c" + t.getName() + " não está aceitando pedidos.");
+            msg(p, "tpa.target-disabled", "player", t.getName());
             return;
         }
         requests.put(t.getUniqueId(), new Request(p.getUniqueId(), here, System.currentTimeMillis()));
-        send(p, "&aPedido enviado para &f" + t.getName() + "&a.");
-        send(t, "&f" + p.getName() + (here ? " &equer que você vá até ele(a)." : " &equer se teleportar até você."));
-        send(t, "&7Digite &a/tpaccept &7para aceitar ou &c/tpdeny &7para negar. &8(" + getInt("timeout") + "s)");
+        msg(p, "tpa.sent", "player", t.getName());
+        msg(t, here ? "tpa.received-here" : "tpa.received", "player", p.getName());
+        msg(t, "tpa.how-to-answer", "seconds", getInt("timeout"));
     }
 
     private Request valid(Player p) {
@@ -81,17 +81,17 @@ public class TpaModule extends Module {
         Player p = (Player) s;
         Request r = valid(p);
         if (r == null) {
-            send(p, "&cVocê não tem pedidos pendentes.");
+            msg(p, "tpa.none");
             return;
         }
         requests.remove(p.getUniqueId());
         Player from = Bukkit.getPlayer(r.from());
         if (from == null) {
-            send(p, "&cQuem enviou o pedido saiu do servidor.");
+            msg(p, "tpa.requester-left");
             return;
         }
-        send(p, "&aPedido aceito!");
-        send(from, "&f" + p.getName() + " &aaceitou seu pedido.");
+        msg(p, "tpa.accepted");
+        msg(from, "tpa.accepted-other", "player", p.getName());
         if (r.here()) plugin.teleporter().teleport(p, from.getLocation(), getInt("delay"));
         else plugin.teleporter().teleport(from, p.getLocation(), getInt("delay"));
     }
@@ -100,12 +100,12 @@ public class TpaModule extends Module {
         Player p = (Player) s;
         Request r = requests.remove(p.getUniqueId());
         if (r == null) {
-            send(p, "&cVocê não tem pedidos pendentes.");
+            msg(p, "tpa.none");
             return;
         }
-        send(p, "&cPedido negado.");
+        msg(p, "tpa.denied");
         Player from = Bukkit.getPlayer(r.from());
-        if (from != null) send(from, "&f" + p.getName() + " &cnegou seu pedido.");
+        if (from != null) msg(from, "tpa.denied-other", "player", p.getName());
     }
 
     @EventHandler

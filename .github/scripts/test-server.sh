@@ -51,7 +51,10 @@ if grep -q "Done (" server.log; then
   for cmd in "painel lista" "painel desativar scoreboard" "painel ativar scoreboard" \
              "painel desativar sleep" "painel ativar sleep" "painel reload" \
              "money Ninguem" "eco give Ninguem 10" "broadcast teste de compatibilidade" "limparitens" \
-             "painel desativar economy" "painel ativar economy" "painel lista"; do
+             "painel desativar economy" "painel ativar economy" \
+             "warn Ninguem teste" "historico Ninguem" "painel desativar shop" "painel ativar shop" \
+             "painel ativar discord" "painel desativar discord" "painel desativar nick" "painel ativar nick" \
+             "painel lista"; do
     echo "$cmd" >&3
     sleep 2
   done
@@ -87,6 +90,14 @@ fi
 # Qualquer stack trace que passe pelo nosso pacote, ou erro citando o plugin
 if grep -nE "at com\.ultracore\.|Error occurred while enabling UltraCore|Could not load 'plugins/UltraCore|Erro ao ativar o módulo|Erro ao desativar o módulo|Erro no comando" server.log; then
   echo "::error::[$VERSION] erros do UltraCore encontrados no log (veja acima)"
+  FAIL=1
+fi
+if [ ! -f plugins/UltraCore/messages.yml ] || ! grep -q "moderation:" plugins/UltraCore/messages.yml; then
+  echo "::error::[$VERSION] messages.yml não foi criado"
+  FAIL=1
+fi
+if [ ! -f plugins/UltraCore/shop.yml ]; then
+  echo "::error::[$VERSION] shop.yml não foi criado"
   FAIL=1
 fi
 if ! grep -q "Módulos:" server.log; then

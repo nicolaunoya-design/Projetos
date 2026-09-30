@@ -4,6 +4,7 @@ import com.ultracore.UltraCore;
 import com.ultracore.data.PlayerData;
 import com.ultracore.hooks.VaultHook;
 import com.ultracore.module.Module;
+import com.ultracore.util.Lang;
 import com.ultracore.util.Msg;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -126,68 +127,68 @@ public class EconomyModule extends Module {
     private void money(CommandSender s, String[] a) {
         if (a.length == 0) {
             if (!(s instanceof Player p)) {
-                send(s, "&cUso: /money <jogador>");
+                msg(s, "common.usage", "usage", "/money <jogador>");
                 return;
             }
-            send(p, "&fSeu saldo: &a" + format(plugin.data().get(p).getBalance()));
+            msg(p, "economy.balance", "money", format(plugin.data().get(p).getBalance()));
             return;
         }
         UUID id = plugin.data().findUUID(a[0]);
         if (id == null) {
-            send(s, "&cJogador nunca entrou no servidor.");
+            msg(s, "common.never-joined");
             return;
         }
         PlayerData d = plugin.data().getOffline(id);
-        send(s, "&fSaldo de &b" + d.getName() + "&f: &a" + format(d.getBalance()));
+        msg(s, "economy.balance-other", "player", d.getName(), "money", format(d.getBalance()));
     }
 
     private synchronized void pay(CommandSender s, String[] a) {
         Player p = (Player) s;
         if (a.length < 2) {
-            send(p, "&cUso: /pay <jogador> <valor>");
+            msg(p, "common.usage", "usage", "/pay <jogador> <valor>");
             return;
         }
         double amount = parse(a[1]);
         if (Double.isNaN(amount) || amount < getDouble("min-pay") || amount <= 0) {
-            send(p, "&cValor inválido. Mínimo: &f" + format(getDouble("min-pay")));
+            msg(p, "economy.pay-invalid", "min", format(getDouble("min-pay")));
             return;
         }
         UUID id = plugin.data().findUUID(a[0]);
         if (id == null) {
-            send(p, "&cJogador nunca entrou no servidor.");
+            msg(p, "common.never-joined");
             return;
         }
         if (id.equals(p.getUniqueId())) {
-            send(p, "&cVocê não pode pagar a si mesmo.");
+            msg(p, "economy.pay-self");
             return;
         }
         PlayerData from = plugin.data().get(p);
         if (from.getBalance() < amount) {
-            send(p, "&cSaldo insuficiente. Você tem &f" + format(from.getBalance()));
+            msg(p, "economy.insufficient", "money", format(from.getBalance()));
             return;
         }
         PlayerData to = plugin.data().getOffline(id);
         from.setBalance(from.getBalance() - amount);
         to.setBalance(to.getBalance() + amount);
         if (!plugin.data().isLoaded(id)) plugin.data().save(to);
-        send(p, "&aVocê enviou &f" + format(amount) + " &apara &f" + to.getName() + "&a.");
+        msg(p, "economy.pay-sent", "money", format(amount), "player", to.getName());
         Player target = Bukkit.getPlayer(id);
-        if (target != null) send(target, "&aVocê recebeu &f" + format(amount) + " &ade &f" + p.getName() + "&a.");
+        if (target != null) msg(target, "economy.pay-received", "money", format(amount), "player", p.getName());
     }
 
     private synchronized void eco(CommandSender s, String[] a) {
         if (a.length < 3) {
-            send(s, "&cUso: /eco <give|take|set> <jogador> <valor>");
+            msg(s, "common.usage", "usage", "/eco <give|take|set> <jogador> <valor>");
             return;
         }
         UUID id = plugin.data().findUUID(a[1]);
         if (id == null) {
-            send(s, "&cJogador nunca entrou no servidor.");
+            msg(s, "common.never-joined");
             return;
         }
         double amount = parse(a[2]);
         if (Double.isNaN(amount) || amount < 0) {
-            send(s, "&cValor inválido.");
+            msg(s, "common.invalid-number");
             return;
         }
         PlayerData d = plugin.data().getOffline(id);
@@ -196,25 +197,25 @@ public class EconomyModule extends Module {
             case "take", "tirar" -> d.setBalance(d.getBalance() - amount);
             case "set", "definir" -> d.setBalance(amount);
             default -> {
-                send(s, "&cUso: /eco <give|take|set> <jogador> <valor>");
+                msg(s, "common.usage", "usage", "/eco <give|take|set> <jogador> <valor>");
                 return;
             }
         }
         if (!plugin.data().isLoaded(id)) plugin.data().save(d);
-        send(s, "&aSaldo de &f" + d.getName() + " &aagora é &f" + format(d.getBalance()));
+        msg(s, "economy.eco-updated", "player", d.getName(), "money", format(d.getBalance()));
     }
 
     private void baltop(CommandSender s, String[] a) {
-        send(s, "&7Calculando ranking...");
+        msg(s, "economy.baltop-loading");
         Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
             List<PlayerData> all = plugin.data().loadAllFromDisk();
             all.sort(Comparator.comparingDouble(PlayerData::getBalance).reversed());
             Bukkit.getScheduler().runTask(plugin, () -> {
-                Msg.raw(s, "&6&l  TOP 10 MAIS RICOS");
+                Msg.raw(s, Lang.get("economy.baltop-header"));
                 for (int i = 0; i < Math.min(10, all.size()); i++) {
                     PlayerData d = all.get(i);
                     String medal = i == 0 ? "&6" : i == 1 ? "&7" : i == 2 ? "&c" : "&8";
-                    Msg.raw(s, " " + medal + (i + 1) + ". &f" + d.getName() + " &8- &a" + format(d.getBalance()));
+                    Msg.raw(s, Lang.get("economy.baltop-entry", "color", medal, "rank", i + 1, "player", d.getName(), "money", format(d.getBalance())));
                 }
             });
         });
@@ -255,6 +256,6 @@ public class EconomyModule extends Module {
         double reward = getDouble("money-per-kill");
         if (killer == null || killer == e.getEntity() || reward <= 0) return;
         deposit(killer, reward);
-        send(killer, "&a+" + format(reward) + " &7por matar &f" + e.getEntity().getName());
+        msg(killer, "economy.kill-reward", "money", format(reward), "player", e.getEntity().getName());
     }
 }

@@ -3,7 +3,9 @@ package com.ultracore.data;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -21,6 +23,13 @@ public final class PlayerData {
     private String muteReason = "";
     private int kills;
     private int deaths;
+    private String lastIp = "";
+    private String nick = "";
+    private long lastDaily;
+    private int dailyStreak;
+    private int warns;
+    /** Histórico de punições: type, reason, by, time, duration. */
+    private final List<Map<String, Object>> history = new ArrayList<>();
 
     public PlayerData(UUID uuid, String name) {
         this.uuid = uuid;
@@ -39,6 +48,16 @@ public final class PlayerData {
         d.muteReason = c.getString("mute.reason", "");
         d.kills = c.getInt("stats.kills");
         d.deaths = c.getInt("stats.deaths");
+        d.lastIp = c.getString("last-ip", "");
+        d.nick = c.getString("nick", "");
+        d.lastDaily = c.getLong("daily.last");
+        d.dailyStreak = c.getInt("daily.streak");
+        d.warns = c.getInt("warns");
+        for (Map<?, ?> m : c.getMapList("history")) {
+            Map<String, Object> entry = new LinkedHashMap<>();
+            m.forEach((key, val) -> entry.put(String.valueOf(key), val));
+            d.history.add(entry);
+        }
         return d;
     }
 
@@ -53,6 +72,12 @@ public final class PlayerData {
         c.set("mute.reason", muteReason);
         c.set("stats.kills", kills);
         c.set("stats.deaths", deaths);
+        c.set("last-ip", lastIp);
+        c.set("nick", nick);
+        c.set("daily.last", lastDaily);
+        c.set("daily.streak", dailyStreak);
+        c.set("warns", warns);
+        c.set("history", history);
         return c;
     }
 
@@ -73,6 +98,29 @@ public final class PlayerData {
     public void addKill() { kills++; }
     public int getDeaths() { return deaths; }
     public void addDeath() { deaths++; }
+
+    public String getLastIp() { return lastIp; }
+    public void setLastIp(String lastIp) { this.lastIp = lastIp == null ? "" : lastIp; }
+    public String getNick() { return nick; }
+    public void setNick(String nick) { this.nick = nick == null ? "" : nick; }
+    public long getLastDaily() { return lastDaily; }
+    public void setLastDaily(long lastDaily) { this.lastDaily = lastDaily; }
+    public int getDailyStreak() { return dailyStreak; }
+    public void setDailyStreak(int dailyStreak) { this.dailyStreak = dailyStreak; }
+    public int getWarns() { return warns; }
+    public void setWarns(int warns) { this.warns = Math.max(0, warns); }
+    public List<Map<String, Object>> getHistory() { return history; }
+
+    /** Registra uma punição no histórico. duration em ms (-1 = permanente, 0 = não se aplica). */
+    public void addHistory(String type, String reason, String by, long duration) {
+        Map<String, Object> e = new LinkedHashMap<>();
+        e.put("type", type);
+        e.put("reason", reason);
+        e.put("by", by);
+        e.put("time", System.currentTimeMillis());
+        e.put("duration", duration);
+        history.add(e);
+    }
 
     public boolean isMuted() {
         if (muteUntil == 0) return false;

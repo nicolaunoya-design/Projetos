@@ -47,6 +47,12 @@ public final class Msg {
         to.sendMessage(color(prefix() + text));
     }
 
+    /** Envia a mensagem do messages.yml (com prefixo). Mensagens vazias não são enviadas. */
+    public static void tell(CommandSender to, String key, Object... placeholders) {
+        String text = Lang.get(key, placeholders);
+        if (!text.isEmpty()) send(to, text);
+    }
+
     /** Envia mensagem sem prefixo. */
     public static void raw(CommandSender to, String text) {
         to.sendMessage(color(text));

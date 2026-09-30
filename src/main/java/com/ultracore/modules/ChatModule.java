@@ -2,6 +2,7 @@ package com.ultracore.modules;
 
 import com.ultracore.UltraCore;
 import com.ultracore.module.Module;
+import com.ultracore.util.Lang;
 import com.ultracore.util.Msg;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -44,21 +45,23 @@ public class ChatModule extends Module {
                 if (p.hasPermission("ultracore.clearchat")) continue;
                 for (int i = 0; i < 100; i++) p.sendMessage(" ");
             }
-            Msg.broadcast(Msg.prefix() + "&fO chat foi limpo por &b" + s.getName() + "&f.");
+            Msg.broadcast(Msg.prefix() + Lang.get("chat.cleared", "player", s.getName()));
         });
         command("broadcast", "ultracore.broadcast", (s, a) -> {
             if (a.length == 0) {
-                send(s, "&cUso: /broadcast <mensagem>");
+                msg(s, "common.usage", "usage", "/broadcast <mensagem>");
                 return;
             }
-            Msg.broadcast("&c&l[ANÚNCIO] &f" + Msg.join(a, 0));
+            Msg.broadcast(Lang.get("chat.broadcast", "message", Msg.join(a, 0)));
         });
         command("staffchat", "ultracore.staffchat", (s, a) -> {
             if (a.length == 0) {
-                send(s, "&cUso: /staffchat <mensagem>");
+                msg(s, "common.usage", "usage", "/staffchat <mensagem>");
                 return;
             }
-            Msg.broadcastPerm("&d&l[STAFF] &f" + s.getName() + "&8: &d" + Msg.join(a, 0), "ultracore.staffchat");
+            String text = Lang.get("chat.staffchat", "player", s.getName(), "message", Msg.join(a, 0));
+            Msg.broadcastPerm(text, "ultracore.staffchat");
+            plugin.discord("staffchat", text);
         });
     }
 
@@ -83,12 +86,12 @@ public class ChatModule extends Module {
             int cd = getInt("cooldown");
             if (last != null && now - last < cd * 1000L) {
                 e.setCancelled(true);
-                Msg.send(p, "&cAguarde um pouco antes de falar novamente.");
+                Msg.tell(p, "chat.cooldown");
                 return;
             }
             if (getBool("block-repeat") && msg.equalsIgnoreCase(lastMsg.get(p.getUniqueId()))) {
                 e.setCancelled(true);
-                Msg.send(p, "&cNão repita a mesma mensagem.");
+                Msg.tell(p, "chat.repeat");
                 return;
             }
             lastTime.put(p.getUniqueId(), now);

@@ -2,6 +2,7 @@ package com.ultracore.modules;
 
 import com.ultracore.UltraCore;
 import com.ultracore.module.Module;
+import com.ultracore.util.Lang;
 import com.ultracore.util.Msg;
 import org.bukkit.Bukkit;
 import org.bukkit.GameRule;
@@ -79,7 +80,7 @@ public class SleepModule extends Module {
                 if (p.isSleeping()) sleeping++;
             }
             int needed = Math.max(1, (int) Math.ceil(total * getInt("percentage") / 100.0));
-            String msg = "&e☾ &f" + e.getPlayer().getName() + " &7foi dormir &8(&f" + sleeping + "&7/&f" + needed + "&8)";
+            String msg = Lang.get("sleep.announce", "player", e.getPlayer().getName(), "sleeping", sleeping, "needed", needed);
             w.getPlayers().forEach(p -> Msg.raw(p, msg));
         }, 1L);
     }

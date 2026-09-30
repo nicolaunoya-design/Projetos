@@ -2,6 +2,7 @@ package com.ultracore.modules;
 
 import com.ultracore.UltraCore;
 import com.ultracore.module.Module;
+import com.ultracore.util.Lang;
 import com.ultracore.util.Msg;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -30,8 +31,7 @@ public class DeathModule extends Module {
         Player p = e.getEntity();
         if (getBool("show-coords")) {
             Location l = p.getLocation();
-            Msg.send(p, "&cVocê morreu em &fX: " + l.getBlockX() + " Y: " + l.getBlockY() + " Z: " + l.getBlockZ()
-                    + " &7(" + l.getWorld().getName() + ")");
+            Msg.tell(p, "death.coords", "x", l.getBlockX(), "y", l.getBlockY(), "z", l.getBlockZ(), "world", l.getWorld().getName());
         }
         Player killer = p.getKiller();
         int chance = getInt("head-drop-chance");
@@ -40,7 +40,7 @@ public class DeathModule extends Module {
             SkullMeta meta = (SkullMeta) head.getItemMeta();
             if (meta != null) {
                 meta.setOwningPlayer(p);
-                meta.setDisplayName(Msg.color("&eCabeça de &f" + p.getName()));
+                meta.setDisplayName(Msg.color(Lang.get("death.head-name", "player", p.getName())));
                 head.setItemMeta(meta);
             }
             e.getDrops().add(head);

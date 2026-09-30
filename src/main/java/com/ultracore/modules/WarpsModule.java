@@ -5,6 +5,7 @@ import com.ultracore.gui.Menu;
 import com.ultracore.module.Module;
 import com.ultracore.util.DataFile;
 import com.ultracore.util.ItemBuilder;
+import com.ultracore.util.Lang;
 import com.ultracore.util.LocUtil;
 import com.ultracore.util.Msg;
 import org.bukkit.Location;
@@ -48,11 +49,11 @@ public class WarpsModule extends Module {
     private void goTo(Player p, String name) {
         Location loc = LocUtil.deserialize(file.get().getString("warps." + name));
         if (loc == null) {
-            send(p, "&cWarp &f" + name + " &cnão existe.");
+            msg(p, "warps.not-found", "name", name);
             return;
         }
         if (!canUse(p, name)) {
-            send(p, "&cVocê não tem permissão para usar esta warp.");
+            msg(p, "warps.no-permission");
             return;
         }
         plugin.teleporter().teleport(p, loc, getInt("delay"));
@@ -70,27 +71,27 @@ public class WarpsModule extends Module {
     private void setWarp(CommandSender s, String[] a) {
         Player p = (Player) s;
         if (a.length == 0 || !a[0].matches("[A-Za-z0-9_-]{1,24}")) {
-            send(p, "&cUso: /setwarp <nome>");
+            msg(p, "common.usage", "usage", "/setwarp <nome>");
             return;
         }
         file.get().set("warps." + a[0].toLowerCase(), LocUtil.serialize(p.getLocation()));
         file.save();
-        send(p, "&aWarp &f" + a[0].toLowerCase() + " &acriada!");
+        msg(p, "warps.created", "name", a[0].toLowerCase());
     }
 
     private void delWarp(CommandSender s, String[] a) {
         if (a.length == 0) {
-            send(s, "&cUso: /delwarp <nome>");
+            msg(s, "common.usage", "usage", "/delwarp <nome>");
             return;
         }
         String name = a[0].toLowerCase();
         if (!names().contains(name)) {
-            send(s, "&cWarp não encontrada.");
+            msg(s, "warps.not-found", "name", name);
             return;
         }
         file.get().set("warps." + name, null);
         file.save();
-        send(s, "&aWarp &f" + name + " &aremovida.");
+        msg(s, "warps.deleted", "name", name);
     }
 
     private List<String> tabWarps(CommandSender s, String[] a) {
@@ -101,7 +102,7 @@ public class WarpsModule extends Module {
         private final Player viewer;
 
         WarpMenu(Player viewer) {
-            super(54, "&8Warps do servidor");
+            super(54, Lang.get("warps.menu-title"));
             this.viewer = viewer;
         }
 

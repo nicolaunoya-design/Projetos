@@ -30,7 +30,7 @@ public class BackModule extends Module {
             Player p = (Player) s;
             Location loc = last.get(p.getUniqueId());
             if (loc == null) {
-                send(p, "&cNão há nenhum local salvo para voltar.");
+                msg(p, "back.none");
                 return;
             }
             plugin.teleporter().teleport(p, loc, getInt("delay"));
@@ -51,6 +51,6 @@ public class BackModule extends Module {
         if (!getBool("on-death")) return;
         Player p = e.getEntity();
         last.put(p.getUniqueId(), p.getLocation().clone());
-        if (p.hasPermission("ultracore.back")) send(p, "&7Use &f/back &7para voltar ao local da sua morte.");
+        if (p.hasPermission("ultracore.back")) msg(p, "back.death-hint");
     }
 }

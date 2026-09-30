@@ -169,10 +169,15 @@ public abstract class Module implements Listener {
         Msg.send(to, msg);
     }
 
+    /** Envia uma mensagem do messages.yml. */
+    protected void msg(CommandSender to, String key, Object... placeholders) {
+        Msg.tell(to, key, placeholders);
+    }
+
     /** Procura um jogador online; envia erro se não encontrar. */
     protected Player online(CommandSender sender, String name) {
         Player p = Bukkit.getPlayer(name);
-        if (p == null) Msg.send(sender, "&cJogador &f" + name + " &cnão está online.");
+        if (p == null) Msg.tell(sender, "common.player-offline", "player", name);
         return p;
     }
 

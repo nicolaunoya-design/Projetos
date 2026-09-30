@@ -2,6 +2,7 @@ package com.ultracore.modules;
 
 import com.ultracore.UltraCore;
 import com.ultracore.module.Module;
+import com.ultracore.util.Lang;
 import com.ultracore.util.Msg;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -53,7 +54,7 @@ public class AfkModule extends Module {
     protected void onDisable() {
         for (UUID id : afk) {
             Player p = Bukkit.getPlayer(id);
-            if (p != null) p.setPlayerListName(null);
+            if (p != null) restoreListName(p);
         }
         afk.clear();
         lastActive.clear();
@@ -67,7 +68,7 @@ public class AfkModule extends Module {
             long idle = now - lastActive.getOrDefault(p.getUniqueId(), now);
             if (auto > 0 && idle >= auto && !afk.contains(p.getUniqueId())) setAfk(p, true);
             if (kick > 0 && idle >= kick && !p.hasPermission("ultracore.afk.bypass")) {
-                p.kickPlayer(Msg.color("&cVocê foi expulso por ficar AFK por muito tempo."));
+                p.kickPlayer(Msg.color(Lang.get("afk.kick")));
             }
         }
     }
@@ -75,13 +76,18 @@ public class AfkModule extends Module {
     private void setAfk(Player p, boolean value) {
         if (value) {
             afk.add(p.getUniqueId());
-            p.setPlayerListName(Msg.color(getString("tag")) + p.getName());
+            p.setPlayerListName(Msg.color(getString("tag")) + p.getDisplayName());
         } else {
             afk.remove(p.getUniqueId());
-            p.setPlayerListName(null);
+            restoreListName(p);
         }
-        if (getBool("broadcast")) Msg.broadcast("&7* &f" + p.getName() + (value ? " &7está AFK." : " &7voltou."));
-        else Msg.send(p, value ? "&7Você está AFK." : "&7Você não está mais AFK.");
+        if (getBool("broadcast")) Msg.broadcast(Lang.get(value ? "afk.broadcast-on" : "afk.broadcast-off", "player", p.getName()));
+        else Msg.tell(p, value ? "afk.on" : "afk.off");
+    }
+
+    /** Volta o nome da TAB ao normal (mantendo o apelido, se houver). */
+    private static void restoreListName(Player p) {
+        p.setPlayerListName(p.getDisplayName().equals(p.getName()) ? null : p.getDisplayName());
     }
 
     private void activity(Player p) {

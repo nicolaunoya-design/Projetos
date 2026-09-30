@@ -4,6 +4,7 @@ import com.ultracore.UltraCore;
 import com.ultracore.data.PlayerData;
 import com.ultracore.module.Module;
 import com.ultracore.util.DataFile;
+import com.ultracore.util.Lang;
 import com.ultracore.util.Msg;
 import com.ultracore.util.TimeUtil;
 import org.bukkit.Bukkit;
@@ -40,12 +41,12 @@ public class KitsModule extends Module {
         command("createkit", "ultracore.createkit", this::createKit).playerOnly();
         command("delkit", "ultracore.createkit", (s, a) -> {
             if (a.length == 0 || !names().contains(a[0].toLowerCase())) {
-                send(s, "&cUso: /delkit <nome>");
+                msg(s, "common.usage", "usage", "/delkit <nome>");
                 return;
             }
             file.get().set("kits." + a[0].toLowerCase(), null);
             file.save();
-            send(s, "&aKit removido.");
+            msg(s, "kits.deleted");
         }).tab((s, a) -> a.length == 1 ? Msg.filter(names(), a[0]) : List.of());
     }
 
@@ -75,6 +76,14 @@ public class KitsModule extends Module {
         return !getBool("require-permission") || p.hasPermission("ultracore.kit." + kit);
     }
 
+    /** Entrega um kit sem checar cooldown (usado por outros módulos). Retorna false se o kit não existir. */
+    public boolean giveKit(Player p, String kit) {
+        String k = kit.toLowerCase();
+        if (!names().contains(k)) return false;
+        give(p, k);
+        return true;
+    }
+
     private void give(Player p, String kit) {
         Map<Integer, ItemStack> left = p.getInventory().addItem(items(kit).toArray(new ItemStack[0]));
         left.values().forEach(i -> p.getWorld().dropItemNaturally(p.getLocation(), i));
@@ -85,39 +94,40 @@ public class KitsModule extends Module {
         PlayerData d = plugin.data().get(p);
         if (a.length == 0) {
             if (names().isEmpty()) {
-                send(p, "&7Nenhum kit disponível.");
+                msg(p, "kits.none");
                 return;
             }
-            send(p, "&fKits disponíveis:");
+            msg(p, "kits.list-header");
             for (String k : names()) {
                 if (!canUse(p, k)) continue;
                 long wait = remaining(d, k);
-                String status = wait == 0 ? "&adisponível" : wait < 0 ? "&8já usado" : "&c" + TimeUtil.format(wait);
-                Msg.raw(p, " &8• &b" + k + " &7(" + status + "&7)");
+                String status = wait == 0 ? Lang.get("kits.status-available") : wait < 0 ? Lang.get("kits.status-used")
+                        : Lang.get("kits.status-cooldown", "time", TimeUtil.format(wait));
+                Msg.raw(p, Lang.get("kits.list-entry", "kit", k, "status", status));
             }
             return;
         }
         String kit = a[0].toLowerCase();
         if (!names().contains(kit)) {
-            send(p, "&cKit não encontrado.");
+            msg(p, "kits.not-found");
             return;
         }
         if (!canUse(p, kit)) {
-            send(p, "&cVocê não tem permissão para este kit.");
+            msg(p, "kits.no-permission");
             return;
         }
         long wait = p.hasPermission("ultracore.bypass.cooldown") ? 0 : remaining(d, kit);
         if (wait < 0) {
-            send(p, "&cEste kit só pode ser pego uma vez.");
+            msg(p, "kits.once");
             return;
         }
         if (wait > 0) {
-            send(p, "&cAguarde &f" + TimeUtil.format(wait) + " &cpara pegar este kit novamente.");
+            msg(p, "kits.cooldown", "time", TimeUtil.format(wait));
             return;
         }
         give(p, kit);
         d.getKitUses().put(kit, System.currentTimeMillis());
-        send(p, "&aVocê recebeu o kit &f" + kit + "&a!");
+        msg(p, "kits.received", "kit", kit);
     }
 
     /** 0 = pode usar, -1 = uso único já usado, >0 = milissegundos restantes. */
@@ -133,8 +143,8 @@ public class KitsModule extends Module {
     private void createKit(CommandSender s, String[] a) {
         Player p = (Player) s;
         if (a.length < 2 || !a[0].matches("[A-Za-z0-9_-]{1,24}")) {
-            send(p, "&cUso: /createkit <nome> <cooldown>");
-            send(p, "&7Cooldown: &f0 &7(sem espera), &f-1 &7(uso único), segundos (&f300&7) ou tempo como &f1d&7, &f12h&7, &f30m&7.");
+            msg(p, "common.usage", "usage", "/createkit <nome> <cooldown>");
+            msg(p, "kits.cooldown-help");
             return;
         }
         long cooldownSec;
@@ -142,7 +152,7 @@ public class KitsModule extends Module {
         else {
             long ms = TimeUtil.parse(a[1]);
             if (ms < 0) {
-                send(p, "&cCooldown inválido. Ex: 1d, 12h, 30m, 0 ou -1.");
+                msg(p, "kits.cooldown-invalid");
                 return;
             }
             cooldownSec = ms / 1000;
@@ -150,14 +160,14 @@ public class KitsModule extends Module {
         List<ItemStack> items = new ArrayList<>();
         for (ItemStack it : p.getInventory().getContents()) if (it != null && !it.getType().isAir()) items.add(it.clone());
         if (items.isEmpty()) {
-            send(p, "&cSeu inventário está vazio. Coloque os itens do kit no inventário primeiro.");
+            msg(p, "kits.empty-inventory");
             return;
         }
         String name = a[0].toLowerCase();
         file.get().set("kits." + name + ".cooldown", cooldownSec);
         file.get().set("kits." + name + ".items", items);
         file.save();
-        send(p, "&aKit &f" + name + " &acriado com &f" + items.size() + " &aitens!");
+        msg(p, "kits.created", "kit", name, "count", items.size());
     }
 
     @EventHandler

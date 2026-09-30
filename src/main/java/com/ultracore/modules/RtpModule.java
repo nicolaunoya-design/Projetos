@@ -35,23 +35,23 @@ public class RtpModule extends Module {
             Player p = (Player) s;
             World w = p.getWorld();
             if (w.getEnvironment() != World.Environment.NORMAL) {
-                send(p, "&cO /rtp só funciona no mundo normal.");
+                msg(p, "rtp.wrong-world");
                 return;
             }
             long now = System.currentTimeMillis();
             long cd = getInt("cooldown") * 1000L;
             Long lastUse = cooldowns.get(p.getUniqueId());
             if (lastUse != null && now - lastUse < cd && !p.hasPermission("ultracore.bypass.cooldown")) {
-                send(p, "&cAguarde &f" + TimeUtil.format(cd - (now - lastUse)) + " &cpara usar de novo.");
+                msg(p, "rtp.cooldown", "time", TimeUtil.format(cd - (now - lastUse)));
                 return;
             }
             Location loc = findSafe(w);
             if (loc == null) {
-                send(p, "&cNão encontrei um local seguro, tente novamente.");
+                msg(p, "rtp.not-found");
                 return;
             }
             cooldowns.put(p.getUniqueId(), now);
-            send(p, "&7Local encontrado: &f" + loc.getBlockX() + ", " + loc.getBlockZ());
+            msg(p, "rtp.found", "x", loc.getBlockX(), "z", loc.getBlockZ());
             plugin.teleporter().teleport(p, loc, getInt("delay"));
         }).playerOnly();
     }

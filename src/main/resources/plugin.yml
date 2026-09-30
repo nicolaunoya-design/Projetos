@@ -117,6 +117,42 @@ commands:
   unmute:
     description: Remove o silêncio.
     aliases: [desmutar]
+  warn:
+    description: Dá um aviso a um jogador.
+    aliases: [avisar, advertir]
+  limparavisos:
+    description: Zera os avisos de um jogador.
+    aliases: [clearwarns]
+  historico:
+    description: Mostra o histórico de punições.
+    aliases: [history, hist]
+  banip:
+    description: Bane o IP de um jogador.
+    aliases: [ipban]
+  unbanip:
+    description: Remove um ban de IP.
+    aliases: [desbanirip]
+  report:
+    description: Denuncia um jogador para a staff.
+    aliases: [reportar, denunciar]
+  # Loja
+  loja:
+    description: Abre a loja do servidor.
+    aliases: [shop, mercado]
+  vender:
+    description: Vende o item da mão ou tudo.
+    aliases: [sell]
+  # Recompensas
+  daily:
+    description: Pega a recompensa diária.
+    aliases: [diario, recompensa]
+  tempo:
+    description: Mostra o tempo de jogo.
+    aliases: [playtime, tempojogado]
+  # Apelidos
+  nick:
+    description: Define um apelido.
+    aliases: [apelido, nickname]
   # Staff
   fly:
     description: Liga/desliga o voo.
@@ -194,6 +230,11 @@ permissions:
       ultracore.afk: true
       ultracore.regras: true
       ultracore.lixo: true
+      ultracore.loja: true
+      ultracore.vender: true
+      ultracore.daily: true
+      ultracore.tempo: true
+      ultracore.report: true
   ultracore.vip:
     description: Vantagens de VIP (dê via LuckPerms).
     default: false
@@ -204,6 +245,8 @@ permissions:
       ultracore.chat.color: true
       ultracore.fly: true
       ultracore.tag.vip: true
+      ultracore.nick: true
+      ultracore.nick.color: true
   ultracore.staff:
     description: Ferramentas de moderação (dê via LuckPerms).
     default: op
@@ -227,6 +270,9 @@ permissions:
       ultracore.bypass.delay: true
       ultracore.afk.bypass: true
       ultracore.tag.mod: true
+      ultracore.warn: true
+      ultracore.historico: true
+      ultracore.report.see: true
   ultracore.admin:
     description: Acesso total, incluindo o /painel.
     default: op
@@ -250,3 +296,6 @@ permissions:
       ultracore.homes.unlimited: true
       ultracore.bypass.cooldown: true
       ultracore.tag.admin: true
+      ultracore.banip: true
+      ultracore.loja.admin: true
+      ultracore.nick.others: true

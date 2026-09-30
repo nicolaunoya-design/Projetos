@@ -30,8 +30,8 @@ public final class ChatInput implements Listener {
         waiting.put(p.getUniqueId(), callback);
         Msg.raw(p, "");
         Msg.send(p, prompt);
-        Msg.send(p, "&7Digite no chat. Use &fcancelar &7para cancelar ou &fvazio &7para deixar em branco.");
-        Msg.send(p, "&7Cores: &f&a &7&f&c &7... e hex &f&#FF8800");
+        Msg.tell(p, "input.help");
+        Msg.tell(p, "input.colors");
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
@@ -42,7 +42,7 @@ public final class ChatInput implements Listener {
         String msg = e.getMessage();
         Bukkit.getScheduler().runTask(plugin, () -> {
             if (msg.equalsIgnoreCase("cancelar")) {
-                Msg.send(e.getPlayer(), "&cEdição cancelada.");
+                Msg.tell(e.getPlayer(), "input.cancelled");
                 return;
             }
             cb.accept(msg.equalsIgnoreCase("vazio") ? "" : msg);

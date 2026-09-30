@@ -6,7 +6,7 @@
 
     <groupId>com.ultracore</groupId>
     <artifactId>UltraCore</artifactId>
-    <version>1.0.3</version>
+    <version>1.1.0</version>
     <packaging>jar</packaging>
     <name>UltraCore</name>
 
@@ -55,6 +55,16 @@
             <resource>
                 <directory>src/main/resources</directory>
                 <filtering>true</filtering>
+                <includes>
+                    <include>plugin.yml</include>
+                </includes>
+            </resource>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>false</filtering>
+                <excludes>
+                    <exclude>plugin.yml</exclude>
+                </excludes>
             </resource>
         </resources>
         <plugins>

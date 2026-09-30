@@ -2,6 +2,7 @@ package com.ultracore.modules;
 
 import com.ultracore.UltraCore;
 import com.ultracore.module.Module;
+import com.ultracore.util.Lang;
 import com.ultracore.util.Msg;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -34,26 +35,27 @@ public class UtilitiesModule extends Module {
             PlayerInventory inv = p.getInventory();
             ItemStack hand = inv.getItemInMainHand();
             if (hand.getType().isAir()) {
-                send(p, "&cSegure um item/bloco na mão.");
+                msg(p, "utilities.hat-empty");
                 return;
             }
             ItemStack old = inv.getHelmet();
             inv.setHelmet(hand);
             inv.setItemInMainHand(old);
-            send(p, "&aBelo chapéu!");
+            msg(p, "utilities.hat");
         }).playerOnly();
         command("ping", "ultracore.ping", (s, a) -> {
             Player t = a.length > 0 ? online(s, a[0]) : (s instanceof Player p ? p : null);
             if (t == null) {
-                if (a.length == 0) send(s, "&cUso: /ping <jogador>");
+                if (a.length == 0) msg(s, "common.usage", "usage", "/ping <jogador>");
                 return;
             }
             int ping = t.getPing();
             String c = ping < 80 ? "&a" : ping < 180 ? "&e" : "&c";
-            send(s, (t == s ? "Seu ping" : "Ping de &f" + t.getName() + "&7") + ": " + c + ping + "ms");
+            if (t == s) msg(s, "utilities.ping", "ping", c + ping);
+            else msg(s, "utilities.ping-other", "player", t.getName(), "ping", c + ping);
         }).tab((s, a) -> a.length == 1 ? onlineNames(a[0]) : List.of());
         command("lixo", "ultracore.lixo", (s, a) ->
-                ((Player) s).openInventory(Bukkit.createInventory(null, 36, Msg.color("&8Lixeira &7(itens serão apagados)")))).playerOnly();
+                ((Player) s).openInventory(Bukkit.createInventory(null, 36, Msg.color(Lang.get("utilities.trash-title"))))).playerOnly();
         command("regras", "ultracore.regras", (s, a) -> getList("rules").forEach(l -> Msg.raw(s, l)));
     }
 }
