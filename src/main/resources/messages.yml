@@ -230,7 +230,7 @@ clearlag:
   manual: '&aForam removidas &f{count} &aentidades.'
   warning: '&eOs itens no chão serão removidos em &f{seconds} segundos&e!'
   done: '&aLimpeza concluída: &f{count} &aitens removidos.'
-discord:
+notify:
   server-start: ✅ Servidor online!
   join: ➕ {player} entrou no servidor.
   quit: ➖ {player} saiu do servidor.

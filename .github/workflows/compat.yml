@@ -10,6 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       list: ${{ steps.find.outputs.list }}
+      bridge: ${{ steps.find.outputs.bridge }}
       latest_api: ${{ steps.api.outputs.latest }}
     steps:
       - name: Descobrir versões do Paper
@@ -22,6 +23,11 @@ jobs:
                  | unique' project.json)
           echo "Versões testadas: $LIST"
           echo "list=$LIST" >> "$GITHUB_OUTPUT"
+          # para a ponte do WhatsApp: a 1.21.x mais nova e a versão mais nova de todas
+          BRIDGE=$(echo "$LIST" | jq -c '[ (map(select(startswith("1.21"))) | sort_by(split(".") | map(tonumber)) | last),
+                                          (sort_by(split(".") | map(tonumber)) | last) ] | unique')
+          echo "Ponte testada em: $BRIDGE"
+          echo "bridge=$BRIDGE" >> "$GITHUB_OUTPUT"
       - name: Descobrir a paper-api mais nova
         id: api
         run: |
@@ -82,3 +88,40 @@ jobs:
           java-version: ${{ steps.java.outputs.v }}
       - name: Testar servidor Paper ${{ matrix.mc }} (Vault=${{ matrix.vault }})
         run: bash .github/scripts/test-server.sh "${{ matrix.mc }}" "$(ls jar/UltraCore-*.jar)" "${{ matrix.vault && 'vault' || '' }}"
+
+  bridge-local:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Testar ponte do WhatsApp (simulada)
+        run: node integracoes/whatsapp-bot/teste/teste-local.cjs
+
+  bridge-server:
+    needs: [versions, build]
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        mc: ${{ fromJson(needs.versions.outputs.bridge) }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: plugin-jar
+          path: jar
+      - name: Escolher Java
+        id: java
+        run: |
+          if [[ "${{ matrix.mc }}" == 1.* ]]; then echo "v=21" >> "$GITHUB_OUTPUT"; else echo "v=25" >> "$GITHUB_OUTPUT"; fi
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: ${{ steps.java.outputs.v }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Ponte WhatsApp + servidor Paper ${{ matrix.mc }}
+        run: bash .github/scripts/test-bridge.sh "${{ matrix.mc }}" "$(ls jar/UltraCore-*.jar)"

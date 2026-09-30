@@ -147,7 +147,7 @@ public class ModerationModule extends Module {
     /** Anuncia no servidor (se ligado) e no Discord. */
     private void announce(String text) {
         if (getBool("broadcast")) Msg.broadcast(Msg.prefix() + text);
-        plugin.discord("punishments", text);
+        plugin.notice("punishments", text);
     }
 
     private static String reasonFrom(String[] a, int from) {
@@ -216,7 +216,7 @@ public class ModerationModule extends Module {
         }
         saveBans();
         msg(s, "moderation.unbanned", "player", a[0]);
-        plugin.discord("punishments", Lang.get("moderation.unban-log", "player", a[0], "by", s.getName()));
+        plugin.notice("punishments", Lang.get("moderation.unban-log", "player", a[0], "by", s.getName()));
     }
 
     // ---------- ban por IP ----------
@@ -466,7 +466,7 @@ public class ModerationModule extends Module {
                 staff++;
             }
         }
-        plugin.discord("reports", text);
+        plugin.notice("reports", text);
         msg(p, staff > 0 ? "moderation.report-sent" : "moderation.report-sent-offline");
     }
 

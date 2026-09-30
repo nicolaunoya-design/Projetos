@@ -79,6 +79,7 @@ public final class UltraCore extends JavaPlugin {
         moduleManager.register(new RewardsModule(this));
         moduleManager.register(new NickModule(this));
         moduleManager.register(new DiscordModule(this));
+        moduleManager.register(new WebhookModule(this));
 
         for (Player p : Bukkit.getOnlinePlayers()) dataManager.get(p); // suporte a /reload
         moduleManager.init();
@@ -149,10 +150,12 @@ public final class UltraCore extends JavaPlugin {
     public ChatInput chatInput() { return chatInput; }
     public EconomyModule economy() { return moduleManager.get(EconomyModule.class); }
 
-    /** Envia um aviso para o Discord (se o módulo Discord estiver ligado e a categoria ativada). */
-    public void discord(String category, String text) {
-        DiscordModule d = moduleManager == null ? null : moduleManager.get(DiscordModule.class);
-        if (d != null) d.post(category, text);
+    /** Envia um aviso para o Discord e para o bot do WhatsApp (os que estiverem ligados com a categoria ativada). */
+    public void notice(String category, String text) {
+        if (moduleManager == null) return;
+        for (com.ultracore.module.Module m : moduleManager.all()) {
+            if (m instanceof NotifierModule n) n.post(category, text);
+        }
     }
     public SpawnModule spawn() { return moduleManager.get(SpawnModule.class); }
 }

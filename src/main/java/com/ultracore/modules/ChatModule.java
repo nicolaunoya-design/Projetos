@@ -61,7 +61,7 @@ public class ChatModule extends Module {
             }
             String text = Lang.get("chat.staffchat", "player", s.getName(), "message", Msg.join(a, 0));
             Msg.broadcastPerm(text, "ultracore.staffchat");
-            plugin.discord("staffchat", text);
+            plugin.notice("staffchat", text);
         });
     }
 
