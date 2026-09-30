@@ -156,7 +156,7 @@ const EMOJIS = {
   staffchat: '🛡️',
   'join-quit': '🚪',
   chat: '💬',
-  'server-start': '🟢'
+  'server-start': ''
 }
 
 function textoDaMensagem (m) {
@@ -246,7 +246,7 @@ function criarPonte (config = {}) {
       }
       const emoji = EMOJIS[dados.event] || '📢'
       try {
-        await enviar(cfg.grupoAvisos, `${emoji} ${dados.message}`)
+        await enviar(cfg.grupoAvisos, `${emoji} ${dados.message}`.trim())
       } catch (err) {
         cfg.log('Não consegui mandar o aviso no WhatsApp:', err.message)
       }
