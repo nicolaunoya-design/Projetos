@@ -140,6 +140,7 @@ A URL do webhook funciona como uma senha: não mostre para ninguém.
 Tem uma ponte pronta para bots de WhatsApp feitos em Node.js com Baileys, em [`integracoes/whatsapp-bot`](integracoes/whatsapp-bot):
 - **Servidor → WhatsApp:** punições, denúncias, staffchat, "servidor ligou" etc. chegam num grupo; o feed do jogo (chat, conquistas, mortes) pode ir para outro grupo.
 - **WhatsApp → Servidor:** `!online`, `!anunciar <texto>` e `!cmd <comando>` (só admins) rodam no servidor pelo RCON.
+- **Hospedagem gratuita (sem RCON nem porta aberta):** ligue **Comandos remotos** no módulo *Bot do WhatsApp*. O plugin busca os comandos no bot a cada poucos segundos (`GET {url}/comandos`), executa no console e devolve a saída (`POST {url}/resultado`). Toda conexão parte do servidor, então funciona em qualquer host que permita acessar a internet.
 
 O passo a passo está no [README da ponte](integracoes/whatsapp-bot/README.md).
 

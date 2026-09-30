@@ -30,6 +30,8 @@ modules:
     url: http://127.0.0.1:3998/ultracore
     token: segredo-ci
     chat: true
+    remote-commands: true
+    poll-seconds: 1
 CFG
 RCON_PORTA=25575 RCON_SENHA=senha-ci HTTP_PORTA=3998 TOKEN=segredo-ci MC_VERSAO="$VERSION" \
   node "$ROOT/integracoes/whatsapp-bot/teste/teste-feed-jogo.cjs" > teste.log 2>&1 &

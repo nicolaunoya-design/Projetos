@@ -98,6 +98,13 @@ public abstract class Module implements Listener {
         return t;
     }
 
+    /** Tarefa repetida fora da thread principal (para rede); cancelada ao desativar o módulo. */
+    protected BukkitTask asyncTimer(long delayTicks, long periodTicks, Runnable r) {
+        BukkitTask t = Bukkit.getScheduler().runTaskTimerAsynchronously(plugin, r, delayTicks, periodTicks);
+        tasks.add(t);
+        return t;
+    }
+
     // ---------- declaração de configurações ----------
 
     private Setting add(Setting s) {
