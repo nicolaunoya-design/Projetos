@@ -277,7 +277,7 @@ function criarPonte (config = {}) {
       }
       const msg = String(dados.message || '').trim()
       // não repete o emoji se a mensagem já começa com um (ex: "💬 Steve: oi")
-      const texto = /^[\p{L}\p{N}*_]/u.test(msg) ? `${EMOJIS[dados.event] ?? '📢'} ${msg}`.trim() : msg
+      const texto = /^\p{Extended_Pictographic}/u.test(msg) ? msg : `${EMOJIS[dados.event] ?? '📢'} ${msg}`.trim()
       if (feed) return enfileirar(alvo, texto)
       try {
         await enviar(alvo, texto)

@@ -89,9 +89,11 @@ async function main () {
   await postFeed({ event: 'chat', message: '💬 Steve: oi' })
   await postFeed({ event: 'deaths', message: '💀 Alex was slain by Zombie' })
   await postFeed({ event: 'punishments', message: 'Bob foi banido' })
+  await postFeed({ event: 'staffchat', message: '[STAFF] Ana: reunião às 20h' })
   await espera(300)
   assert.deepStrictEqual(sockFeed.enviados, [
     { jid: GRUPO, texto: '🔨 Bob foi banido' },
+    { jid: GRUPO, texto: '🛡️ [STAFF] Ana: reunião às 20h' },
     { jid: 'chat@g.us', texto: '💬 Steve: oi\n💀 Alex was slain by Zombie' }
   ])
   ponteFeed.fechar()
