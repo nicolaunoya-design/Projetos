@@ -58,7 +58,7 @@ if grep -q "Done (" server.log; then
              "painel desativar tags" "painel ativar tags" "painel padrao chat" "painel padrao tags" \
              "painel comando broadcast desativar" "broadcast nao deveria aparecer" "painel comando broadcast ativar" "silentjoin" \
              "esconder Ninguem" "painel desativar menus" "painel ativar menus" "painel comando top desativar" "painel comando top ativar" \
-             "msgtoggle" "menu" "trovao" "trovao Ninguem" "explodir todos" "foguete todos" "painel desativar fun" "painel ativar fun" \
+             "msgtoggle" "menu" "painel nether desativar" "painel nether ativar" "trovao" "trovao Ninguem" "explodir todos" "foguete todos" "painel desativar fun" "painel ativar fun" \
              "painel lista"; do
     echo "$cmd" >&3
     sleep 2
@@ -107,7 +107,7 @@ if [ ! -f plugins/UltraCore/shop.yml ]; then
 fi
 for esperado in "Tag lenda criada" "Tag lenda apagada" "restauradas para o padrão" \
                 "Comando /broadcast desligado" "Este comando está desativado" "Comando /broadcast ligado" \
-                "Ninguém online"; do
+                "Ninguém online" "Nether desligado" "Nether liberado"; do
   if ! grep -q "$esperado" server.log; then
     echo "::error::Não encontrei \"$esperado\" no log (tags / restaurar padrão / comandos)"
     FAIL=1

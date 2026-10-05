@@ -72,6 +72,18 @@ public final class PanelCommand implements TabExecutor {
                 m.resetDefaults();
                 Msg.send(sender, "&fConfigurações de &b" + m.getName() + " &frestauradas para o padrão.");
             }
+            case "nether", "end", "theend" -> {
+                if (args.length < 2 || !List.of("ativar", "desativar").contains(args[1].toLowerCase())) {
+                    Msg.send(sender, "&cUso: /" + label + " " + args[0] + " <ativar|desativar>");
+                    return true;
+                }
+                com.ultracore.modules.WorldProtectionModule world = plugin.modules().get(com.ultracore.modules.WorldProtectionModule.class);
+                boolean on = args[1].equalsIgnoreCase("ativar");
+                String key = args[0].equalsIgnoreCase("nether") ? "nether" : "the-end";
+                if (!world.isEnabled()) world.setEnabledPersist(true);
+                world.setValue(key, on);
+                Msg.send(sender, (on ? "&a" : "&c") + (key.equals("nether") ? "Nether" : "The End") + (on ? " liberado." : " desligado."));
+            }
             case "comando", "command" -> {
                 if (args.length < 3 || !List.of("ativar", "desativar").contains(args[2].toLowerCase())) {
                     Msg.send(sender, "&cUso: /" + label + " comando <comando> <ativar|desativar>");
@@ -86,7 +98,7 @@ public final class PanelCommand implements TabExecutor {
                 c.getModule().setCommandEnabled(c.getName(), on);
                 Msg.send(sender, (on ? "&aComando /" + c.getName() + " ligado." : "&cComando /" + c.getName() + " desligado."));
             }
-            default -> Msg.send(sender, "&fUso: /" + label + " [lista|reload|ativar <módulo>|desativar <módulo>|padrao <módulo>|comando <comando> <ativar|desativar>]");
+            default -> Msg.send(sender, "&fUso: /" + label + " [lista|reload|ativar <módulo>|desativar <módulo>|padrao <módulo>|comando <comando> <ativar|desativar>|nether|end <ativar|desativar>]");
         }
         return true;
     }
@@ -94,11 +106,14 @@ public final class PanelCommand implements TabExecutor {
     @Override
     public List<String> onTabComplete(CommandSender sender, Command cmd, String alias, String[] args) {
         if (!sender.hasPermission("ultracore.admin")) return List.of();
-        if (args.length == 1) return Msg.filter(List.of("lista", "reload", "ativar", "desativar", "padrao", "comando"), args[0]);
+        if (args.length == 1) return Msg.filter(List.of("lista", "reload", "ativar", "desativar", "padrao", "comando", "nether", "end"), args[0]);
         if (args.length == 2 && List.of("ativar", "desativar", "padrao").contains(args[0].toLowerCase())) {
             List<String> ids = new ArrayList<>();
             plugin.modules().all().forEach(m -> ids.add(m.getId()));
             return Msg.filter(ids, args[1]);
+        }
+        if (args.length == 2 && List.of("nether", "end", "theend").contains(args[0].toLowerCase())) {
+            return Msg.filter(List.of("ativar", "desativar"), args[1]);
         }
         if (args[0].equalsIgnoreCase("comando")) {
             if (args.length == 2) {

@@ -184,6 +184,17 @@ async function main () {
   checar(/Comandos/.test(tituloDe(w)) && temItem(w, '/spawn'), 'menu de comandos do módulo abre')
   if (bots.Robo.currentWindow) bots.Robo.closeWindow(bots.Robo.currentWindow)
 
+  // ---------- dimensões (Nether / The End) ----------
+  w = await janela(bots.Robo, () => bots.Robo.chat('/painel'))
+  checar(temItem(w, 'Dimens'), '/painel tem o botão Dimensões')
+  w = await janela(bots.Robo, () => clicar(bots.Robo, slotCom(w, 'Dimens')))
+  checar(temItem(w, 'Nether') && temItem(w, 'The End'), 'menu Dimensões mostra Nether e The End')
+  desde = marca('Robo')
+  if (w) await clicar(bots.Robo, slotCom(w, 'The End'))
+  checar(await esperarMsg('Robo', /The End desligado/, desde), 'desligar o The End pelo menu')
+  if (bots.Robo.currentWindow) bots.Robo.closeWindow(bots.Robo.currentWindow)
+  checar(await comando('Robo', '/painel end ativar', /The End liberado/), 'religar o The End pelo comando')
+
   // ---------- editor da loja (OP) ----------
   await rcon.comando('give Robo minecraft:amethyst_shard 4')
   await espera(1000)

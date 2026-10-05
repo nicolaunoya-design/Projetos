@@ -95,6 +95,21 @@ public final class MainMenu extends Menu {
             });
         }
 
+        com.ultracore.modules.WorldProtectionModule world = plugin.modules().get(com.ultracore.modules.WorldProtectionModule.class);
+        if (world != null) {
+            boolean nether = world.isEnabled() && !world.getBool("nether");
+            boolean end = world.isEnabled() && !world.getBool("the-end");
+            set(49, new ItemBuilder(Material.END_PORTAL_FRAME).name("&5&lDimensões").glow(true).lore(
+                    "&7Ligar ou desligar o Nether e o The End.", "",
+                    "&fNether: " + (nether ? "&c&lDESLIGADO" : "&a&lLIGADO"),
+                    "&fThe End: " + (end ? "&c&lDESLIGADO" : "&a&lLIGADO"), "",
+                    "&e▸ Clique para abrir").build(), e -> {
+                Player p = (Player) e.getWhoClicked();
+                click(p);
+                openLater(p, new DimensionsMenu(world));
+            });
+        }
+
         set(45, new ItemBuilder(Material.COMPARATOR).name("&e&lRecarregar config").lore(
                 "&7Relê o config.yml e o messages.yml", "&7do disco e reaplica os módulos.").build(), e -> {
             Player p = (Player) e.getWhoClicked();
@@ -125,6 +140,56 @@ public final class MainMenu extends Menu {
 
     static boolean configurable(Module m) {
         return !m.getSettings().isEmpty() || !m.getCommands().isEmpty() || m.hasEditor();
+    }
+
+    /** Liga/desliga o Nether e o The End (opções do módulo Proteção do Mundo). */
+    private final class DimensionsMenu extends Menu {
+        private final com.ultracore.modules.WorldProtectionModule world;
+
+        DimensionsMenu(com.ultracore.modules.WorldProtectionModule world) {
+            super(45, "&8Painel &7» &5Dimensões");
+            this.world = world;
+        }
+
+        private boolean isOpen(String key) {
+            return !world.isEnabled() || world.getBool(key);
+        }
+
+        private void toggle(Player p, String key, String name) {
+            click(p);
+            boolean nowOpen = !isOpen(key);
+            // as dimensões são controladas pelo módulo Proteção do Mundo: liga ele se precisar
+            if (!world.isEnabled()) world.setEnabledPersist(true);
+            world.setValue(key, nowOpen);
+            Msg.send(p, "&f" + name + (nowOpen ? " &aliberado&f." : " &cdesligado&f. Quem estava lá voltou para o spawn."));
+            build();
+        }
+
+        private void column(int col, String key, String name, Material icon) {
+            boolean on = isOpen(key);
+            set(9 + col, new ItemBuilder(icon).name((on ? "&a&l" : "&c&l") + name).glow(on).lore(
+                    on ? "&7Jogadores podem entrar." : "&7Ninguém entra (portais desligados)",
+                    on ? "" : "&7e quem estiver lá volta para o spawn.",
+                    "&8Admins (ultracore.bypass.dimension) sempre entram.", "",
+                    "&e▸ Clique para " + (on ? "&cdesligar" : "&aligar")).build(), e -> toggle((Player) e.getWhoClicked(), key, name));
+            set(18 + col, new ItemBuilder(on ? Material.LIME_DYE : Material.GRAY_DYE)
+                    .name(on ? "&a&lLIGADO" : "&c&lDESLIGADO").lore("&e▸ Clique para mudar").build(),
+                    e -> toggle((Player) e.getWhoClicked(), key, name));
+        }
+
+        @Override
+        public void build() {
+            clear();
+            frame(Material.PURPLE_STAINED_GLASS_PANE);
+            set(4, new ItemBuilder(Material.END_PORTAL_FRAME).name("&5&lDimensões").lore("&7Clique para ligar ou desligar.").build(), null);
+            column(3, "nether", "Nether", Material.NETHERRACK);
+            column(5, "the-end", "The End", Material.END_STONE);
+            set(36, new ItemBuilder(Material.SPECTRAL_ARROW).name("&7« Voltar").build(), e -> {
+                click((Player) e.getWhoClicked());
+                openLater((Player) e.getWhoClicked(), new MainMenu(plugin));
+            });
+            set(44, new ItemBuilder(Material.BARRIER).name("&cFechar").build(), e -> closeLater((Player) e.getWhoClicked()));
+        }
     }
 
     /** Módulos de uma categoria. */
