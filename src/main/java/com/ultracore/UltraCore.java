@@ -79,6 +79,7 @@ public final class UltraCore extends JavaPlugin {
         moduleManager.register(new RewardsModule(this));
         moduleManager.register(new NickModule(this));
         moduleManager.register(new TagsModule(this));
+        moduleManager.register(new FunModule(this));
         moduleManager.register(new DiscordModule(this));
         moduleManager.register(new WebhookModule(this));
 
@@ -168,10 +169,12 @@ public final class UltraCore extends JavaPlugin {
         p.setPlayerListName(full.equals(p.getName()) ? null : full);
     }
 
-    /** Se o jogador está com entrada silenciosa ligada (/silentjoin). */
+    /** Se a entrada/saída do jogador não deve ser anunciada (/silentjoin ou /vanish). */
     public boolean isSilentJoin(Player p) {
-        JoinQuitModule jq = moduleManager == null ? null : moduleManager.get(JoinQuitModule.class);
-        return jq != null && jq.isSilent(p);
+        if (moduleManager == null) return false;
+        JoinQuitModule jq = moduleManager.get(JoinQuitModule.class);
+        StaffModule staff = moduleManager.get(StaffModule.class);
+        return (jq != null && jq.isSilent(p)) || (staff != null && staff.isVanished(p));
     }
 
     public PlayerDataManager data() { return dataManager; }

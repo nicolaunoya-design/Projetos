@@ -95,6 +95,7 @@ Textos aceitam cores `&a`, `&l`... e hex `&#FF8800`.
 | Mensagens Privadas | Conversas privadas + socialspy | `/msg`, `/r`, `/socialspy` |
 | **Apelidos** 🆕 | Apelido no chat e na TAB, com cores para VIP | `/nick` |
 | **Tags** 🆕 | Tags como [VIP], [Admin] no chat e na TAB; o jogador escolhe a sua | `/tag` |
+| **Diversão (só OP)** 🆕 | Raio, explosão, foguete, fogos, congelar, susto... Sem nome = você; `todos` = todo mundo | `/trovao`, `/explodir`, `/foguete`, `/fogos`, `/queimar`, `/congelar`, `/assustar`, `/arremessar`, `/falsoop`, `/fazerfalar`, `/chuvadeitens`, `/girar` |
 | Entrada e Saída | Mensagens de entrada/saída, boas-vindas, título, **entrada silenciosa** 🆕 | `/silentjoin` |
 | Anúncios Automáticos | Mensagens periódicas no chat | — |
 | Scoreboard | Placar lateral com placeholders | — |
@@ -142,12 +143,33 @@ Tempos nos comandos aceitam `30s`, `10m`, `2h`, `7d`, `1w` (ex: `/tempban Fulano
 
 A TAB junta tudo: `[AFK]` + tag + apelido. Os nomes na TAB não são reordenados pela tag.
 
+### Diversão (só OP)
+
+Todos aceitam `[jogador]` (sem nome = em você mesmo) ou `todos`. Permissão `ultracore.diversao`, que **só OP tem** (não vem junto com `ultracore.admin`).
+
+| Comando | O que faz |
+|---|---|
+| `/trovao [jogador]` (`/raio`) | Cai um raio. No `/painel` dá para deixar o raio sem dano. |
+| `/explodir [jogador] [força 1-10]` | Explosão. Por padrão **não quebra blocos** (configurável). |
+| `/foguete [jogador]` | Lança para o alto. Sem dano de queda. |
+| `/fogos [jogador]` | Fogos de artifício coloridos em volta. |
+| `/queimar [jogador] [segundos]` | Põe fogo. |
+| `/congelar [jogador]` | Congela no lugar (de novo para descongelar). |
+| `/assustar [jogador]` | Som e tela assustadora do guardião, só para o alvo. |
+| `/arremessar [jogador]` | Joga para longe numa direção aleatória. Sem dano de queda. |
+| `/falsoop [jogador]` | Mostra a mensagem falsa "Made X a server operator". |
+| `/fazerfalar <jogador> <mensagem>` | Faz a pessoa falar no chat (comandos não são permitidos). |
+| `/chuvadeitens [jogador]` | Chuva de diamantes, esmeraldas... só enfeite, ninguém pega. |
+| `/girar [jogador]` | Faz a pessoa girar. |
+
+Cada um pode ser desligado no `/painel` → Diversão → **Comandos**.
+
 ### Entrada silenciosa (`/silentjoin`)
 
 - Quem tem `ultracore.silentjoin` (staff/admin) digita `/silentjoin` (ou `/sj`) para ligar/desligar. Fica salvo.
 - Ligado: **ninguém vê** a mensagem de entrada/saída, nem a de novato, e o aviso de entrada/saída **não vai** para o Discord/WhatsApp.
 - A staff com `ultracore.silentjoin.see` recebe um aviso discreto (`[Silencioso] Fulano entrou`); dá para desligar isso no `/painel` → Entrada e Saída.
-- Para sumir também da TAB e do mundo, use junto com o `/vanish`.
+- Para sumir também da TAB e do mundo, use o `/vanish`. 🆕 O **vanish continua ligado** quando você sai e entra de novo (entra invisível e sem mensagem de entrada/saída, nem no Discord/WhatsApp). `/vanish` de novo para aparecer.
 
 ### Avisos e punição automática
 

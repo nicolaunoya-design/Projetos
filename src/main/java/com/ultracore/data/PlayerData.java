@@ -32,6 +32,8 @@ public final class PlayerData {
     private String tag = "";
     /** Entrada silenciosa (/silentjoin): não avisa quando entra/sai. */
     private boolean silentJoin;
+    /** Continua invisível (/vanish) ao sair e entrar de novo. */
+    private boolean vanished;
     /** Tags dadas por um admin (além das liberadas por permissão). */
     private final List<String> ownedTags = new ArrayList<>();
     /** Histórico de punições: type, reason, by, time, duration. */
@@ -61,6 +63,7 @@ public final class PlayerData {
         d.warns = c.getInt("warns");
         d.tag = c.getString("tag.selected", "");
         d.silentJoin = c.getBoolean("silent-join");
+        d.vanished = c.getBoolean("vanished");
         d.ownedTags.addAll(c.getStringList("tag.owned"));
         for (Map<?, ?> m : c.getMapList("history")) {
             Map<String, Object> entry = new LinkedHashMap<>();
@@ -88,6 +91,7 @@ public final class PlayerData {
         c.set("warns", warns);
         c.set("tag.selected", tag);
         c.set("silent-join", silentJoin);
+        c.set("vanished", vanished);
         c.set("tag.owned", ownedTags);
         c.set("history", history);
         return c;
@@ -125,6 +129,8 @@ public final class PlayerData {
     public String getTag() { return tag; }
     public boolean isSilentJoin() { return silentJoin; }
     public void setSilentJoin(boolean silentJoin) { this.silentJoin = silentJoin; }
+    public boolean isVanished() { return vanished; }
+    public void setVanished(boolean vanished) { this.vanished = vanished; }
     public void setTag(String tag) { this.tag = tag == null ? "" : tag; }
     public List<String> getOwnedTags() { return ownedTags; }
 

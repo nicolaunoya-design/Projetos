@@ -66,11 +66,11 @@ public class JoinQuitModule extends Module {
     @EventHandler(priority = EventPriority.HIGH)
     public void onJoin(PlayerJoinEvent e) {
         Player p = e.getPlayer();
-        boolean silent = isSilent(p);
+        boolean silent = plugin.isSilentJoin(p);
         String msg = getString("join-message");
         e.setJoinMessage(msg.isEmpty() || silent ? null : plugin.placeholders(p, msg));
-        if (silent) {
-            tellStaff(p, "joinquit.silent-join-staff");
+        if (silent) tellStaff(p, "joinquit.silent-join-staff");
+        if (isSilent(p)) {
             Bukkit.getScheduler().runTaskLater(plugin, () -> {
                 if (p.isOnline()) msg(p, "joinquit.silent-reminder");
             }, 30L);
@@ -93,7 +93,7 @@ public class JoinQuitModule extends Module {
 
     @EventHandler(priority = EventPriority.HIGH)
     public void onQuit(PlayerQuitEvent e) {
-        boolean silent = isSilent(e.getPlayer());
+        boolean silent = plugin.isSilentJoin(e.getPlayer());
         String msg = getString("quit-message");
         e.setQuitMessage(msg.isEmpty() || silent ? null : plugin.placeholders(e.getPlayer(), msg));
         if (silent) tellStaff(e.getPlayer(), "joinquit.silent-quit-staff");

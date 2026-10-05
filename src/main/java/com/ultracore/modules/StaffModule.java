@@ -199,10 +199,20 @@ public class StaffModule extends Module {
         };
     }
 
+    /** Se o jogador está (ou vai continuar) invisível, inclusive depois de relogar. */
+    public boolean isVanished(Player p) {
+        return isEnabled() && p.hasPermission("ultracore.vanish") && plugin.data().get(p).isVanished();
+    }
+
+    private void hide(Player p) {
+        vanished.add(p.getUniqueId());
+        for (Player o : Bukkit.getOnlinePlayers()) if (o != p && !o.hasPermission("ultracore.vanish.see")) o.hidePlayer(plugin, p);
+    }
+
     private void setVanish(Player p, boolean on) {
+        plugin.data().get(p).setVanished(on);
         if (on) {
-            vanished.add(p.getUniqueId());
-            for (Player o : Bukkit.getOnlinePlayers()) if (!o.hasPermission("ultracore.vanish.see")) o.hidePlayer(plugin, p);
+            hide(p);
             msg(p, "staff.vanish-on");
             if (getBool("vanish-fake-messages")) Bukkit.broadcastMessage(Msg.color(Lang.get("staff.vanish-fake-quit", "player", p.getName())));
         } else {
@@ -213,6 +223,22 @@ public class StaffModule extends Module {
         }
     }
 
+    /** Quem saiu invisível volta invisível, sem mensagem de entrada. */
+    @EventHandler(priority = EventPriority.LOWEST)
+    public void onJoinVanished(PlayerJoinEvent e) {
+        Player p = e.getPlayer();
+        if (!plugin.data().get(p).isVanished()) return;
+        if (!p.hasPermission("ultracore.vanish")) {
+            plugin.data().get(p).setVanished(false);
+            return;
+        }
+        hide(p);
+        e.setJoinMessage(null);
+        Bukkit.getScheduler().runTaskLater(plugin, () -> {
+            if (p.isOnline()) msg(p, "staff.vanish-rejoin");
+        }, 20L);
+    }
+
     @EventHandler
     public void onJoin(PlayerJoinEvent e) {
         Player p = e.getPlayer();
@@ -221,6 +247,11 @@ public class StaffModule extends Module {
             Player v = Bukkit.getPlayer(id);
             if (v != null) p.hidePlayer(plugin, v);
         }
+    }
+
+    @EventHandler(priority = EventPriority.LOWEST)
+    public void onQuitVanished(PlayerQuitEvent e) {
+        if (vanished.contains(e.getPlayer().getUniqueId())) e.setQuitMessage(null);
     }
 
     @EventHandler
@@ -243,6 +274,11 @@ public class StaffModule extends Module {
     @EventHandler(ignoreCancelled = true)
     public void onTarget(EntityTargetEvent e) {
         if (e.getTarget() instanceof Player p && vanished.contains(p.getUniqueId())) e.setCancelled(true);
+    }
+
+    @Override
+    protected void onEnable() {
+        for (Player p : Bukkit.getOnlinePlayers()) if (isVanished(p)) hide(p);
     }
 
     @Override

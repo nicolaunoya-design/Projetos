@@ -148,6 +148,11 @@ nick:
   too-long: '&cApelido muito grande (máximo {max} letras).'
   taken: '&cEsse apelido é o nome de outro jogador.'
   set: '&aApelido definido: &r{nick}'
+fun:
+  done: '{effect} &7em &f{target}&7!'
+  everyone: 'todos ({count})'
+  target: '&7Você recebeu {effect} &7de &f{player}&7!'
+  nobody: '&cNinguém online.'
 joinquit:
   silent-on: '&aEntrada silenciosa ligada. &7Ninguém será avisado quando você entrar ou sair.'
   silent-off: '&eEntrada silenciosa desligada. &7Todos verão quando você entrar e sair.'
@@ -238,6 +243,7 @@ staff:
   vanish-on: '&aVocê está invisível.'
   vanish-fake-quit: '&8[&c-&8] &7{player}'
   vanish-off: '&cVocê está visível novamente.'
+  vanish-rejoin: '&aVocê entrou &linvisível&a (vanish continua ligado). Use &f/vanish &apara aparecer.'
   vanish-fake-join: '&8[&a+&8] &7{player}'
 utilities:
   hat-empty: '&cSegure um item/bloco na mão.'

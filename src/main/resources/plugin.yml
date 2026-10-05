@@ -153,6 +153,43 @@ commands:
   nick:
     description: Define um apelido.
     aliases: [apelido, nickname]
+  # Diversão (só OP)
+  trovao:
+    description: Cai um raio em alguém (ou em você).
+    aliases: [raio, smite, lightning]
+  explodir:
+    description: Explosão em alguém (por padrão não quebra blocos).
+    aliases: [explode, boom]
+  foguete:
+    description: Lança alguém para o alto (sem dano de queda).
+    aliases: [rocket]
+  fogos:
+    description: Solta fogos de artifício em volta de alguém.
+    aliases: [fireworks, firework]
+  queimar:
+    description: Põe fogo em alguém.
+    aliases: [burn]
+  congelar:
+    description: Congela/descongela alguém no lugar.
+    aliases: [freeze]
+  assustar:
+    description: Dá um susto (som e tela do guardião).
+    aliases: [scare]
+  arremessar:
+    description: Arremessa alguém para longe.
+    aliases: [fling, lancar]
+  falsoop:
+    description: Mostra uma mensagem falsa de que a pessoa virou OP.
+    aliases: [fakeop]
+  fazerfalar:
+    description: Faz alguém falar no chat.
+    aliases: [sudo]
+  chuvadeitens:
+    description: Chuva de itens (só enfeite) em volta de alguém.
+    aliases: [itemrain, chuva]
+  girar:
+    description: Faz alguém girar.
+    aliases: [spin]
   # Entrada silenciosa
   silentjoin:
     description: Entra e sai do servidor sem avisar ninguém.
@@ -219,6 +256,9 @@ commands:
     aliases: [clearlag, lagg]
 
 permissions:
+  ultracore.diversao:
+    description: Comandos de diversão (/trovao, /explodir, /foguete...). Só OP por padrão.
+    default: op
   ultracore.player:
     description: Comandos básicos de jogador.
     default: true
