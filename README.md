@@ -102,7 +102,7 @@ Textos aceitam cores `&a`, `&l`... e hex `&#FF8800`.
 | Tablist | Cabeçalho e rodapé da TAB | — |
 | MOTD | Descrição na lista de servidores (desligado por padrão) | — |
 | Moderação | Ban, tempban, ban por IP, kick, mute com tempo, **avisos com punição automática**, **histórico**, **denúncias** | `/ban`, `/tempban`, `/unban`, `/banip`, `/unbanip`, `/kick`, `/mute`, `/unmute`, `/warn`, `/limparavisos`, `/historico`, `/report` |
-| Ferramentas da Staff | Voo, cura, gamemode, deus, vanish, invsee... | `/fly`, `/heal`, `/feed`, `/gm`, `/god`, `/vanish`, `/invsee`, `/ecsee`, `/clearinv`, `/speed`, `/tphere` |
+| Ferramentas da Staff | Voo, cura, gamemode, deus, vanish, invsee... | `/fly`, `/heal`, `/feed`, `/gm`, `/god`, `/vanish`, `/esconder`, `/invsee`, `/ecsee`, `/clearinv`, `/speed`, `/tphere` |
 | Utilidades | Bancada, enderchest, chapéu, ping, lixeira, regras | `/craft`, `/ec`, `/hat`, `/ping`, `/lixo`, `/regras` |
 | Proteção do Mundo | Creeper/TNT sem quebrar blocos, fogo, enderman, phantoms, keep inventory, clima, queda, plantações | — |
 | AFK | Detecta ausentes, tag [AFK], expulsão opcional | `/afk` |
@@ -163,6 +163,13 @@ Todos aceitam `[jogador]` (sem nome = em você mesmo) ou `todos`. São **secreto
 | `/girar [jogador]` | Faz a pessoa girar. |
 
 Cada um pode ser desligado no `/painel` → Diversão → **Comandos**.
+
+### Esconder da TAB (`/esconder`)
+
+- `/esconder` tira você da lista TAB **para sempre** (fica salvo, mesmo saindo e entrando). `/esconder` de novo para voltar.
+- Diferente do `/vanish`: você **continua visível no mundo** e no chat, só some da lista.
+- `/esconder <jogador>` esconde outra pessoa. Permissões `ultracore.tabhide` e `ultracore.tabhide.others`, que **só OP tem**. A staff com `ultracore.tabhide.see` continua vendo na TAB.
+- O número de jogadores online (lista de servidores, `{online}`) continua contando a pessoa.
 
 ### Entrada silenciosa (`/silentjoin`)
 

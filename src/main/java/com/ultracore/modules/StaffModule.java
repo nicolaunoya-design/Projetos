@@ -94,6 +94,15 @@ public class StaffModule extends Module {
             setVanish(p, !vanished.contains(p.getUniqueId()));
         }).playerOnly();
 
+        command("esconder", "ultracore.tabhide", (s, a) -> {
+            Player t = self(s, a, 0, "ultracore.tabhide.others");
+            if (t == null) return;
+            boolean on = !plugin.data().get(t).isTabHidden();
+            plugin.data().get(t).setTabHidden(on);
+            refreshTabHidden(t);
+            report(s, t, Lang.get(on ? "staff.tabhide-on" : "staff.tabhide-off"));
+        }).tab((s, a) -> a.length == 1 && s.hasPermission("ultracore.tabhide.others") ? onlineNames(a[0]) : none);
+
         command("invsee", "ultracore.invsee", (s, a) -> {
             if (a.length == 0) {
                 msg(s, "common.usage", "usage", "/invsee <jogador>");
@@ -234,6 +243,36 @@ public class StaffModule extends Module {
         }, 20L);
     }
 
+    // ---------- escondido da TAB (fica salvo; só some da lista, continua visível no mundo) ----------
+
+    private boolean tabHidden(Player p) {
+        return isEnabled() && plugin.data().get(p).isTabHidden();
+    }
+
+    /** Tira (ou devolve) o jogador da TAB de todos que não têm ultracore.tabhide.see. */
+    private void refreshTabHidden(Player p) {
+        boolean hide = tabHidden(p);
+        for (Player o : Bukkit.getOnlinePlayers()) {
+            if (o == p) continue;
+            if (hide && !o.hasPermission("ultracore.tabhide.see")) o.unlistPlayer(p);
+            else o.listPlayer(p);
+        }
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void onJoinTabHidden(PlayerJoinEvent e) {
+        Player p = e.getPlayer();
+        // um tick depois, quando o jogador já foi mandado para a TAB de todos
+        Bukkit.getScheduler().runTask(plugin, () -> {
+            if (!p.isOnline() || !isEnabled()) return;
+            if (tabHidden(p)) refreshTabHidden(p);
+            if (p.hasPermission("ultracore.tabhide.see")) return;
+            for (Player o : Bukkit.getOnlinePlayers()) {
+                if (o != p && tabHidden(o)) p.unlistPlayer(o);
+            }
+        });
+    }
+
     @EventHandler
     public void onJoin(PlayerJoinEvent e) {
         Player p = e.getPlayer();
@@ -273,7 +312,10 @@ public class StaffModule extends Module {
 
     @Override
     protected void onEnable() {
-        for (Player p : Bukkit.getOnlinePlayers()) if (isVanished(p)) hide(p);
+        for (Player p : Bukkit.getOnlinePlayers()) {
+            if (isVanished(p)) hide(p);
+            if (tabHidden(p)) refreshTabHidden(p);
+        }
     }
 
     @Override
@@ -284,5 +326,9 @@ public class StaffModule extends Module {
         }
         vanished.clear();
         god.clear();
+        for (Player p : Bukkit.getOnlinePlayers()) {
+            if (!plugin.data().get(p).isTabHidden()) continue;
+            for (Player o : Bukkit.getOnlinePlayers()) if (o != p) o.listPlayer(p);
+        }
     }
 }

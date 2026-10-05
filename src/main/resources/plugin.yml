@@ -217,6 +217,9 @@ commands:
   vanish:
     description: Fica invisível.
     aliases: [v, invisivel]
+  esconder:
+    description: Esconde (ou mostra) alguém da lista TAB para sempre.
+    aliases: [tabhide, hidetab, escondertab]
   invsee:
     description: Vê o inventário de um jogador.
   ecsee:
@@ -256,6 +259,12 @@ commands:
     aliases: [clearlag, lagg]
 
 permissions:
+  ultracore.tabhide:
+    description: /esconder (sair da TAB). Só OP por padrão.
+    default: op
+  ultracore.tabhide.others:
+    description: /esconder outros jogadores. Só OP por padrão.
+    default: op
   ultracore.diversao:
     description: Comandos de diversão (/trovao, /explodir, /foguete...). Só OP por padrão.
     default: op
@@ -310,6 +319,7 @@ permissions:
       ultracore.socialspy: true
       ultracore.vanish: true
       ultracore.vanish.see: true
+      ultracore.tabhide.see: true
       ultracore.invsee: true
       ultracore.tphere: true
       ultracore.gamemode: true
