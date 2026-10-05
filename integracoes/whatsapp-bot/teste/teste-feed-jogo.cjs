@@ -64,8 +64,10 @@ async function main () {
 
   await rcon.comando('advancement grant Robo only minecraft:story/mine_stone')
   checar(await aguardar(() => tem('advancements', (m) => m.includes('Robo')), 15000), 'conquista chegou no webhook')
-  const conquista = recebidos.find((r) => r.event === 'advancements')
-  checar(conquista && /Stone Age/i.test(conquista.message), 'conquista veio com o nome traduzido ("Stone Age"), não com código interno')
+  // o kit inicial pode dar outra conquista antes (ex: "Getting an Upgrade"); procura a que foi dada aqui
+  const conquistas = recebidos.filter((r) => r.event === 'advancements')
+  checar(conquistas.some((r) => /Stone Age/i.test(r.message)), 'conquista veio com o nome traduzido ("Stone Age"), não com código interno')
+  checar(!conquistas.some((r) => /minecraft:|story\//i.test(r.message)), 'nenhuma conquista veio com código interno')
 
   await rcon.comando('advancement grant Robo only minecraft:recipes/misc/charcoal')
   await espera(3000)
