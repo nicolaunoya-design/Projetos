@@ -17,6 +17,8 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -52,11 +54,12 @@ public class AfkModule extends Module {
 
     @Override
     protected void onDisable() {
-        for (UUID id : afk) {
-            Player p = Bukkit.getPlayer(id);
-            if (p != null) restoreListName(p);
-        }
+        List<UUID> was = new ArrayList<>(afk);
         afk.clear();
+        for (UUID id : was) {
+            Player p = Bukkit.getPlayer(id);
+            if (p != null) plugin.refreshListName(p);
+        }
         lastActive.clear();
     }
 
@@ -74,20 +77,11 @@ public class AfkModule extends Module {
     }
 
     private void setAfk(Player p, boolean value) {
-        if (value) {
-            afk.add(p.getUniqueId());
-            p.setPlayerListName(Msg.color(getString("tag")) + p.getDisplayName());
-        } else {
-            afk.remove(p.getUniqueId());
-            restoreListName(p);
-        }
+        if (value) afk.add(p.getUniqueId());
+        else afk.remove(p.getUniqueId());
+        plugin.refreshListName(p);
         if (getBool("broadcast")) Msg.broadcast(Lang.get(value ? "afk.broadcast-on" : "afk.broadcast-off", "player", p.getName()));
         else Msg.tell(p, value ? "afk.on" : "afk.off");
-    }
-
-    /** Volta o nome da TAB ao normal (mantendo o apelido, se houver). */
-    private static void restoreListName(Player p) {
-        p.setPlayerListName(p.getDisplayName().equals(p.getName()) ? null : p.getDisplayName());
     }
 
     private void activity(Player p) {

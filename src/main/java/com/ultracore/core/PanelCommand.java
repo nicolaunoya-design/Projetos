@@ -59,7 +59,20 @@ public final class PanelCommand implements TabExecutor {
                 m.setEnabledPersist(on);
                 Msg.send(sender, "&fMódulo &b" + m.getName() + (on ? " &aativado." : " &cdesativado."));
             }
-            default -> Msg.send(sender, "&fUso: /" + label + " [lista|reload|ativar <módulo>|desativar <módulo>]");
+            case "padrao", "padrão", "reset" -> {
+                if (args.length < 2) {
+                    Msg.send(sender, "&cUso: /" + label + " padrao <módulo>");
+                    return true;
+                }
+                Module m = plugin.modules().byId(args[1]);
+                if (m == null) {
+                    Msg.send(sender, "&cMódulo não encontrado. Use /" + label + " lista");
+                    return true;
+                }
+                m.resetDefaults();
+                Msg.send(sender, "&fConfigurações de &b" + m.getName() + " &frestauradas para o padrão.");
+            }
+            default -> Msg.send(sender, "&fUso: /" + label + " [lista|reload|ativar <módulo>|desativar <módulo>|padrao <módulo>]");
         }
         return true;
     }
@@ -67,8 +80,8 @@ public final class PanelCommand implements TabExecutor {
     @Override
     public List<String> onTabComplete(CommandSender sender, Command cmd, String alias, String[] args) {
         if (!sender.hasPermission("ultracore.admin")) return List.of();
-        if (args.length == 1) return Msg.filter(List.of("lista", "reload", "ativar", "desativar"), args[0]);
-        if (args.length == 2 && (args[0].equalsIgnoreCase("ativar") || args[0].equalsIgnoreCase("desativar"))) {
+        if (args.length == 1) return Msg.filter(List.of("lista", "reload", "ativar", "desativar", "padrao"), args[0]);
+        if (args.length == 2 && List.of("ativar", "desativar", "padrao").contains(args[0].toLowerCase())) {
             List<String> ids = new ArrayList<>();
             plugin.modules().all().forEach(m -> ids.add(m.getId()));
             return Msg.filter(ids, args[1]);

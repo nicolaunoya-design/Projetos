@@ -28,6 +28,10 @@ public final class PlayerData {
     private long lastDaily;
     private int dailyStreak;
     private int warns;
+    /** Tag escolhida em /tag ("" = automática, "none" = sem tag). */
+    private String tag = "";
+    /** Tags dadas por um admin (além das liberadas por permissão). */
+    private final List<String> ownedTags = new ArrayList<>();
     /** Histórico de punições: type, reason, by, time, duration. */
     private final List<Map<String, Object>> history = new ArrayList<>();
 
@@ -53,6 +57,8 @@ public final class PlayerData {
         d.lastDaily = c.getLong("daily.last");
         d.dailyStreak = c.getInt("daily.streak");
         d.warns = c.getInt("warns");
+        d.tag = c.getString("tag.selected", "");
+        d.ownedTags.addAll(c.getStringList("tag.owned"));
         for (Map<?, ?> m : c.getMapList("history")) {
             Map<String, Object> entry = new LinkedHashMap<>();
             m.forEach((key, val) -> entry.put(String.valueOf(key), val));
@@ -77,6 +83,8 @@ public final class PlayerData {
         c.set("daily.last", lastDaily);
         c.set("daily.streak", dailyStreak);
         c.set("warns", warns);
+        c.set("tag.selected", tag);
+        c.set("tag.owned", ownedTags);
         c.set("history", history);
         return c;
     }
@@ -110,6 +118,9 @@ public final class PlayerData {
     public int getWarns() { return warns; }
     public void setWarns(int warns) { this.warns = Math.max(0, warns); }
     public List<Map<String, Object>> getHistory() { return history; }
+    public String getTag() { return tag; }
+    public void setTag(String tag) { this.tag = tag == null ? "" : tag; }
+    public List<String> getOwnedTags() { return ownedTags; }
 
     /** Registra uma punição no histórico. duration em ms (-1 = permanente, 0 = não se aplica). */
     public void addHistory(String type, String reason, String by, long duration) {

@@ -78,6 +78,7 @@ public final class UltraCore extends JavaPlugin {
         moduleManager.register(new ShopModule(this));
         moduleManager.register(new RewardsModule(this));
         moduleManager.register(new NickModule(this));
+        moduleManager.register(new TagsModule(this));
         moduleManager.register(new DiscordModule(this));
         moduleManager.register(new WebhookModule(this));
 
@@ -125,6 +126,7 @@ public final class UltraCore extends JavaPlugin {
         String s = text
                 .replace("{player}", p.getName())
                 .replace("{displayname}", p.getDisplayName())
+                .replace("{tag}", tag(p))
                 .replace("{online}", String.valueOf(Bukkit.getOnlinePlayers().size()))
                 .replace("{max}", String.valueOf(Bukkit.getMaxPlayers()))
                 .replace("{money}", economy().format(d.getBalance()))
@@ -142,6 +144,28 @@ public final class UltraCore extends JavaPlugin {
             }
         }
         return Msg.color(s);
+    }
+
+    /** Tag atual do jogador (módulo Tags), já colorida; vazio se não tiver ou se o módulo estiver desligado. */
+    public String tag(Player p) {
+        TagsModule tags = moduleManager == null ? null : moduleManager.get(TagsModule.class);
+        return tags != null && tags.isEnabled() ? tags.tagOf(p) : "";
+    }
+
+    /**
+     * Monta o nome do jogador na TAB juntando o que cada módulo quer mostrar: [AFK] + tag + apelido.
+     * Os módulos chamam isto em vez de mexer no nome da TAB diretamente, para um não apagar o outro.
+     */
+    public void refreshListName(Player p) {
+        if (moduleManager == null) return;
+        NickModule nick = moduleManager.get(NickModule.class);
+        TagsModule tags = moduleManager.get(TagsModule.class);
+        AfkModule afk = moduleManager.get(AfkModule.class);
+        String name = nick != null && nick.isEnabled() && nick.getBool("tab-name") ? p.getDisplayName() : p.getName();
+        String full = (afk != null && afk.isEnabled() && afk.isAfk(p) ? Msg.color(afk.getString("tag")) : "")
+                + (tags != null && tags.isEnabled() ? tags.tabPrefix(p) : "")
+                + name;
+        p.setPlayerListName(full.equals(p.getName()) ? null : full);
     }
 
     public PlayerDataManager data() { return dataManager; }

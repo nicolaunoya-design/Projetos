@@ -164,6 +164,13 @@ public abstract class Module implements Listener {
         return plugin.getConfig().getStringList(path(key));
     }
 
+    /** Volta todas as configurações deste módulo para o padrão (não muda se ele está ligado ou desligado). */
+    public void resetDefaults() {
+        for (Setting s : settings.values()) plugin.getConfig().set(path(s.getKey()), s.getDefaultValue());
+        plugin.saveConfig();
+        restart();
+    }
+
     public void setValue(String key, Object value) {
         plugin.getConfig().set(path(key), value);
         plugin.saveConfig();

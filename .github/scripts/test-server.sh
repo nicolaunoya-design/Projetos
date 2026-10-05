@@ -54,6 +54,8 @@ if grep -q "Done (" server.log; then
              "painel desativar economy" "painel ativar economy" \
              "warn Ninguem teste" "historico Ninguem" "painel desativar shop" "painel ativar shop" \
              "painel ativar discord" "painel desativar discord" "painel desativar nick" "painel ativar nick" \
+             "tag lista" "tag criar lenda &5[Lenda]" "tag dar Ninguem lenda" "tag apagar lenda" \
+             "painel desativar tags" "painel ativar tags" "painel padrao chat" "painel padrao tags" \
              "painel lista"; do
     echo "$cmd" >&3
     sleep 2
@@ -100,6 +102,12 @@ if [ ! -f plugins/UltraCore/shop.yml ]; then
   echo "::error::[$VERSION] shop.yml não foi criado"
   FAIL=1
 fi
+for esperado in "Tag lenda criada" "Tag lenda apagada" "restauradas para o padrão"; do
+  if ! grep -q "$esperado" server.log; then
+    echo "::error::Não encontrei \"$esperado\" no log (tags / restaurar padrão)"
+    FAIL=1
+  fi
+done
 if ! grep -q "Módulos:" server.log; then
   echo "::error::[$VERSION] o comando /painel lista não respondeu"
   FAIL=1

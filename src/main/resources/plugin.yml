@@ -153,6 +153,10 @@ commands:
   nick:
     description: Define um apelido.
     aliases: [apelido, nickname]
+  # Tags
+  tag:
+    description: Escolhe a tag que aparece no chat e na TAB.
+    aliases: [tags, prefixo]
   # Staff
   fly:
     description: Liga/desliga o voo.
@@ -235,6 +239,7 @@ permissions:
       ultracore.daily: true
       ultracore.tempo: true
       ultracore.report: true
+      ultracore.tag: true
   ultracore.vip:
     description: Vantagens de VIP (dê via LuckPerms).
     default: false
@@ -296,6 +301,7 @@ permissions:
       ultracore.homes.unlimited: true
       ultracore.bypass.cooldown: true
       ultracore.tag.admin: true
+      ultracore.tags.admin: true
       ultracore.banip: true
       ultracore.loja.admin: true
       ultracore.nick.others: true

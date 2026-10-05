@@ -19,6 +19,7 @@ public final class SettingsMenu extends Menu {
     private final UltraCore plugin;
     private final Module module;
     private final Menu parent;
+    private boolean confirmReset;
 
     public SettingsMenu(UltraCore plugin, Module module, Menu parent) {
         super(54, "&8Config: &b" + module.getName());
@@ -42,11 +43,31 @@ public final class SettingsMenu extends Menu {
             click((Player) e.getWhoClicked());
             openLater((Player) e.getWhoClicked(), parent);
         });
+        if (!module.getSettings().isEmpty()) {
+            set(47, new ItemBuilder(confirmReset ? Material.TNT : Material.WATER_BUCKET)
+                    .name(confirmReset ? "&c&lCLIQUE DE NOVO PARA CONFIRMAR" : "&eRestaurar padrão")
+                    .lore(confirmReset
+                            ? List.of("&7Todas as opções deste módulo voltam", "&7para o valor original.", "", "&8Feche o menu para cancelar.")
+                            : List.of("&7Volta todas as opções deste módulo", "&7para o valor original.", "&8(não liga nem desliga o módulo)"))
+                    .glow(confirmReset).build(), e -> {
+                Player p = (Player) e.getWhoClicked();
+                click(p);
+                if (!confirmReset) {
+                    confirmReset = true;
+                } else {
+                    confirmReset = false;
+                    module.resetDefaults();
+                    Msg.send(p, "&aConfigurações de &b" + module.getName() + " &arestauradas para o padrão.");
+                }
+                build();
+            });
+        }
         boolean on = module.isEnabled();
         set(49, new ItemBuilder(on ? Material.LIME_DYE : Material.GRAY_DYE)
                 .name("&fMódulo: " + (on ? "&a&lATIVADO" : "&c&lDESATIVADO"))
                 .lore("&eClique &7para " + (on ? "desativar" : "ativar")).build(), e -> {
             click((Player) e.getWhoClicked());
+            confirmReset = false;
             module.setEnabledPersist(!module.isEnabled());
             build();
         });
@@ -106,6 +127,7 @@ public final class SettingsMenu extends Menu {
     }
 
     private void onClick(InventoryClickEvent e, Setting s) {
+        confirmReset = false;
         Player p = (Player) e.getWhoClicked();
         click(p);
         String key = s.getKey();

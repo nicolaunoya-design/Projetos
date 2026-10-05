@@ -81,14 +81,8 @@ public class NickModule extends Module {
 
     private void apply(Player p) {
         String nick = plugin.data().get(p).getNick();
-        if (!isEnabled() || nick.isEmpty()) {
-            p.setDisplayName(null);
-            if (getBool("tab-name")) p.setPlayerListName(null);
-            return;
-        }
-        String display = Msg.color(getString("prefix") + nick + "&r");
-        p.setDisplayName(display);
-        if (getBool("tab-name")) p.setPlayerListName(display);
+        p.setDisplayName(!isEnabled() || nick.isEmpty() ? null : Msg.color(getString("prefix") + nick + "&r"));
+        plugin.refreshListName(p);
     }
 
     @EventHandler(priority = EventPriority.LOW)
@@ -105,7 +99,7 @@ public class NickModule extends Module {
     protected void onDisable() {
         for (Player p : Bukkit.getOnlinePlayers()) {
             p.setDisplayName(null);
-            p.setPlayerListName(null);
+            plugin.refreshListName(p);
         }
     }
 }

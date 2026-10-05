@@ -31,8 +31,8 @@ public class ChatModule extends Module {
         text("format", "{prefix}&f{player} &8» &7{message}", Material.WRITABLE_BOOK, "Formato do chat",
                 "Use {prefix}, {player}, {message}, {world} e placeholders do PlaceholderAPI.");
         list("prefixes", List.of("ultracore.tag.dono:&4[Dono] ", "ultracore.tag.admin:&c[Admin] ",
-                        "ultracore.tag.mod:&2[Mod] ", "ultracore.tag.vip:&6[VIP] "), Material.NAME_TAG, "Tags por permissão",
-                "Formato permissão:tag. A primeira que o jogador tiver vira o {prefix}. (OP tem todas; use LuckPerms p/ controlar)");
+                        "ultracore.tag.mod:&2[Mod] ", "ultracore.tag.vip:&6[VIP] "), Material.NAME_TAG, "Tags por permissão (antigo)",
+                "Só usado se o módulo Tags estiver desligado. Formato permissão:tag; a primeira que o jogador tiver vira o {prefix}.");
         integer("cooldown", 2, 0, 30, 1, Material.CLOCK, "Anti-spam (segundos)", "Tempo mínimo entre mensagens. ultracore.chat.bypass ignora.");
         bool("block-repeat", true, Material.REPEATER, "Bloquear mensagens repetidas", "Impede enviar a mesma mensagem duas vezes seguidas.");
         bool("anti-caps", true, Material.BOOK, "Anti-CAPS", "Deixa em minúsculo mensagens com muitas letras maiúsculas.");
@@ -66,6 +66,8 @@ public class ChatModule extends Module {
     }
 
     private String prefixFor(Player p) {
+        TagsModule tags = plugin.modules().get(TagsModule.class);
+        if (tags != null && tags.isEnabled()) return tags.chatPrefix(p);
         for (String line : getList("prefixes")) {
             int i = line.indexOf(':');
             if (i <= 0) continue;
@@ -117,7 +119,8 @@ public class ChatModule extends Module {
 
         String fmt = getString("format");
         if (!fmt.contains("{message}")) fmt += " {message}";
-        fmt = fmt.replace("{prefix}", prefixFor(p)).replace("{world}", p.getWorld().getName());
+        String prefix = prefixFor(p);
+        fmt = fmt.replace("{prefix}", prefix).replace("{tag}", prefix).replace("{world}", p.getWorld().getName());
         String marked = fmt.replace("{player}", "\u0000P\u0000").replace("{message}", "\u0000M\u0000");
         marked = plugin.placeholders(p, marked).replace("%", "%%");
         e.setFormat(marked.replace("\u0000P\u0000", "%1$s").replace("\u0000M\u0000", "%2$s"));
