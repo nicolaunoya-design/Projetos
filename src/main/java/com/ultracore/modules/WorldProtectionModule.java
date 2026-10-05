@@ -31,7 +31,7 @@ public class WorldProtectionModule extends Module {
 
     public WorldProtectionModule(UltraCore plugin) {
         super(plugin, "world", "Proteção e Regras do Mundo", Material.GRASS_BLOCK, true,
-                "Ajustes do mundo: explosões, fogo, endermans, phantoms, keep inventory, clima, dano de queda e plantações.");
+                "Ajustes do mundo: explosões, fogo, endermans, phantoms, keep inventory, clima, dano de queda, plantações e desligar o Nether e o The End.");
 
         bool("creeper-block-damage", false, Material.CREEPER_HEAD, "Creeper destrói blocos", "Se desativado, creepers explodem sem quebrar blocos.");
         bool("tnt-block-damage", true, Material.TNT, "TNT destrói blocos", "Se desativado, TNT explode sem quebrar blocos.");
@@ -42,10 +42,77 @@ public class WorldProtectionModule extends Module {
         bool("lock-clear-weather", false, Material.SUNFLOWER, "Sempre sol", "Impede chuva e tempestade.");
         bool("fall-damage", true, Material.FEATHER, "Dano de queda", "Se desativado, ninguém toma dano de queda.");
         bool("crop-trample", false, Material.FARMLAND, "Pisotear plantações", "Se desativado, pular na plantação não estraga a terra arada.");
+        bool("nether", true, Material.NETHERRACK, "Nether liberado",
+                "Se desativado, ninguém entra no Nether (portais não funcionam nem são criados) e quem estiver lá volta para o spawn. ultracore.bypass.dimension ignora.");
+        bool("the-end", true, Material.END_STONE, "The End liberado",
+                "Se desativado, ninguém entra no The End e quem estiver lá volta para o spawn. ultracore.bypass.dimension ignora.");
+    }
+
+    // ---------- Nether e The End ----------
+
+    private boolean blocked(World.Environment env) {
+        return (env == World.Environment.NETHER && !getBool("nether")) || (env == World.Environment.THE_END && !getBool("the-end"));
+    }
+
+    private static String dimensionName(World.Environment env) {
+        return env == World.Environment.NETHER ? "Nether" : "The End";
+    }
+
+    /** Manda para o spawn quem está numa dimensão desligada. */
+    private void sendOut(Player p) {
+        World.Environment env = p.getWorld().getEnvironment();
+        if (!blocked(env) || p.hasPermission("ultracore.bypass.dimension")) return;
+        org.bukkit.Location dest = plugin.spawn() != null && plugin.spawn().isEnabled() ? plugin.spawn().getSpawn() : null;
+        if (dest == null || dest.getWorld() == null || blocked(dest.getWorld().getEnvironment())) dest = Bukkit.getWorlds().get(0).getSpawnLocation();
+        p.teleport(dest);
+        msg(p, "world.dimension-closed", "dimension", dimensionName(env));
+    }
+
+    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
+    public void onPortal(org.bukkit.event.player.PlayerPortalEvent e) {
+        if (e.getTo() == null || e.getTo().getWorld() == null) return;
+        World.Environment env = e.getTo().getWorld().getEnvironment();
+        if (!blocked(env) || e.getPlayer().hasPermission("ultracore.bypass.dimension")) return;
+        e.setCancelled(true);
+        msg(e.getPlayer(), "world.dimension-disabled", "dimension", dimensionName(env));
+    }
+
+    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
+    public void onEntityPortal(org.bukkit.event.entity.EntityPortalEvent e) {
+        if (e.getTo() != null && e.getTo().getWorld() != null && blocked(e.getTo().getWorld().getEnvironment())) e.setCancelled(true);
+    }
+
+    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
+    public void onPortalCreate(org.bukkit.event.world.PortalCreateEvent e) {
+        if (e.getReason() == org.bukkit.event.world.PortalCreateEvent.CreateReason.FIRE && !getBool("nether")) e.setCancelled(true);
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    public void onTeleport(org.bukkit.event.player.PlayerTeleportEvent e) {
+        if (e.getTo() == null || e.getTo().getWorld() == null) return;
+        World.Environment env = e.getTo().getWorld().getEnvironment();
+        if (!blocked(env) || e.getPlayer().hasPermission("ultracore.bypass.dimension")) return;
+        // /tp, /home, /warp... para uma dimensão desligada
+        Player p = e.getPlayer();
+        Bukkit.getScheduler().runTask(plugin, () -> {
+            if (p.isOnline()) sendOut(p);
+        });
+    }
+
+    @EventHandler
+    public void onJoinDimension(org.bukkit.event.player.PlayerJoinEvent e) {
+        Player p = e.getPlayer();
+        Bukkit.getScheduler().runTaskLater(plugin, () -> {
+            if (p.isOnline() && isEnabled()) sendOut(p);
+        }, 5L);
     }
 
     @Override
     protected void onEnable() {
+        // ao desligar uma dimensão pelo /painel, quem estiver lá volta para o spawn
+        Bukkit.getScheduler().runTask(plugin, () -> {
+            if (isEnabled()) Bukkit.getOnlinePlayers().forEach(this::sendOut);
+        });
         if (getBool("lock-clear-weather")) {
             for (World w : Bukkit.getWorlds()) {
                 w.setStorm(false);

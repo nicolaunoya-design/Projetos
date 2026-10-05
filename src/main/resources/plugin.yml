@@ -375,6 +375,7 @@ permissions:
       ultracore.bypass.cooldown: true
       ultracore.tag.admin: true
       ultracore.tags.admin: true
+      ultracore.bypass.dimension: true
       ultracore.banip: true
       ultracore.loja.admin: true
       ultracore.nick.others: true

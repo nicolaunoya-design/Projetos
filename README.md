@@ -11,6 +11,7 @@ Cada recurso é um **módulo** que pode ser **ligado, desligado e configurado de
 - **`/preferencias`**: cada jogador escolhe se recebe pedidos de TPA, mensagens privadas e o som de menção (fica salvo). Novo `/msgtoggle`.
 - **Cooldowns** no `/spawn` e no `/tpa` (30 segundos por padrão) e opcionais no `/home`, `/warp` e `/back`, ajustáveis no `/painel`.
 - **Menções no chat**: escrever o nome de alguém destaca `@Nome` e avisa a pessoa com som.
+- **Desligar o Nether e/ou o The End** pelo `/painel` → Mundo → Proteção do Mundo: portais param de funcionar e quem estiver lá volta para o spawn (admins com `ultracore.bypass.dimension` continuam entrando).
 - **Painel por categorias** (Teleporte, Economia, Chat, Visual, Staff, Mundo, Diversão, Integrações).
 - **Diversão 100% secreta**: além de não avisar o alvo, quem morre por `/trovao`, `/explodir` etc. não gera mensagem de morte no chat nem no Discord/WhatsApp.
 - **Testado de verdade**: a cada versão, servidores Paper reais de todas as versões sobem com o plugin, e dois jogadores-robô entram, usam os comandos e clicam nos menus. A Release só é publicada se tudo passar.
@@ -144,7 +145,7 @@ Textos aceitam cores `&a`, `&l`... e hex `&#FF8800`.
 | Moderação | Ban, tempban, ban por IP, kick, mute com tempo, **avisos com punição automática**, **histórico**, **denúncias** | `/ban`, `/tempban`, `/unban`, `/banip`, `/unbanip`, `/kick`, `/mute`, `/unmute`, `/warn`, `/limparavisos`, `/historico`, `/report` |
 | Ferramentas da Staff | Voo, cura, gamemode, deus, vanish, invsee... | `/fly`, `/heal`, `/feed`, `/gm`, `/god`, `/vanish`, `/esconder`, `/invsee`, `/ecsee`, `/clearinv`, `/speed`, `/tphere` |
 | Utilidades | Bancada, enderchest, chapéu, ping, lixeira, regras | `/craft`, `/ec`, `/hat`, `/ping`, `/lixo`, `/regras` |
-| Proteção do Mundo | Creeper/TNT sem quebrar blocos, fogo, enderman, phantoms, keep inventory, clima, queda, plantações | — |
+| Proteção do Mundo | Creeper/TNT sem quebrar blocos, fogo, enderman, phantoms, keep inventory, clima, queda, plantações, **desligar o Nether e o The End** 🆕 | — |
 | AFK | Detecta ausentes, tag [AFK], expulsão opcional | `/afk` |
 | Dormir | % de jogadores necessários para pular a noite | — |
 | Colheita Fácil | Botão direito colhe e replanta | — |

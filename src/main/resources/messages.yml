@@ -157,6 +157,9 @@ nick:
   too-long: '&cApelido muito grande (máximo {max} letras).'
   taken: '&cEsse apelido é o nome de outro jogador.'
   set: '&aApelido definido: &r{nick}'
+world:
+  dimension-disabled: '&cO {dimension} está desativado neste servidor.'
+  dimension-closed: '&cO {dimension} foi desativado. Você voltou para o spawn.'
 menus:
   top-loading: '&7Carregando os rankings...'
   top-title: '&8Rankings do Servidor'
