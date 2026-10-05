@@ -44,7 +44,9 @@ public final class Lang {
 
     /** Texto da chave com {placeholders} substituídos. Uso: get("homes.set", "name", "casa"). */
     public static String get(String key, Object... placeholders) {
-        return apply(messages.getString(key, key), placeholders);
+        // getString(key) sem padrão também lê as mensagens novas do plugin que ainda não estão no arquivo
+        String text = messages.getString(key);
+        return apply(text == null ? key : text, placeholders);
     }
 
     public static List<String> list(String key, Object... placeholders) {

@@ -151,7 +151,6 @@ nick:
 fun:
   done: '{effect} &7em &f{target}&7!'
   everyone: 'todos ({count})'
-  target: '&7Você recebeu {effect} &7de &f{player}&7!'
   nobody: '&cNinguém online.'
 joinquit:
   silent-on: '&aEntrada silenciosa ligada. &7Ninguém será avisado quando você entrar ou sair.'

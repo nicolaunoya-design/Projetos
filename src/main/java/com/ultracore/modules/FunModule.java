@@ -54,14 +54,13 @@ public class FunModule extends Module {
         integer("explosion-power", 3, 1, 10, 1, Material.TNT, "Força da explosão", "Força padrão do /explodir (TNT = 4).");
         bool("explosion-breaks-blocks", false, Material.GRASS_BLOCK, "Explosão quebra blocos",
                 "Se ligado, o /explodir destrói o terreno. Cuidado!");
-        bool("notify-target", true, Material.BELL, "Avisar o alvo", "Avisa o jogador de quem fez a brincadeira (exceto /falsoop e /assustar).");
 
         List<String> none = List.of();
         fun("trovao", "&eRaio", t -> {
             Location l = t.getLocation();
             if (getBool("lightning-damage")) t.getWorld().strikeLightning(l);
             else t.getWorld().strikeLightningEffect(l);
-        }, true);
+        });
         command("explodir", PERM, (s, a) -> {
             List<Player> targets = targets(s, a, 0);
             if (targets == null) return;
@@ -76,7 +75,6 @@ public class FunModule extends Module {
             }
             for (Player t : targets) {
                 t.getWorld().createExplosion(t.getLocation(), power, false, getBool("explosion-breaks-blocks"));
-                notifyTarget(s, t, "&cExplosão");
             }
             done(s, targets, "&cExplosão");
         }).tab((s, a) -> a.length == 1 ? withAll(a[0]) : a.length == 2 ? List.of("1", "3", "5", "10") : none);
@@ -85,10 +83,10 @@ public class FunModule extends Module {
             noFall.put(t.getUniqueId(), System.currentTimeMillis() + 15_000);
             t.getWorld().playSound(t.getLocation(), Sound.ENTITY_FIREWORK_ROCKET_LAUNCH, 1f, 0.8f);
             t.getWorld().spawnParticle(Particle.FLAME, t.getLocation(), 40, 0.3, 0.1, 0.3, 0.05);
-        }, true);
+        });
         fun("fogos", "&dFogos", t -> {
             for (int i = 0; i < 3; i++) firework(t.getLocation().add(rnd(-2, 2), 0, rnd(-2, 2)));
-        }, false);
+        });
         command("queimar", PERM, (s, a) -> {
             List<Player> targets = targets(s, a, 0);
             if (targets == null) return;
@@ -103,7 +101,6 @@ public class FunModule extends Module {
             }
             for (Player t : targets) {
                 t.setFireTicks(seconds * 20);
-                notifyTarget(s, t, "&6Fogo");
             }
             done(s, targets, "&6Fogo (" + seconds + "s)");
         }).tab((s, a) -> a.length == 1 ? withAll(a[0]) : a.length == 2 ? List.of("5", "10", "30") : none);
@@ -116,7 +113,6 @@ public class FunModule extends Module {
                     frozen.remove(t.getUniqueId());
                     t.setFreezeTicks(0);
                 }
-                send(t, on ? "&b❄ Você foi congelado! &7Não consegue se mexer." : "&aVocê foi descongelado.");
                 send(s, (on ? "&b❄ Congelado: &f" : "&aDescongelado: &f") + t.getName());
             }
         }).tab((s, a) -> a.length == 1 ? withAll(a[0]) : none);
@@ -124,14 +120,14 @@ public class FunModule extends Module {
             t.playSound(t.getLocation(), Sound.ENTITY_ELDER_GUARDIAN_CURSE, 1f, 1f);
             t.playSound(t.getLocation(), Sound.ENTITY_CREEPER_PRIMED, 1f, 0.5f);
             t.spawnParticle(Particle.ELDER_GUARDIAN, t.getLocation(), 1);
-        }, false);
+        });
         fun("arremessar", "&aArremesso", t -> {
             double angle = ThreadLocalRandom.current().nextDouble(Math.PI * 2);
             t.setVelocity(new Vector(Math.cos(angle) * 2.5, 1.2, Math.sin(angle) * 2.5));
             noFall.put(t.getUniqueId(), System.currentTimeMillis() + 10_000);
             t.getWorld().playSound(t.getLocation(), Sound.ENTITY_PLAYER_ATTACK_KNOCKBACK, 1f, 0.6f);
-        }, true);
-        fun("falsoop", "&7Falso OP", t -> t.sendMessage(Msg.color("&7&o[Server: Made " + t.getName() + " a server operator]")), false);
+        });
+        fun("falsoop", "&7Falso OP", t -> t.sendMessage(Msg.color("&7&o[Server: Made " + t.getName() + " a server operator]")));
         command("fazerfalar", PERM, (s, a) -> {
             if (a.length < 2) {
                 msg(s, "common.usage", "usage", "/fazerfalar <jogador> <mensagem>");
@@ -161,7 +157,7 @@ public class FunModule extends Module {
                     Bukkit.getScheduler().runTaskLater(plugin, () -> item.remove(), 100L);
                 }, delay);
             }
-        }, false);
+        });
         fun("girar", "&5Giro", t -> {
             for (int i = 1; i <= 16; i++) {
                 int step = i;
@@ -173,19 +169,18 @@ public class FunModule extends Module {
                     if (step == 16) t.playSound(t.getLocation(), Sound.ENTITY_PLAYER_BURP, 1f, 1f);
                 }, i * 2L);
             }
-        }, true);
+        });
     }
 
     // ---------- ajudantes ----------
 
     /** Registra um comando simples: /cmd [jogador|todos]. */
-    private void fun(String name, String label, Consumer<Player> effect, boolean notify) {
+    private void fun(String name, String label, Consumer<Player> effect) {
         command(name, PERM, (s, a) -> {
             List<Player> targets = targets(s, a, 0);
             if (targets == null) return;
             for (Player t : targets) {
                 effect.accept(t);
-                if (notify) notifyTarget(s, t, label);
             }
             done(s, targets, label);
         }).tab((s, a) -> a.length == 1 ? withAll(a[0]) : List.of());
@@ -217,9 +212,6 @@ public class FunModule extends Module {
         return names;
     }
 
-    private void notifyTarget(CommandSender s, Player t, String label) {
-        if (getBool("notify-target") && t != s) msg(t, "fun.target", "effect", Msg.color(label), "player", s.getName());
-    }
 
     private void done(CommandSender s, List<Player> targets, String label) {
         String who = targets.size() == 1 ? targets.get(0).getName() : Lang.get("fun.everyone", "count", targets.size());

@@ -157,7 +157,8 @@ public abstract class Module implements Listener {
     }
 
     public String getString(String key) {
-        return plugin.getConfig().getString(path(key), "");
+        String v = plugin.getConfig().getString(path(key));
+        return v == null ? "" : v;
     }
 
     public List<String> getList(String key) {

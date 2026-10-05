@@ -145,7 +145,7 @@ A TAB junta tudo: `[AFK]` + tag + apelido. Os nomes na TAB não são reordenados
 
 ### Diversão (só OP)
 
-Todos aceitam `[jogador]` (sem nome = em você mesmo) ou `todos`. Permissão `ultracore.diversao`, que **só OP tem** (não vem junto com `ultracore.admin`).
+Todos aceitam `[jogador]` (sem nome = em você mesmo) ou `todos`. São **secretos**: só quem usou recebe a confirmação; o alvo não é avisado de nada. Permissão `ultracore.diversao`, que **só OP tem** (não vem junto com `ultracore.admin`).
 
 | Comando | O que faz |
 |---|---|
