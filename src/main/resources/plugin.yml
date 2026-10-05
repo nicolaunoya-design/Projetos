@@ -278,6 +278,9 @@ permissions:
   ultracore.tabhide.others:
     description: /esconder outros jogadores. Só OP por padrão.
     default: op
+  ultracore.tabhide.see:
+    description: Continua vendo na TAB quem usou /esconder. Ninguém tem por padrão (nem OP); dê pelo LuckPerms.
+    default: false
   ultracore.diversao:
     description: Comandos de diversão (/trovao, /explodir, /foguete...). Só OP por padrão.
     default: op
@@ -335,7 +338,6 @@ permissions:
       ultracore.socialspy: true
       ultracore.vanish: true
       ultracore.vanish.see: true
-      ultracore.tabhide.see: true
       ultracore.invsee: true
       ultracore.tphere: true
       ultracore.gamemode: true

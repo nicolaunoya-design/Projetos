@@ -209,7 +209,7 @@ Cada um pode ser desligado no `/painel` → Diversão → **Comandos**.
 
 - `/esconder` tira você da lista TAB **para sempre** (fica salvo, mesmo saindo e entrando). `/esconder` de novo para voltar.
 - Diferente do `/vanish`: você **continua visível no mundo** e no chat, só some da lista.
-- `/esconder <jogador>` esconde outra pessoa. Permissões `ultracore.tabhide` e `ultracore.tabhide.others`, que **só OP tem**. A staff com `ultracore.tabhide.see` continua vendo na TAB.
+- `/esconder <jogador>` esconde outra pessoa. Permissões `ultracore.tabhide` e `ultracore.tabhide.others`, que **só OP tem**. Some da TAB de **todo mundo, inclusive dos OPs**; só quem recebeu `ultracore.tabhide.see` (pelo LuckPerms) continua vendo. Na **sua própria** TAB você sempre aparece (o Minecraft não deixa esconder você de você mesmo).
 - O número de jogadores online (lista de servidores, `{online}`) continua contando a pessoa.
 
 ### Entrada silenciosa (`/silentjoin`)

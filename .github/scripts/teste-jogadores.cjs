@@ -217,6 +217,12 @@ async function main () {
   checar(temItem(w, 'Amethyst shard'), 'item novo aparece na /loja')
   if (bots.Robo.currentWindow) bots.Robo.closeWindow(bots.Robo.currentWindow)
 
+  // ---------- /esconder (some da TAB, continua no mundo) ----------
+  checar(await comando('Robo', '/esconder', /Escondido da TAB/), '/esconder liga')
+  checar(await aguardar(() => bots.Alvo.players.Robo && bots.Alvo.players.Robo.listed === false, 8000), 'quem usou /esconder some da TAB dos outros')
+  checar(await comando('Robo', '/esconder', /Visível na TAB/), '/esconder de novo desliga')
+  checar(await aguardar(() => bots.Alvo.players.Robo && bots.Alvo.players.Robo.listed !== false, 8000), 'volta a aparecer na TAB')
+
   // ---------- vanish continua ao relogar ----------
   checar(await comando('Robo', '/vanish', /invisível/), '/vanish liga')
   await espera(1000)
