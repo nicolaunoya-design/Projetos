@@ -129,7 +129,7 @@ public final class UltraCore extends JavaPlugin {
                 .replace("{player}", p.getName())
                 .replace("{displayname}", p.getDisplayName())
                 .replace("{tag}", tag(p))
-                .replace("{online}", String.valueOf(Bukkit.getOnlinePlayers().size()))
+                .replace("{online}", String.valueOf(onlineFor(p)))
                 .replace("{max}", String.valueOf(Bukkit.getMaxPlayers()))
                 .replace("{money}", economy().format(d.getBalance()))
                 .replace("{kills}", String.valueOf(d.getKills()))
@@ -182,6 +182,15 @@ public final class UltraCore extends JavaPlugin {
     public com.ultracore.gui.Menu mainMenu(Player p) {
         MenusModule menus = moduleManager == null ? null : moduleManager.get(MenusModule.class);
         return menus != null && menus.isEnabled() ? menus.mainMenu(p) : null;
+    }
+
+    /** Quantos jogadores "viewer" vê online (quem está invisível não conta, se a opção estiver ligada). */
+    public int onlineFor(Player viewer) {
+        StaffModule staff = moduleManager == null ? null : moduleManager.get(StaffModule.class);
+        if (staff == null || !staff.isEnabled() || !staff.getBool("vanish-hide-count")) return Bukkit.getOnlinePlayers().size();
+        int n = 0;
+        for (Player o : Bukkit.getOnlinePlayers()) if (o == viewer || !staff.isHiddenNow(o) || viewer.hasPermission("ultracore.vanish.see")) n++;
+        return n;
     }
 
     /** Se "viewer" pode ver "target" nas listas (respeita /vanish e /esconder). */

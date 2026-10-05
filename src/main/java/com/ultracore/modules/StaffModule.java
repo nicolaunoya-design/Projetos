@@ -31,11 +31,20 @@ import java.util.UUID;
 public class StaffModule extends Module {
 
     private final Set<UUID> god = new HashSet<>();
-    private final Set<UUID> vanished = new HashSet<>();
+    /** Quem está invisível (lido também no chat e na lista de servidores, que rodam fora da thread principal). */
+    private final Set<UUID> vanished = java.util.concurrent.ConcurrentHashMap.newKeySet();
 
     public StaffModule(UltraCore plugin) {
         super(plugin, "staff", "Ferramentas da Staff", Material.DIAMOND_SWORD, true,
                 "/fly, /heal, /feed, /gm, /god, /vanish, /invsee, /ecsee, /clearinv, /speed e /tphere.");
+
+        bool("vanish-hide-deaths", true, Material.SKELETON_SKULL, "Invisível: esconder mortes e abates",
+                "Se quem está invisível morrer ou matar alguém, a mensagem de morte não aparece (nem no Discord/WhatsApp).");
+        bool("vanish-block-chat", true, Material.OAK_SIGN, "Invisível: bloquear o chat",
+                "Evita se entregar falando no chat sem querer. Para falar mesmo assim, comece a mensagem com !");
+        bool("vanish-no-pickup", true, Material.HOPPER, "Invisível: não pegar itens", "Itens do chão não vão para o inventário de quem está invisível.");
+        bool("vanish-hide-count", true, Material.PLAYER_HEAD, "Invisível: não contar como online",
+                "Não conta na lista de servidores nem no {online} (scoreboard, TAB...).");
 
         List<String> none = List.of();
         command("fly", "ultracore.fly", (s, a) -> {
@@ -213,6 +222,63 @@ public class StaffModule extends Module {
     private void hide(Player p) {
         vanished.add(p.getUniqueId());
         for (Player o : Bukkit.getOnlinePlayers()) if (o != p && !o.hasPermission("ultracore.vanish.see")) o.hidePlayer(plugin, p);
+        p.setSleepingIgnored(true);   // não atrapalha quem quer pular a noite
+        p.setCollidable(false);       // não empurra ninguém (o que entregaria a posição)
+    }
+
+    private void unhide(Player p) {
+        vanished.remove(p.getUniqueId());
+        for (Player o : Bukkit.getOnlinePlayers()) o.showPlayer(plugin, p);
+        p.setSleepingIgnored(false);
+        p.setCollidable(true);
+    }
+
+    /** Se está invisível agora (seguro fora da thread principal). */
+    public boolean isHiddenNow(Player p) {
+        return vanished.contains(p.getUniqueId());
+    }
+
+    // ---------- modo fantasma: o que mais esconde quem está invisível ----------
+
+    @EventHandler(priority = EventPriority.HIGHEST)
+    public void onGhostDeath(org.bukkit.event.entity.PlayerDeathEvent e) {
+        if (!getBool("vanish-hide-deaths")) return;
+        Player victim = e.getEntity();
+        Player killer = victim.getKiller();
+        if (vanished.contains(victim.getUniqueId()) || (killer != null && vanished.contains(killer.getUniqueId()))) e.deathMessage(null);
+    }
+
+    @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
+    public void onGhostChat(org.bukkit.event.player.AsyncPlayerChatEvent e) {
+        Player p = e.getPlayer();
+        if (!vanished.contains(p.getUniqueId()) || !getBool("vanish-block-chat")) return;
+        if (e.getMessage().startsWith("!") && e.getMessage().length() > 1) {
+            e.setMessage(e.getMessage().substring(1));
+            return;
+        }
+        e.setCancelled(true);
+        msg(p, "staff.vanish-chat-blocked");
+    }
+
+    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
+    public void onGhostPickup(org.bukkit.event.entity.EntityPickupItemEvent e) {
+        if (e.getEntity() instanceof Player p && vanished.contains(p.getUniqueId()) && getBool("vanish-no-pickup")) e.setCancelled(true);
+    }
+
+    @EventHandler(priority = EventPriority.HIGH)
+    public void onGhostAdvancement(org.bukkit.event.player.PlayerAdvancementDoneEvent e) {
+        if (vanished.contains(e.getPlayer().getUniqueId())) e.message(null);
+    }
+
+    @EventHandler
+    public void onGhostPing(org.bukkit.event.server.ServerListPingEvent e) {
+        if (vanished.isEmpty() || !getBool("vanish-hide-count")) return;
+        try {
+            java.util.Iterator<Player> it = e.iterator();
+            while (it.hasNext()) if (vanished.contains(it.next().getUniqueId())) it.remove();
+        } catch (UnsupportedOperationException ignored) {
+            // algumas versões não deixam mexer na lista; aí só o número fica igual
+        }
     }
 
     private void setVanish(Player p, boolean on) {
@@ -221,8 +287,7 @@ public class StaffModule extends Module {
             hide(p);
             msg(p, "staff.vanish-on");
         } else {
-            vanished.remove(p.getUniqueId());
-            for (Player o : Bukkit.getOnlinePlayers()) o.showPlayer(plugin, p);
+            unhide(p);
             msg(p, "staff.vanish-off");
         }
     }

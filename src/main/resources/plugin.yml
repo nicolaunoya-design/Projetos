@@ -228,8 +228,8 @@ commands:
     description: Modo deus.
     aliases: [deus]
   vanish:
-    description: Fica invisível.
-    aliases: [v, invisivel]
+    description: Modo fantasma (invisível no mundo, na TAB, no chat e nas mortes).
+    aliases: [v, invisivel, fantasma, ghost]
   esconder:
     description: Esconde (ou mostra) alguém da lista TAB para sempre.
     aliases: [tabhide, hidetab, escondertab]

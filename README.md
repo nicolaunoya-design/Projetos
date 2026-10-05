@@ -14,6 +14,7 @@ Cada recurso é um **módulo** que pode ser **ligado, desligado e configurado de
 - **Desligar o Nether e/ou o The End** pelo botão **Dimensões** na tela inicial do `/painel` (ou `/painel nether desativar`, `/painel end desativar`): portais param de funcionar e quem estiver lá volta para o spawn (admins com `ultracore.bypass.dimension` continuam entrando).
 - **Painel por categorias** (Teleporte, Economia, Chat, Visual, Staff, Mundo, Diversão, Integrações).
 - **Diversão 100% secreta**: além de não avisar o alvo, quem morre por `/trovao`, `/explodir` etc. não gera mensagem de morte no chat nem no Discord/WhatsApp.
+- **Modo fantasma** (`/vanish` ou `/fantasma`): além de sumir do mundo e da TAB, não aparece mensagem de morte quando você mata ou morre, não conta como online (lista de servidores e `{online}`), não pega itens, mobs ignoram, conquistas não são anunciadas, não atrapalha o pular a noite, e o chat fica bloqueado para você não se entregar (comece com `!` para falar). Continua ao relogar. Cada parte liga/desliga no `/painel` → Staff → Ferramentas da Staff.
 - **Testado de verdade**: a cada versão, servidores Paper reais de todas as versões sobem com o plugin, e dois jogadores-robô entram, usam os comandos e clicam nos menus. A Release só é publicada se tudo passar.
 
 ## ⬇️ Download

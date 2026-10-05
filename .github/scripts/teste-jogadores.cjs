@@ -234,6 +234,10 @@ async function main () {
   await espera(2000)
   checar(!msgs.Alvo.slice(desde).some((m) => /Robo/.test(m)), 'ninguém vê a saída/entrada de quem está invisível')
   checar(!bots.Alvo.players.Robo, 'invisível não aparece na TAB dos outros')
+  desde = marca('Alvo')
+  checar(await comando('Robo', 'segredo do fantasma', /não foi enviada/), 'invisível não fala no chat sem querer')
+  await espera(1500)
+  checar(!msgs.Alvo.slice(desde).some((m) => /segredo do fantasma/.test(m)), 'ninguém vê a mensagem de quem está invisível')
   await comando('Robo', '/vanish', /visível novamente/)
 
   // ---------- mensagens "cruas" ----------
