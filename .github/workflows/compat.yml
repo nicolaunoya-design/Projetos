@@ -42,10 +42,10 @@ jobs:
                  | unique | sort_by(split(".") | map(tonumber))' project.json)
           echo "Versões testadas: $LIST"
           # grupos de até 5 versões (sem misturar 1.21.x, que usa Java 21, com 26.x, que usa Java 25)
-          GROUPS=$(echo "$LIST" | jq -c 'def chunks(n): [range(0; length; n) as $i | .[$i:$i+n]];
+          GRUPOS=$(echo "$LIST" | jq -c 'def chunks(n): [range(0; length; n) as $i | .[$i:$i+n]];
                    (map(select(startswith("1."))) | chunks(5)) + (map(select(startswith("1.") | not)) | chunks(5))')
-          echo "Grupos: $GROUPS"
-          echo "groups=$GROUPS" >> "$GITHUB_OUTPUT"
+          echo "Grupos: $GRUPOS"
+          echo "groups=$GRUPOS" >> "$GITHUB_OUTPUT"
           BRIDGE=$(echo "$LIST" | jq -c '[ (map(select(startswith("1.21"))) | last), last ] | unique')
           echo "bridge=$BRIDGE" >> "$GITHUB_OUTPUT"
       - name: Descobrir a paper-api mais nova
