@@ -17,7 +17,14 @@ async function aguardar (cond, ms, passo = 250) {
   return false
 }
 let falhas = 0
-function checar (ok, nome) { console.log((ok ? '✔ ' : '✘ ') + nome); if (!ok) falhas++ }
+let total = 0
+// "::error::" vira anotação no GitHub Actions (dá para ler o que falhou sem baixar o log)
+const anotar = (tipo, t) => console.log(`::${tipo}::${String(t).replace(/\r?\n/g, ' ')}`)
+function checar (ok, nome) {
+  total++
+  console.log((ok ? '✔ ' : '✘ ') + nome)
+  if (!ok) { falhas++; anotar('error', 'Falhou: ' + nome + ' | últimas mensagens: Robo=' + JSON.stringify(msgs.Robo.slice(-4)) + ' Alvo=' + JSON.stringify(msgs.Alvo.slice(-4))) }
+}
 
 const semCor = (s) => String(s).replace(/§./g, '')
 const texto = (v) => v == null ? '' : semCor(typeof v === 'string' ? v : JSON.stringify(v))
@@ -38,7 +45,7 @@ function criar (nome) {
     console.log(`  [${nome}] ${m}`)
   })
   bot.on('error', (e) => console.log(`  [${nome}] erro:`, e.message))
-  bot.on('kicked', (r) => console.log(`  [${nome}] expulso:`, JSON.stringify(r)))
+  bot.on('kicked', (r) => { console.log(`  [${nome}] expulso:`, JSON.stringify(r)); anotar('warning', `${nome} foi expulso: ${JSON.stringify(r)}`) })
   bots[nome] = bot
   return new Promise((resolve) => { bot.once('spawn', () => resolve(bot)); setTimeout(() => resolve(null), 60000) })
 }
@@ -215,6 +222,7 @@ async function main () {
   await espera(1000)
   rcon.comando('stop').catch(() => {})
   console.log(falhas ? `\n${falhas} TESTE(S) FALHARAM` : '\nTODOS OS TESTES PASSARAM')
+  anotar(falhas ? 'error' : 'notice', `Jogadores-robô: ${total - falhas} de ${total} verificações passaram`)
   process.exit(falhas ? 1 : 0)
 }
-main().catch((e) => { console.error('FALHOU:', e); process.exit(1) })
+main().catch((e) => { console.error('FALHOU:', e); anotar('error', 'O teste quebrou: ' + (e && e.stack || e)); process.exit(1) })

@@ -50,6 +50,8 @@ RESULT=$?
 for _ in $(seq 1 90); do kill -0 $SERVER 2>/dev/null || break; sleep 1; done
 kill -9 $SERVER 2>/dev/null
 echo "=============== TESTE COM JOGADORES ($VERSION) ==============="; cat teste.log
+# erros do servidor viram anotações (no máximo 5)
+grep -nE "Exception|ERROR\]|at com\.ultracore\." server.log | head -5 | while read -r L; do echo "::warning::servidor: ${L:0:400}"; done
 echo "=============== LOG DO SERVIDOR ($VERSION) ==============="; tail -150 server.log
 if grep -nE "at com\.ultracore\.|Erro no comando|Erro ao ativar o módulo" server.log; then echo "::error::erros do UltraCore no log"; RESULT=1; fi
 if [ $RESULT -eq 0 ]; then echo "| Jogadores-robô $VERSION (menus, cooldowns, diversão) | ✅ OK |" >> "$GITHUB_STEP_SUMMARY"; else echo "| Jogadores-robô $VERSION | ❌ Falhou |" >> "$GITHUB_STEP_SUMMARY"; fi
