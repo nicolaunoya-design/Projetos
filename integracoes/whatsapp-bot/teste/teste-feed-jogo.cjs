@@ -19,7 +19,10 @@ async function aguardar (cond, ms, passo = 500) {
   return false
 }
 let falhas = 0
-function checar (ok, nome) { console.log((ok ? '✔ ' : '✘ ') + nome); if (!ok) falhas++ }
+function checar (ok, nome) {
+  console.log((ok ? '✔ ' : '✘ ') + nome)
+  if (!ok) { falhas++; console.log(`::error::Feed: falhou "${nome}" | recebidos: ${JSON.stringify(recebidos.slice(-5)).slice(0, 600)}`) }
+}
 
 const receptor = http.createServer((req, res) => {
   let b = ''
@@ -86,4 +89,4 @@ async function main () {
   console.log(falhas ? `\n${falhas} TESTE(S) FALHARAM` : '\nTODOS OS TESTES PASSARAM')
   process.exit(falhas ? 1 : 0)
 }
-main().catch((e) => { console.error('FALHOU:', e); process.exit(1) })
+main().catch((e) => { console.error('FALHOU:', e); console.log('::error::Feed quebrou: ' + String(e && e.stack || e).replace(/\n/g, ' ')); process.exit(1) })
