@@ -254,9 +254,8 @@ public class StaffModule extends Module {
         boolean hide = isTabHidden(p);
         for (Player o : Bukkit.getOnlinePlayers()) {
             if (o == p) continue;
-            boolean r = hide && !o.hasPermission("ultracore.tabhide.see") ? o.unlistPlayer(p) : o.listPlayer(p);
-            plugin.getLogger().info("[esconder-debug] " + (hide ? "unlist " : "list ") + p.getName() + " para " + o.getName()
-                    + " = " + r + " canSee=" + o.canSee(p) + " listed=" + o.isListed(p));
+            if (hide && !o.hasPermission("ultracore.tabhide.see")) o.unlistPlayer(p);
+            else o.listPlayer(p);
         }
     }
 
