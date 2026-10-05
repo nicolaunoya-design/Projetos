@@ -241,10 +241,8 @@ staff:
   done-self: '{action}&7.'
   done-other: '{action} &7para &f{player}&7.'
   vanish-on: '&aVocê está invisível.'
-  vanish-fake-quit: '&8[&c-&8] &7{player}'
   vanish-off: '&cVocê está visível novamente.'
   vanish-rejoin: '&aVocê entrou &linvisível&a (vanish continua ligado). Use &f/vanish &apara aparecer.'
-  vanish-fake-join: '&8[&a+&8] &7{player}'
 utilities:
   hat-empty: '&cSegure um item/bloco na mão.'
   hat: '&aBelo chapéu!'
