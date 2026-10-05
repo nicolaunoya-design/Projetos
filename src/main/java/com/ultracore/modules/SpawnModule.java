@@ -23,6 +23,8 @@ public class SpawnModule extends Module {
         this.file = new DataFile(plugin, "spawn.yml");
 
         integer("delay", 3, 0, 30, 1, Material.CLOCK, "Delay do teleporte", "Segundos parado antes de teleportar (0 = instantâneo).");
+        integer("cooldown", 30, 0, 3600, 5, Material.HOPPER, "Cooldown (segundos)",
+                "Tempo de espera entre um /spawn e outro (0 = sem cooldown). ultracore.bypass.cooldown ignora.");
         bool("first-join", true, Material.EMERALD, "Spawn na primeira entrada", "Leva jogadores novos para o spawn.");
         bool("every-join", false, Material.OAK_DOOR, "Spawn em toda entrada", "Leva o jogador para o spawn sempre que entrar.");
         bool("on-respawn", true, Material.TOTEM_OF_UNDYING, "Renascer no spawn", "Ao morrer, renasce no spawn (se não tiver cama).");
@@ -34,7 +36,8 @@ public class SpawnModule extends Module {
                 msg(p, "spawn.not-set");
                 return;
             }
-            plugin.teleporter().teleport(p, loc, getInt("delay"));
+            if (!cooldownReady(p, "spawn", "spawn")) return;
+            plugin.teleporter().teleport(p, loc, getInt("delay"), () -> startCooldown(p, "spawn", getInt("cooldown")));
         }).playerOnly();
 
         command("setspawn", "ultracore.setspawn", (s, a) -> {

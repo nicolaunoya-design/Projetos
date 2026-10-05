@@ -153,6 +153,19 @@ commands:
   nick:
     description: Define um apelido.
     aliases: [apelido, nickname]
+  # Menus dos jogadores
+  menu:
+    description: Abre a central do servidor (spawn, homes, warps, loja, kits...).
+    aliases: [servidor, central]
+  top:
+    description: Rankings do servidor (dinheiro, abates, tempo de jogo).
+    aliases: [ranking, rank, tops]
+  preferencias:
+    description: Suas preferências (pedidos de TPA, mensagens privadas, menções).
+    aliases: [prefs, opcoes]
+  msgtoggle:
+    description: Liga/desliga receber mensagens privadas.
+    aliases: [togglemsg, msgoff]
   # Diversão (só OP)
   trovao:
     description: Cai um raio em alguém (ou em você).
@@ -293,6 +306,9 @@ permissions:
       ultracore.tempo: true
       ultracore.report: true
       ultracore.tag: true
+      ultracore.menu: true
+      ultracore.top: true
+      ultracore.preferencias: true
   ultracore.vip:
     description: Vantagens de VIP (dê via LuckPerms).
     default: false
@@ -334,6 +350,7 @@ permissions:
       ultracore.report.see: true
       ultracore.silentjoin: true
       ultracore.silentjoin.see: true
+      ultracore.msg.bypass: true
   ultracore.admin:
     description: Acesso total, incluindo o /painel.
     default: op

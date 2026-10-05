@@ -245,13 +245,13 @@ public class StaffModule extends Module {
 
     // ---------- escondido da TAB (fica salvo; só some da lista, continua visível no mundo) ----------
 
-    private boolean tabHidden(Player p) {
+    public boolean isTabHidden(Player p) {
         return isEnabled() && plugin.data().get(p).isTabHidden();
     }
 
     /** Tira (ou devolve) o jogador da TAB de todos que não têm ultracore.tabhide.see. */
     private void refreshTabHidden(Player p) {
-        boolean hide = tabHidden(p);
+        boolean hide = isTabHidden(p);
         for (Player o : Bukkit.getOnlinePlayers()) {
             if (o == p) continue;
             if (hide && !o.hasPermission("ultracore.tabhide.see")) o.unlistPlayer(p);
@@ -265,10 +265,10 @@ public class StaffModule extends Module {
         // um tick depois, quando o jogador já foi mandado para a TAB de todos
         Bukkit.getScheduler().runTask(plugin, () -> {
             if (!p.isOnline() || !isEnabled()) return;
-            if (tabHidden(p)) refreshTabHidden(p);
+            if (isTabHidden(p)) refreshTabHidden(p);
             if (p.hasPermission("ultracore.tabhide.see")) return;
             for (Player o : Bukkit.getOnlinePlayers()) {
-                if (o != p && tabHidden(o)) p.unlistPlayer(o);
+                if (o != p && isTabHidden(o)) p.unlistPlayer(o);
             }
         });
     }
@@ -314,7 +314,7 @@ public class StaffModule extends Module {
     protected void onEnable() {
         for (Player p : Bukkit.getOnlinePlayers()) {
             if (isVanished(p)) hide(p);
-            if (tabHidden(p)) refreshTabHidden(p);
+            if (isTabHidden(p)) refreshTabHidden(p);
         }
     }
 

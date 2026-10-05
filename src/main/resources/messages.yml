@@ -18,6 +18,7 @@ common:
   specify-player: '&cInforme um jogador.'
   invalid-number: '&cNúmero inválido.'
   usage: '&cUso: {usage}'
+  cooldown: '&cAguarde &f{time} &cpara usar &f/{command} &cde novo.'
 teleport:
   invalid: '&cDestino inválido (o mundo existe?).'
   countdown: '&7Teleportando em &f{seconds}s&7... não se mova!'
@@ -31,6 +32,8 @@ spawn:
   not-set: '&cO spawn ainda não foi definido. Use /setspawn.'
   set: '&aSpawn definido na sua posição!'
 homes:
+  menu-title: '&8Suas &4Homes'
+  ask-name: '&fDigite o &anome da home &f(ex: casa, base, mina):'
   invalid-name: '&cNome inválido. Use letras, números, _ ou - (até 16 caracteres).'
   limit: '&cVocê atingiu o limite de &f{max} &chomes. Use /delhome para liberar espaço.'
   set: '&aHome &f{name} &adefinida!'
@@ -47,6 +50,7 @@ warps:
   deleted: '&aWarp &f{name} &aremovida.'
   menu-title: '&8Warps do servidor'
 tpa:
+  menu-title: '&8Teleporte &7» &0Jogadores'
   toggle-on: '&aAgora você recebe pedidos de teleporte.'
   toggle-off: '&cVocê não receberá mais pedidos de teleporte.'
   self: '&cVocê não pode enviar um pedido para si mesmo.'
@@ -107,6 +111,7 @@ shop:
   admin-removed: '&aItem &f{item} &aremovido da loja.'
   admin-not-found: '&cSegure na mão um item que esteja na loja.'
 kits:
+  menu-title: '&8Kits'
   deleted: '&aKit removido.'
   none: '&7Nenhum kit disponível.'
   list-header: '&fKits disponíveis:'
@@ -132,12 +137,16 @@ rewards:
   daily-kit: '&aVocê também recebeu o kit &f{kit}&a!'
   reminder: '&e🎁 Sua recompensa diária está disponível! Use &f/daily&e.'
 chat:
+  mention-actionbar: '&e{player} &fmencionou você no chat!'
   cleared: '&fO chat foi limpo por &b{player}&f.'
   broadcast: '&c&l[ANÚNCIO] &f{message}'
   staffchat: '&d&l[STAFF] &f{player}&8: &d{message}'
   cooldown: '&cAguarde um pouco antes de falar novamente.'
   repeat: '&cNão repita a mesma mensagem.'
 privatemsg:
+  toggle-on: '&aAgora você recebe mensagens privadas.'
+  toggle-off: '&cVocê não receberá mais mensagens privadas.'
+  target-disabled: '&c{player} não está aceitando mensagens privadas.'
   no-reply: '&cNinguém para responder.'
   spy-off: '&cSocialSpy desativado.'
   spy-on: '&aSocialSpy ativado.'
@@ -148,6 +157,12 @@ nick:
   too-long: '&cApelido muito grande (máximo {max} letras).'
   taken: '&cEsse apelido é o nome de outro jogador.'
   set: '&aApelido definido: &r{nick}'
+menus:
+  top-loading: '&7Carregando os rankings...'
+  top-title: '&8Rankings do Servidor'
+  prefs-title: '&8Suas Preferências'
+  mentions-on: '&aSom de menção ligado.'
+  mentions-off: '&cSom de menção desligado.'
 fun:
   done: '{effect} &7em &f{target}&7!'
   everyone: 'todos ({count})'

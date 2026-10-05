@@ -55,6 +55,8 @@ public class PrivateMessageModule extends Module {
             deliver(p, t, Msg.join(a, 0));
         }).playerOnly();
 
+        command("msgtoggle", "ultracore.msg", (s, a) -> toggle((Player) s)).playerOnly();
+
         command("socialspy", "ultracore.socialspy", (s, a) -> {
             Player p = (Player) s;
             if (spies.remove(p.getUniqueId())) msg(p, "privatemsg.spy-off");
@@ -65,9 +67,26 @@ public class PrivateMessageModule extends Module {
         }).playerOnly();
     }
 
+    /** Liga/desliga receber mensagens privadas (fica salvo). Usado também pelo menu de preferências. */
+    public void toggle(Player p) {
+        boolean off = !plugin.data().get(p).isMsgDisabled();
+        plugin.data().get(p).setMsgDisabled(off);
+        msg(p, off ? "privatemsg.toggle-off" : "privatemsg.toggle-on");
+    }
+
     private void deliver(CommandSender from, Player to, String message) {
         if (from == to) {
             msg(from, "privatemsg.self");
+            return;
+        }
+        if (from instanceof Player fp && !plugin.canSee(fp, to)) {
+            msg(from, "common.player-offline", "player", to.getName());
+            return;
+        }
+        // quem desligou as mensagens ainda recebe resposta de quem ele mesmo chamou
+        boolean reply = from instanceof Player fp && fp.getUniqueId().equals(lastPartner.get(to.getUniqueId()));
+        if (plugin.data().get(to).isMsgDisabled() && !reply && !from.hasPermission("ultracore.msg.bypass")) {
+            msg(from, "privatemsg.target-disabled", "player", to.getName());
             return;
         }
         String sender = from.getName();

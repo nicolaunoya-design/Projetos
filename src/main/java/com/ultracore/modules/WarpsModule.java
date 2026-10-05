@@ -1,7 +1,7 @@
 package com.ultracore.modules;
 
 import com.ultracore.UltraCore;
-import com.ultracore.gui.Menu;
+import com.ultracore.gui.PagedMenu;
 import com.ultracore.module.Module;
 import com.ultracore.util.DataFile;
 import com.ultracore.util.ItemBuilder;
@@ -13,6 +13,8 @@ import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
+import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,6 +30,8 @@ public class WarpsModule extends Module {
         this.file = new DataFile(plugin, "warps.yml");
 
         integer("delay", 3, 0, 30, 1, Material.CLOCK, "Delay do teleporte", "Segundos parado antes de teleportar (0 = instantâneo).");
+        integer("cooldown", 0, 0, 3600, 5, Material.HOPPER, "Cooldown (segundos)",
+                "Tempo de espera entre um /warp e outro (0 = sem cooldown). ultracore.bypass.cooldown ignora.");
         bool("per-warp-permission", false, Material.IRON_BARS, "Permissão por warp",
                 "Se ativado, cada warp exige a permissão ultracore.warp.<nome>.");
 
@@ -56,7 +60,8 @@ public class WarpsModule extends Module {
             msg(p, "warps.no-permission");
             return;
         }
-        plugin.teleporter().teleport(p, loc, getInt("delay"));
+        if (!cooldownReady(p, "warp", "warp")) return;
+        plugin.teleporter().teleport(p, loc, getInt("delay"), () -> startCooldown(p, "warp", getInt("cooldown")));
     }
 
     private void warp(CommandSender s, String[] a) {
@@ -98,32 +103,48 @@ public class WarpsModule extends Module {
         return a.length == 1 ? Msg.filter(names(), a[0]) : List.of();
     }
 
-    private final class WarpMenu extends Menu {
-        private final Player viewer;
+    private static final Material[] ICONS = {Material.ENDER_PEARL, Material.ENDER_EYE, Material.HEART_OF_THE_SEA, Material.AMETHYST_SHARD,
+            Material.PRISMARINE_CRYSTALS, Material.ECHO_SHARD, Material.NETHER_STAR, Material.END_CRYSTAL};
+
+    /** /warps: menu com todas as warps (clique para ir). */
+    private final class WarpMenu extends PagedMenu<String> {
 
         WarpMenu(Player viewer) {
-            super(54, Lang.get("warps.menu-title"));
-            this.viewer = viewer;
+            super(viewer, Lang.get("warps.menu-title"), Material.PURPLE_STAINED_GLASS_PANE, () -> plugin.mainMenu(viewer));
         }
 
         @Override
-        public void build() {
-            clear();
+        protected List<String> entries() {
             List<String> list = new ArrayList<>(names());
-            if (list.isEmpty()) {
-                set(22, new ItemBuilder(Material.BARRIER).name("&cNenhuma warp criada").lore("&7Admins: use /setwarp <nome>").build(), null);
-                return;
-            }
-            for (int i = 0; i < list.size() && i < 54; i++) {
-                String w = list.get(i);
-                boolean ok = canUse(viewer, w);
-                set(i, new ItemBuilder(ok ? Material.ENDER_PEARL : Material.GRAY_DYE).name((ok ? "&a" : "&7") + w)
-                        .lore(ok ? "&eClique para teleportar" : "&cSem permissão").build(), e -> {
-                    if (!ok) return;
-                    closeLater(viewer);
-                    goTo(viewer, w);
-                });
-            }
+            list.sort(String::compareTo);
+            return list;
+        }
+
+        @Override
+        protected ItemStack icon(String w) {
+            boolean ok = canUse(viewer, w);
+            Location loc = LocUtil.deserialize(file.get().getString("warps." + w));
+            Material icon = ok ? ICONS[Math.floorMod(w.hashCode(), ICONS.length)] : Material.GRAY_DYE;
+            ItemBuilder b = new ItemBuilder(icon).name((ok ? "&d&l" : "&7&l") + w);
+            if (loc != null) b.lore("&7Mundo: &f" + loc.getWorld().getName());
+            b.lore("", ok ? "&e▸ Clique para teleportar" : "&c✘ Sem permissão");
+            return b.build();
+        }
+
+        @Override
+        protected void onClick(String w, InventoryClickEvent e) {
+            if (!canUse(viewer, w)) return;
+            runCommand("warp " + w);
+        }
+
+        @Override
+        protected ItemStack empty() {
+            return new ItemBuilder(Material.BARRIER).name("&cNenhuma warp criada").lore("&7Admins: use /setwarp <nome>").build();
+        }
+
+        @Override
+        protected void decorate() {
+            set(4, new ItemBuilder(Material.ENDER_PEARL).name("&d&lWarps").lore("&7Lugares públicos do servidor.").build(), null);
         }
     }
 }

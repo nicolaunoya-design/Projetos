@@ -25,6 +25,8 @@ public class BackModule extends Module {
         bool("on-death", true, Material.SKELETON_SKULL, "Salvar local de morte", "Permite usar /back para voltar ao local onde morreu.");
         bool("on-teleport", true, Material.ENDER_PEARL, "Salvar antes de teleportar", "Permite usar /back após usar /home, /warp, /tpa...");
         integer("delay", 3, 0, 30, 1, Material.CLOCK, "Delay do teleporte", "Segundos parado antes de teleportar (0 = instantâneo).");
+        integer("cooldown", 0, 0, 3600, 5, Material.HOPPER, "Cooldown (segundos)",
+                "Tempo de espera entre um /back e outro (0 = sem cooldown). ultracore.bypass.cooldown ignora.");
 
         command("back", "ultracore.back", (s, a) -> {
             Player p = (Player) s;
@@ -33,7 +35,8 @@ public class BackModule extends Module {
                 msg(p, "back.none");
                 return;
             }
-            plugin.teleporter().teleport(p, loc, getInt("delay"));
+            if (!cooldownReady(p, "back", "back")) return;
+            plugin.teleporter().teleport(p, loc, getInt("delay"), () -> startCooldown(p, "back", getInt("cooldown")));
         }).playerOnly();
     }
 

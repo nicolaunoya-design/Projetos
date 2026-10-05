@@ -114,11 +114,29 @@ public final class PlayerDataManager implements Listener {
         return n != null ? n : uuid.toString().substring(0, 8);
     }
 
+    /** Copia o tempo de jogo do Minecraft para os dados do jogador (usado no ranking). */
+    public void updatePlaytime(Player p) {
+        try {
+            get(p).setPlayTicks(p.getStatistic(org.bukkit.Statistic.PLAY_ONE_MINUTE));
+        } catch (Throwable ignored) {
+        }
+    }
+
+    /** Dados de todos os jogadores (disco + quem está online e ainda não foi salvo). Use fora da thread principal. */
+    public List<PlayerData> allPlayers() {
+        List<PlayerData> list = loadAllFromDisk();
+        java.util.Set<UUID> seen = new java.util.HashSet<>();
+        for (PlayerData d : list) seen.add(d.getUuid());
+        for (PlayerData d : cache.values()) if (seen.add(d.getUuid())) list.add(d);
+        return list;
+    }
+
     @EventHandler(priority = EventPriority.LOWEST)
     public void onJoin(PlayerJoinEvent e) {
         Player p = e.getPlayer();
         PlayerData d = get(p);
         d.setName(p.getName());
+        updatePlaytime(p);
         if (p.getAddress() != null && p.getAddress().getAddress() != null) {
             d.setLastIp(p.getAddress().getAddress().getHostAddress());
         }
@@ -130,7 +148,10 @@ public final class PlayerDataManager implements Listener {
     public void onQuit(PlayerQuitEvent e) {
         Player p = e.getPlayer();
         PlayerData d = cache.get(p.getUniqueId());
-        if (d != null) save(d);
+        if (d != null) {
+            updatePlaytime(p);
+            save(d);
+        }
         Bukkit.getScheduler().runTask(plugin, () -> {
             if (p.isOnline()) return;
             PlayerData removed = cache.remove(p.getUniqueId());

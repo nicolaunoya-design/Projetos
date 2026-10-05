@@ -2,7 +2,9 @@ package com.ultracore.modules;
 
 import com.ultracore.UltraCore;
 import com.ultracore.data.PlayerData;
+import com.ultracore.gui.PagedMenu;
 import com.ultracore.module.Module;
+import com.ultracore.util.ItemBuilder;
 import com.ultracore.util.DataFile;
 import com.ultracore.util.Lang;
 import com.ultracore.util.Msg;
@@ -13,6 +15,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.inventory.ItemStack;
 
@@ -93,6 +96,10 @@ public class KitsModule extends Module {
         Player p = (Player) s;
         PlayerData d = plugin.data().get(p);
         if (a.length == 0) {
+            new KitsMenu(p).open(p);
+            return;
+        }
+        if (a[0].equalsIgnoreCase("lista")) {
             if (names().isEmpty()) {
                 msg(p, "kits.none");
                 return;
@@ -168,6 +175,62 @@ public class KitsModule extends Module {
         file.get().set("kits." + name + ".items", items);
         file.save();
         msg(p, "kits.created", "kit", name, "count", items.size());
+    }
+
+    private static String pretty(Material m) {
+        String s = m.name().toLowerCase().replace('_', ' ');
+        return Character.toUpperCase(s.charAt(0)) + s.substring(1);
+    }
+
+    /** /kit sem nome: menu com os kits, o que vem em cada um e se já pode pegar. */
+    private final class KitsMenu extends PagedMenu<String> {
+
+        KitsMenu(Player viewer) {
+            super(viewer, Lang.get("kits.menu-title"), Material.ORANGE_STAINED_GLASS_PANE, () -> plugin.mainMenu(viewer));
+        }
+
+        @Override
+        protected List<String> entries() {
+            List<String> list = new ArrayList<>(names());
+            list.sort(String::compareTo);
+            return list;
+        }
+
+        @Override
+        protected ItemStack icon(String kit) {
+            List<ItemStack> items = items(kit);
+            boolean allowed = canUse(viewer, kit);
+            long wait = viewer.hasPermission("ultracore.bypass.cooldown") ? 0 : remaining(plugin.data().get(viewer), kit);
+            Material icon = !allowed ? Material.GRAY_DYE : wait == 0 ? (items.isEmpty() ? Material.CHEST : items.get(0).getType()) : Material.MINECART;
+            ItemBuilder b = new ItemBuilder(icon).name((allowed && wait == 0 ? "&a&l" : "&7&l") + "Kit " + kit).glow(allowed && wait == 0);
+            b.lore("&7Itens:");
+            for (int i = 0; i < items.size() && i < 8; i++) b.lore("&8• &f" + items.get(i).getAmount() + "x " + pretty(items.get(i).getType()));
+            if (items.size() > 8) b.lore("&8... e mais " + (items.size() - 8));
+            long cd = file.get().getLong("kits." + kit + ".cooldown");
+            b.lore("&7Recarga: &f" + (cd < 0 ? "uso único" : cd == 0 ? "nenhuma" : TimeUtil.format(cd * 1000L)), "");
+            if (!allowed) b.lore("&c✘ Sem permissão");
+            else if (wait < 0) b.lore("&c✘ Você já pegou (uso único)");
+            else if (wait > 0) b.lore("&e⌛ Disponível em &f" + TimeUtil.format(wait));
+            else b.lore("&a✔ Disponível!", "&e▸ Clique para pegar");
+            return b.build();
+        }
+
+        @Override
+        protected void onClick(String kit, InventoryClickEvent e) {
+            click(viewer);
+            viewer.performCommand("kit " + kit);
+            build();
+        }
+
+        @Override
+        protected ItemStack empty() {
+            return new ItemBuilder(Material.BARRIER).name("&7Nenhum kit criado").lore("&7Admins: &f/createkit <nome> <tempo>").build();
+        }
+
+        @Override
+        protected void decorate() {
+            set(4, new ItemBuilder(Material.CHEST).name("&6&lKits").lore("&7Clique num kit disponível para pegar.").build(), null);
+        }
     }
 
     @EventHandler

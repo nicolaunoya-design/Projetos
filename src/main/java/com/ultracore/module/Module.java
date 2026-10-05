@@ -2,6 +2,7 @@ package com.ultracore.module;
 
 import com.ultracore.UltraCore;
 import com.ultracore.util.Msg;
+import com.ultracore.util.TimeUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
@@ -15,6 +16,7 @@ import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 
 /**
@@ -32,6 +34,8 @@ public abstract class Module implements Listener {
     private final Map<String, Setting> settings = new LinkedHashMap<>();
     private final Map<String, ModuleCommand> commands = new LinkedHashMap<>();
     private final List<BukkitTask> tasks = new ArrayList<>();
+    /** "uuid:chave" -> horário em que o cooldown acaba. Fica na memória (zera ao reiniciar o servidor). */
+    private final Map<String, Long> cooldowns = new ConcurrentHashMap<>();
     private boolean enabled;
 
     protected Module(UltraCore plugin, String id, String name, Material icon, boolean defaultEnabled, String description) {
@@ -205,6 +209,32 @@ public abstract class Module implements Listener {
         plugin.getConfig().set(path(key), value);
         plugin.saveConfig();
         restart();
+    }
+
+    // ---------- cooldowns ----------
+
+    /** Milissegundos que faltam para o jogador poder usar de novo (0 = liberado). */
+    public long cooldownLeft(Player p, String key) {
+        Long until = cooldowns.get(p.getUniqueId() + ":" + key);
+        if (until == null) return 0;
+        long left = until - System.currentTimeMillis();
+        if (left <= 0) cooldowns.remove(p.getUniqueId() + ":" + key);
+        return Math.max(0, left);
+    }
+
+    /** Começa um cooldown de "seconds" segundos (0 ou menos = nenhum). */
+    protected void startCooldown(Player p, String key, int seconds) {
+        if (seconds <= 0 || p.hasPermission("ultracore.bypass.cooldown")) return;
+        cooldowns.put(p.getUniqueId() + ":" + key, System.currentTimeMillis() + seconds * 1000L);
+    }
+
+    /** Se ainda estiver em cooldown, avisa o jogador e retorna false. */
+    protected boolean cooldownReady(Player p, String key, String command) {
+        if (p.hasPermission("ultracore.bypass.cooldown")) return true;
+        long left = cooldownLeft(p, key);
+        if (left <= 0) return true;
+        msg(p, "common.cooldown", "time", TimeUtil.format(left + 999), "command", command);
+        return false;
     }
 
     // ---------- ajudantes para comandos ----------

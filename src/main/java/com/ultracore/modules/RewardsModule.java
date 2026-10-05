@@ -51,6 +51,18 @@ public class RewardsModule extends Module {
         return d.getLastDaily() == 0 || dayOf(d.getLastDaily()).isBefore(LocalDate.now());
     }
 
+    /** Se o jogador já pode pegar a recompensa diária hoje. */
+    public boolean isDailyAvailable(Player p) {
+        return available(plugin.data().get(p));
+    }
+
+    /** Milissegundos até a próxima recompensa diária (0 = disponível). */
+    public long dailyWait(Player p) {
+        if (isDailyAvailable(p)) return 0;
+        long midnight = LocalDate.now().plusDays(1).atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli();
+        return Math.max(0, midnight - System.currentTimeMillis());
+    }
+
     private void daily(Player p) {
         PlayerData d = plugin.data().get(p);
         if (!available(d)) {

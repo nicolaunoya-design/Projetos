@@ -5,6 +5,7 @@ import com.ultracore.module.Module;
 import com.ultracore.util.Lang;
 import com.ultracore.util.Msg;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -39,6 +40,9 @@ public class ChatModule extends Module {
         bool("filter", true, Material.SHEARS, "Filtro de palavras", "Substitui palavras proibidas.");
         list("filter-words", List.of("palavrao1", "palavrao2"), Material.PAPER, "Palavras proibidas", "Palavras que serão censuradas no chat.");
         text("filter-replacement", "***", Material.PAPER, "Substituto do filtro", "Texto que aparece no lugar das palavras proibidas.");
+        bool("mentions", true, Material.BELL, "Menções (@nome)",
+                "Destaca o nome de quem foi citado no chat e toca um som para ele (cada um pode desligar o som em /preferencias).");
+        text("mention-color", "&e", Material.YELLOW_DYE, "Cor da menção", "Cor do @nome destacado no chat.");
 
         command("clearchat", "ultracore.clearchat", (s, a) -> {
             for (Player p : Bukkit.getOnlinePlayers()) {
@@ -115,7 +119,6 @@ public class ChatModule extends Module {
         }
 
         if (p.hasPermission("ultracore.chat.color")) msg = Msg.color(msg);
-        e.setMessage(msg);
 
         String fmt = getString("format");
         if (!fmt.contains("{message}")) fmt += " {message}";
@@ -123,7 +126,39 @@ public class ChatModule extends Module {
         fmt = fmt.replace("{prefix}", prefix).replace("{tag}", prefix).replace("{world}", p.getWorld().getName());
         String marked = fmt.replace("{player}", "\u0000P\u0000").replace("{message}", "\u0000M\u0000");
         marked = plugin.placeholders(p, marked).replace("%", "%%");
+
+        if (getBool("mentions")) {
+            // cor que a mensagem tinha antes da menção, para voltar a ela depois do @nome
+            String restore = ChatColor.getLastColors(marked.substring(0, marked.indexOf("\u0000M\u0000")));
+            msg = mentions(p, msg, restore.isEmpty() ? ChatColor.RESET.toString() : restore);
+        }
+        e.setMessage(msg);
         e.setFormat(marked.replace("\u0000P\u0000", "%1$s").replace("\u0000M\u0000", "%2$s"));
+    }
+
+    /** Destaca @nome de quem está online e avisa a pessoa com som e uma mensagem na barra de ação. */
+    private String mentions(Player from, String msg, String restore) {
+        String color = Msg.color(getString("mention-color"));
+        List<Player> mentioned = new java.util.ArrayList<>();
+        for (Player o : Bukkit.getOnlinePlayers()) {
+            if (o == from || o.getName().length() < 3 || !plugin.canSee(from, o)) continue;
+            Pattern pat = Pattern.compile("(?i)(?<![A-Za-z0-9_])@?" + Pattern.quote(o.getName()) + "(?![A-Za-z0-9_])");
+            java.util.regex.Matcher m = pat.matcher(msg);
+            if (!m.find()) continue;
+            msg = m.replaceAll(java.util.regex.Matcher.quoteReplacement(color + "@" + o.getName() + restore));
+            mentioned.add(o);
+        }
+        if (!mentioned.isEmpty()) {
+            String bar = Msg.color(Lang.get("chat.mention-actionbar", "player", from.getName()));
+            Bukkit.getScheduler().runTask(plugin, () -> {
+                for (Player o : mentioned) {
+                    if (!o.isOnline() || plugin.data().get(o).isMentionsDisabled()) continue;
+                    o.playSound(o.getLocation(), org.bukkit.Sound.BLOCK_NOTE_BLOCK_PLING, 0.8f, 1.6f);
+                    o.sendActionBar(net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer.legacySection().deserialize(bar));
+                }
+            });
+        }
+        return msg;
     }
 
     @EventHandler

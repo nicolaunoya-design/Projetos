@@ -17,6 +17,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.meta.FireworkMeta;
@@ -43,6 +44,8 @@ public class FunModule extends Module {
     private final Set<UUID> frozen = ConcurrentHashMap.newKeySet();
     /** Quem foi lançado para cima e não deve morrer na queda (até o horário guardado). */
     private final Map<UUID, Long> noFall = new ConcurrentHashMap<>();
+    /** Quem foi atingido por uma brincadeira (até o horário guardado): se morrer, ninguém fica sabendo. */
+    private final Map<UUID, Long> secretVictims = new ConcurrentHashMap<>();
 
     public FunModule(UltraCore plugin) {
         super(plugin, "fun", "Diversão (OP)", Material.FIREWORK_ROCKET, true,
@@ -58,6 +61,7 @@ public class FunModule extends Module {
         List<String> none = List.of();
         fun("trovao", "&eRaio", t -> {
             Location l = t.getLocation();
+            markNearby(t, 4);
             if (getBool("lightning-damage")) t.getWorld().strikeLightning(l);
             else t.getWorld().strikeLightningEffect(l);
         });
@@ -74,11 +78,13 @@ public class FunModule extends Module {
                 }
             }
             for (Player t : targets) {
+                markNearby(t, power * 2 + 2);
                 t.getWorld().createExplosion(t.getLocation(), power, false, getBool("explosion-breaks-blocks"));
             }
             done(s, targets, "&cExplosão");
         }).tab((s, a) -> a.length == 1 ? withAll(a[0]) : a.length == 2 ? List.of("1", "3", "5", "10") : none);
         fun("foguete", "&bFoguete", t -> {
+            markVictim(t, 20);
             t.setVelocity(new Vector(0, 3.2, 0));
             noFall.put(t.getUniqueId(), System.currentTimeMillis() + 15_000);
             t.getWorld().playSound(t.getLocation(), Sound.ENTITY_FIREWORK_ROCKET_LAUNCH, 1f, 0.8f);
@@ -100,6 +106,7 @@ public class FunModule extends Module {
                 }
             }
             for (Player t : targets) {
+                markVictim(t, seconds + 15);
                 t.setFireTicks(seconds * 20);
             }
             done(s, targets, "&6Fogo (" + seconds + "s)");
@@ -122,6 +129,7 @@ public class FunModule extends Module {
             t.spawnParticle(Particle.ELDER_GUARDIAN, t.getLocation(), 1);
         });
         fun("arremessar", "&aArremesso", t -> {
+            markVictim(t, 20);
             double angle = ThreadLocalRandom.current().nextDouble(Math.PI * 2);
             t.setVelocity(new Vector(Math.cos(angle) * 2.5, 1.2, Math.sin(angle) * 2.5));
             noFall.put(t.getUniqueId(), System.currentTimeMillis() + 10_000);
@@ -206,6 +214,19 @@ public class FunModule extends Module {
         return t == null ? null : List.of(t);
     }
 
+    /** Marca o alvo como vítima secreta por alguns segundos (morte sem mensagem no chat). */
+    private void markVictim(Player p, int seconds) {
+        secretVictims.put(p.getUniqueId(), System.currentTimeMillis() + seconds * 1000L);
+    }
+
+    /** Marca o alvo e quem estiver perto (raio/explosão também podem acertar os vizinhos). */
+    private void markNearby(Player t, double radius) {
+        markVictim(t, 15);
+        for (Player o : t.getWorld().getPlayers()) {
+            if (o != t && o.getLocation().distanceSquared(t.getLocation()) <= radius * radius) markVictim(o, 15);
+        }
+    }
+
     private static List<String> withAll(String typed) {
         List<String> names = new ArrayList<>(onlineNames(typed));
         if ("todos".startsWith(typed.toLowerCase())) names.add("todos");
@@ -266,10 +287,24 @@ public class FunModule extends Module {
         noFall.remove(p.getUniqueId());
     }
 
+    /**
+     * Morte causada por uma brincadeira (raio, explosão, fogo, queda...) não aparece no chat,
+     * nem no Discord/WhatsApp: assim ninguém fica sabendo que alguém usou um comando de OP.
+     */
+    @EventHandler(priority = EventPriority.HIGHEST)
+    public void onDeath(PlayerDeathEvent e) {
+        Long until = secretVictims.remove(e.getEntity().getUniqueId());
+        if (until == null || until < System.currentTimeMillis()) return;
+        EntityDamageEvent last = e.getEntity().getLastDamageCause();
+        if (last != null && last.getCause() == EntityDamageEvent.DamageCause.KILL) return;
+        e.deathMessage(null);
+    }
+
     @EventHandler
     public void onQuit(PlayerQuitEvent e) {
         frozen.remove(e.getPlayer().getUniqueId());
         noFall.remove(e.getPlayer().getUniqueId());
+        secretVictims.remove(e.getPlayer().getUniqueId());
     }
 
     @Override
@@ -280,5 +315,6 @@ public class FunModule extends Module {
         }
         frozen.clear();
         noFall.clear();
+        secretVictims.clear();
     }
 }

@@ -4,6 +4,17 @@ Plugin para **Paper 1.21 até 26.x** (e forks como Purpur) que junta num só lug
 
 Cada recurso é um **módulo** que pode ser **ligado, desligado e configurado dentro do jogo** pelo comando `/painel`, sem mexer em arquivos nem reiniciar o servidor. Todas as mensagens podem ser editadas no `messages.yml`.
 
+## ✨ Novidades da 2.0
+
+- **`/menu`**: central do servidor para os jogadores, com perfil (dinheiro, abates, tempo de jogo) e botões para spawn, homes, warps, teleporte, loja, kits, recompensa diária, rankings, tags e preferências.
+- **Menus novos**: homes (`/homes`: clique para ir, criar e apagar), kits (`/kit`: o que vem em cada kit e quando pode pegar), teleporte (`/tpa`: cabeças dos jogadores online), warps e **rankings** (`/top`: mais ricos, mais abates, mais tempo de jogo).
+- **`/preferencias`**: cada jogador escolhe se recebe pedidos de TPA, mensagens privadas e o som de menção (fica salvo). Novo `/msgtoggle`.
+- **Cooldowns** no `/spawn` e no `/tpa` (30 segundos por padrão) e opcionais no `/home`, `/warp` e `/back`, ajustáveis no `/painel`.
+- **Menções no chat**: escrever o nome de alguém destaca `@Nome` e avisa a pessoa com som.
+- **Painel por categorias** (Teleporte, Economia, Chat, Visual, Staff, Mundo, Diversão, Integrações).
+- **Diversão 100% secreta**: além de não avisar o alvo, quem morre por `/trovao`, `/explodir` etc. não gera mensagem de morte no chat nem no Discord/WhatsApp.
+- **Testado de verdade**: a cada versão, servidores Paper reais de todas as versões sobem com o plugin, e dois jogadores-robô entram, usam os comandos e clicam nos menus. A Release só é publicada se tudo passar.
+
 ## ⬇️ Download
 
 Baixe o `.jar` mais recente na página de **[Releases](../../releases/latest)** → seção *Assets* → `UltraCore-x.y.z.jar`.
@@ -44,9 +55,13 @@ Testado automaticamente ligando um **servidor Paper real** de cada versão com o
 
 1. Baixe o `.jar` na página de **[Releases](../../releases/latest)**.
 2. Coloque na pasta `plugins/` do servidor.
-3. Inicie o servidor, entre como OP e digite **`/painel`**.
+3. Inicie o servidor, entre como OP e digite **`/painel`**. Para os jogadores, o comando principal é **`/menu`**.
+
+Para atualizar: troque o `.jar` e **reinicie** o servidor (não use `/reload`). Suas configurações são mantidas.
 
 ## O painel (`/painel`)
+
+O painel abre com as **categorias** (Teleporte, Economia, Chat e Social, Visual, Staff, Mundo, Diversão, Integrações). Dentro de cada uma:
 
 - **Clique esquerdo** em um módulo → liga/desliga na hora.
 - **Clique direito** → abre as configurações do módulo:
@@ -57,9 +72,33 @@ Testado automaticamente ligando um **servidor Paper real** de cada versão com o
   - **Restaurar padrão** 🆕 (balde de água): volta todas as opções daquele módulo para o valor original. Clique duas vezes para confirmar. Não liga nem desliga o módulo e não mexe em dados salvos (loja, kits, warps...).
   - **Comandos** 🆕 (bloco de comando): liga/desliga **cada comando** do módulo separadamente. Ex: em **Utilidades**, desligar só o `/craft` e deixar o resto. Comando desligado responde "Este comando está desativado".
   - **Abrir editor** 🆕 (bigorna): aparece em módulos com editor visual, como a **Loja**.
-- Botões: **Recarregar config**, **Ativar todos**, **Desativar todos**.
+- Botões: **Recarregar config** (na tela principal), **Ativar/Desativar todos desta categoria** (dentro de cada categoria).
 
 Pelo console: `/painel lista`, `/painel ativar <módulo>`, `/painel desativar <módulo>`, `/painel padrao <módulo>`, `/painel comando <comando> <ativar|desativar>`, `/painel reload`.
+
+## Menus dos jogadores
+
+| Comando | O que abre |
+|---|---|
+| `/menu` (`/servidor`) | Central do servidor: perfil e botões para tudo abaixo (só aparecem os recursos ligados e que o jogador pode usar). Admins veem também o botão do painel. |
+| `/homes` | Suas homes: **clique** para teleportar, **Shift + clique direito** duas vezes para apagar, botão **Criar home aqui**. |
+| `/kit` | Kits com os itens de cada um, a recarga e se já pode pegar. Clique para pegar. (`/kit lista` mostra no chat.) |
+| `/tpa` | Cabeças dos jogadores online: **esquerdo** pede para ir até ele, **direito** pede para ele vir até você. |
+| `/warps` | Warps do servidor. |
+| `/top` (`/ranking`) | Rankings: mais ricos, mais abates e mais tempo de jogo. |
+| `/preferencias` | Liga/desliga: pedidos de TPA, mensagens privadas, som de menção e (staff) entrada silenciosa. |
+| `/tag` | Escolher a tag. |
+
+## Cooldowns
+
+| Comando | Padrão | Onde muda |
+|---|---|---|
+| `/spawn` | 30 s | `/painel` → Teleporte → Spawn → Cooldown |
+| `/tpa` e `/tpahere` | 30 s (entre um pedido e outro) | `/painel` → Teleporte → TPA → Cooldown |
+| `/home`, `/warp`, `/back` | desligado (0) | `/painel` → Teleporte → módulo → Cooldown |
+| `/rtp` | 5 min | `/painel` → Teleporte → Teleporte Aleatório |
+
+O cooldown só começa quando o teleporte acontece (se a pessoa se mexer e cancelar, não perde a vez). Quem tem `ultracore.bypass.cooldown` (admins/OP) não tem cooldown.
 
 ## Arquivos de configuração
 
@@ -84,15 +123,16 @@ Textos aceitam cores `&a`, `&l`... e hex `&#FF8800`.
 | Spawn | Spawn do servidor, spawn na 1ª entrada e ao renascer | `/spawn`, `/setspawn` |
 | Homes | Casas por jogador, com limite configurável | `/sethome`, `/home`, `/delhome`, `/homes` |
 | Warps | Pontos públicos com menu visual | `/warp`, `/warps`, `/setwarp`, `/delwarp` |
-| TPA | Pedidos de teleporte | `/tpa`, `/tpahere`, `/tpaccept`, `/tpdeny`, `/tptoggle` |
+| TPA | Pedidos de teleporte, com menu e cooldown | `/tpa`, `/tpahere`, `/tpaccept`, `/tpdeny`, `/tptoggle` |
 | Back | Voltar ao local anterior ou da morte | `/back` |
 | Teleporte Aleatório | Local aleatório e seguro, com cooldown | `/rtp` |
 | Economia | Dinheiro, pagamentos, ranking, prêmio por abate, integração com Vault | `/money`, `/pay`, `/baltop`, `/eco` |
 | **Loja** 🆕 | Loja em menu para comprar e vender itens | `/loja`, `/vender`, `/vender tudo` |
 | Kits | Kits com cooldown ou uso único, kit inicial | `/kit`, `/createkit`, `/delkit` |
 | **Recompensas** 🆕 | Recompensa diária com bônus por dias seguidos, tempo de jogo | `/daily`, `/tempo` |
-| Chat | Formato, anti-spam, anti-CAPS, filtro | `/staffchat`, `/clearchat`, `/broadcast` |
-| Mensagens Privadas | Conversas privadas + socialspy | `/msg`, `/r`, `/socialspy` |
+| Chat | Formato, anti-spam, anti-CAPS, filtro, **menções @nome** 🆕 | `/staffchat`, `/clearchat`, `/broadcast` |
+| Mensagens Privadas | Conversas privadas + socialspy; cada um pode desligar | `/msg`, `/r`, `/socialspy`, `/msgtoggle` |
+| **Menus dos Jogadores** 🆕 | Central do servidor, rankings e preferências | `/menu`, `/top`, `/preferencias` |
 | **Apelidos** 🆕 | Apelido no chat e na TAB, com cores para VIP | `/nick` |
 | **Tags** 🆕 | Tags como [VIP], [Admin] no chat e na TAB; o jogador escolhe a sua | `/tag` |
 | **Diversão (só OP)** 🆕 | Raio, explosão, foguete, fogos, congelar, susto... Sem nome = você; `todos` = todo mundo | `/trovao`, `/explodir`, `/foguete`, `/fogos`, `/queimar`, `/congelar`, `/assustar`, `/arremessar`, `/falsoop`, `/fazerfalar`, `/chuvadeitens`, `/girar` |
@@ -145,7 +185,7 @@ A TAB junta tudo: `[AFK]` + tag + apelido. Os nomes na TAB não são reordenados
 
 ### Diversão (só OP)
 
-Todos aceitam `[jogador]` (sem nome = em você mesmo) ou `todos`. São **secretos**: só quem usou recebe a confirmação; o alvo não é avisado de nada. Permissão `ultracore.diversao`, que **só OP tem** (não vem junto com `ultracore.admin`).
+Todos aceitam `[jogador]` (sem nome = em você mesmo) ou `todos`. São **secretos**: só quem usou recebe a confirmação; o alvo não é avisado de nada, e se alguém morrer por causa de uma brincadeira, **a mensagem de morte não aparece** no chat nem no Discord/WhatsApp. Permissão `ultracore.diversao`, que **só OP tem** (não vem junto com `ultracore.admin`).
 
 | Comando | O que faz |
 |---|---|
@@ -212,12 +252,12 @@ O passo a passo está no [README da ponte](integracoes/whatsapp-bot/README.md).
 
 | Permissão | Quem tem por padrão | Inclui |
 |---|---|---|
-| `ultracore.player` | todos | spawn, home, warp, tpa, back, rtp, money, pay, baltop, kit, msg, ping, afk, regras, lixo, loja, vender, daily, tempo, report |
+| `ultracore.player` | todos | spawn, home, warp, tpa, back, rtp, money, pay, baltop, kit, msg, ping, afk, regras, lixo, loja, vender, daily, tempo, report, tag, menu, top, preferencias |
 | `ultracore.vip` | ninguém (dê pelo LuckPerms) | craft, enderchest, hat, cores no chat, fly, nick com cores, tag [VIP] |
 | `ultracore.staff` | OP | kick, mute, ban, warn, histórico, ver denúncias, staffchat, vanish, invsee, gm, heal, feed, tphere... |
 | `ultracore.admin` | OP | tudo + `/painel`, setspawn, setwarp, eco, createkit, banip, editar a loja, gerenciar tags, god, speed... |
 
-Outras úteis: `ultracore.homes.unlimited`, `ultracore.bypass.delay`, `ultracore.bypass.cooldown`, `ultracore.kit.<nome>`, `ultracore.warp.<nome>`, `ultracore.tag.<id>` (cada tag), `ultracore.tags.admin` (/tag dar, tirar, criar, apagar), `ultracore.nick.others`, `ultracore.report.see`, `ultracore.silentjoin` e `ultracore.silentjoin.see` (staff).
+Outras úteis: `ultracore.homes.unlimited`, `ultracore.bypass.delay`, `ultracore.bypass.cooldown`, `ultracore.kit.<nome>`, `ultracore.warp.<nome>`, `ultracore.tag.<id>` (cada tag), `ultracore.tags.admin` (/tag dar, tirar, criar, apagar), `ultracore.nick.others`, `ultracore.report.see`, `ultracore.silentjoin` e `ultracore.silentjoin.see` (staff), `ultracore.msg.bypass` (staff: manda mensagem privada mesmo para quem desligou).
 
 ## Para desenvolvedores
 

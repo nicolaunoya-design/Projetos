@@ -80,6 +80,7 @@ public final class UltraCore extends JavaPlugin {
         moduleManager.register(new NickModule(this));
         moduleManager.register(new TagsModule(this));
         moduleManager.register(new FunModule(this));
+        moduleManager.register(new MenusModule(this));
         moduleManager.register(new DiscordModule(this));
         moduleManager.register(new WebhookModule(this));
 
@@ -175,6 +176,20 @@ public final class UltraCore extends JavaPlugin {
         JoinQuitModule jq = moduleManager.get(JoinQuitModule.class);
         StaffModule staff = moduleManager.get(StaffModule.class);
         return (jq != null && jq.isSilent(p)) || (staff != null && staff.isVanished(p));
+    }
+
+    /** Menu principal dos jogadores (/menu), ou null se o módulo Menus estiver desligado. */
+    public com.ultracore.gui.Menu mainMenu(Player p) {
+        MenusModule menus = moduleManager == null ? null : moduleManager.get(MenusModule.class);
+        return menus != null && menus.isEnabled() ? menus.mainMenu(p) : null;
+    }
+
+    /** Se "viewer" pode ver "target" nas listas (respeita /vanish e /esconder). */
+    public boolean canSee(Player viewer, Player target) {
+        if (viewer == target) return true;
+        if (!viewer.canSee(target)) return false;
+        StaffModule staff = moduleManager == null ? null : moduleManager.get(StaffModule.class);
+        return staff == null || !staff.isTabHidden(target) || viewer.hasPermission("ultracore.tabhide.see");
     }
 
     public PlayerDataManager data() { return dataManager; }

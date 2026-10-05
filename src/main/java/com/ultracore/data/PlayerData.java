@@ -36,6 +36,12 @@ public final class PlayerData {
     private boolean vanished;
     /** Escondido da lista TAB (/esconder), continua visível no mundo. */
     private boolean tabHidden;
+    /** Preferências (/preferencias): não receber pedidos de TPA, mensagens privadas ou som de menção. */
+    private boolean tpaDisabled;
+    private boolean msgDisabled;
+    private boolean mentionsDisabled;
+    /** Tempo de jogo em ticks (atualizado ao entrar/sair; usado no ranking). */
+    private long playTicks;
     /** Tags dadas por um admin (além das liberadas por permissão). */
     private final List<String> ownedTags = new ArrayList<>();
     /** Histórico de punições: type, reason, by, time, duration. */
@@ -67,6 +73,10 @@ public final class PlayerData {
         d.silentJoin = c.getBoolean("silent-join");
         d.vanished = c.getBoolean("vanished");
         d.tabHidden = c.getBoolean("tab-hidden");
+        d.tpaDisabled = c.getBoolean("prefs.tpa-off");
+        d.msgDisabled = c.getBoolean("prefs.msg-off");
+        d.mentionsDisabled = c.getBoolean("prefs.mentions-off");
+        d.playTicks = c.getLong("stats.play-ticks");
         d.ownedTags.addAll(c.getStringList("tag.owned"));
         for (Map<?, ?> m : c.getMapList("history")) {
             Map<String, Object> entry = new LinkedHashMap<>();
@@ -96,6 +106,10 @@ public final class PlayerData {
         c.set("silent-join", silentJoin);
         c.set("vanished", vanished);
         c.set("tab-hidden", tabHidden);
+        c.set("prefs.tpa-off", tpaDisabled);
+        c.set("prefs.msg-off", msgDisabled);
+        c.set("prefs.mentions-off", mentionsDisabled);
+        c.set("stats.play-ticks", playTicks);
         c.set("tag.owned", ownedTags);
         c.set("history", history);
         return c;
@@ -137,6 +151,14 @@ public final class PlayerData {
     public void setVanished(boolean vanished) { this.vanished = vanished; }
     public boolean isTabHidden() { return tabHidden; }
     public void setTabHidden(boolean tabHidden) { this.tabHidden = tabHidden; }
+    public boolean isTpaDisabled() { return tpaDisabled; }
+    public void setTpaDisabled(boolean v) { this.tpaDisabled = v; }
+    public boolean isMsgDisabled() { return msgDisabled; }
+    public void setMsgDisabled(boolean v) { this.msgDisabled = v; }
+    public boolean isMentionsDisabled() { return mentionsDisabled; }
+    public void setMentionsDisabled(boolean v) { this.mentionsDisabled = v; }
+    public long getPlayTicks() { return playTicks; }
+    public void setPlayTicks(long playTicks) { this.playTicks = Math.max(0, playTicks); }
     public void setTag(String tag) { this.tag = tag == null ? "" : tag; }
     public List<String> getOwnedTags() { return ownedTags; }
 

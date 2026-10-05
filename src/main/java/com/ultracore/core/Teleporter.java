@@ -26,13 +26,18 @@ public final class Teleporter implements Listener {
     }
 
     public void teleport(Player p, Location dest, int delaySeconds) {
+        teleport(p, dest, delaySeconds, null);
+    }
+
+    /** Igual ao outro, mas roda "onDone" só se o teleporte acontecer (não roda se cancelar). */
+    public void teleport(Player p, Location dest, int delaySeconds, Runnable onDone) {
         cancel(p);
         if (dest == null || dest.getWorld() == null) {
             Msg.tell(p, "teleport.invalid");
             return;
         }
         if (delaySeconds <= 0 || p.hasPermission("ultracore.bypass.delay")) {
-            doTeleport(p, dest);
+            doTeleport(p, dest, onDone);
             return;
         }
         Location start = p.getLocation().clone();
@@ -59,17 +64,18 @@ public final class Teleporter implements Listener {
                 if (ticks <= 0) {
                     cancel();
                     pending.remove(p.getUniqueId());
-                    doTeleport(p, dest);
+                    doTeleport(p, dest, onDone);
                 }
             }
         }.runTaskTimer(plugin, 5L, 5L);
         pending.put(p.getUniqueId(), task);
     }
 
-    private void doTeleport(Player p, Location dest) {
-        p.teleport(dest);
+    private void doTeleport(Player p, Location dest, Runnable onDone) {
+        if (!p.teleport(dest)) return;
         p.playSound(p.getLocation(), Sound.ENTITY_ENDERMAN_TELEPORT, 0.7f, 1.2f);
         Msg.tell(p, "teleport.done");
+        if (onDone != null) onDone.run();
     }
 
     public void cancel(Player p) {
