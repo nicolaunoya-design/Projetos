@@ -60,6 +60,10 @@ public abstract class Menu implements InventoryHolder {
         p.playSound(p.getLocation(), Sound.UI_BUTTON_CLICK, 0.5f, 1.2f);
     }
 
+    /** Clique no inventário do próprio jogador com este menu aberto (por padrão, ignorado). */
+    protected void handleBottom(InventoryClickEvent e) {
+    }
+
     void handle(InventoryClickEvent e) {
         Consumer<InventoryClickEvent> a = actions.get(e.getRawSlot());
         if (a != null) a.accept(e);

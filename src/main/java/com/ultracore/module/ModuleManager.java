@@ -59,6 +59,7 @@ public final class ModuleManager implements TabExecutor {
         for (Module m : modules) {
             cfg.addDefault(m.path("enabled"), m.isDefaultEnabled());
             for (Setting s : m.getSettings()) cfg.addDefault(m.path(s.getKey()), s.getDefaultValue());
+            for (ModuleCommand c : m.getCommands()) cfg.addDefault(m.commandPath(c.getName()), true);
         }
         cfg.options().copyDefaults(true);
         plugin.saveConfig();
@@ -94,6 +95,11 @@ public final class ModuleManager implements TabExecutor {
         return (T) byClass.get(type);
     }
 
+    /** O comando registrado com esse nome (sem a barra), ou null. */
+    public ModuleCommand command(String name) {
+        return commands.get(name.toLowerCase());
+    }
+
     public Module byId(String id) {
         for (Module m : modules) if (m.getId().equalsIgnoreCase(id)) return m;
         return null;
@@ -105,6 +111,10 @@ public final class ModuleManager implements TabExecutor {
         if (c == null) return false;
         if (!c.getModule().isEnabled()) {
             Msg.tell(sender, "common.module-disabled");
+            return true;
+        }
+        if (!c.getModule().isCommandEnabled(c.getName())) {
+            Msg.tell(sender, "common.command-disabled");
             return true;
         }
         if (c.getPermission() != null && !sender.hasPermission(c.getPermission())) {
@@ -127,7 +137,7 @@ public final class ModuleManager implements TabExecutor {
     @Override
     public List<String> onTabComplete(CommandSender sender, Command cmd, String alias, String[] args) {
         ModuleCommand c = commands.get(cmd.getName().toLowerCase());
-        if (c == null || !c.getModule().isEnabled()) return Collections.emptyList();
+        if (c == null || !c.getModule().isEnabled() || !c.getModule().isCommandEnabled(c.getName())) return Collections.emptyList();
         if (c.getPermission() != null && !sender.hasPermission(c.getPermission())) return Collections.emptyList();
         if (c.getTab() == null) return null;
         List<String> r = c.getTab().complete(sender, args);

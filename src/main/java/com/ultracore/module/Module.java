@@ -167,8 +167,37 @@ public abstract class Module implements Listener {
     /** Volta todas as configurações deste módulo para o padrão (não muda se ele está ligado ou desligado). */
     public void resetDefaults() {
         for (Setting s : settings.values()) plugin.getConfig().set(path(s.getKey()), s.getDefaultValue());
+        for (String c : commands.keySet()) plugin.getConfig().set(commandPath(c), true);
         plugin.saveConfig();
         restart();
+    }
+
+    // ---------- comandos individuais ----------
+
+    public String commandPath(String command) {
+        return path("commands." + command);
+    }
+
+    /** Se o comando está ligado (cada comando de um módulo pode ser desligado sozinho no /painel). */
+    public boolean isCommandEnabled(String command) {
+        return plugin.getConfig().getBoolean(commandPath(command), true);
+    }
+
+    public void setCommandEnabled(String command, boolean value) {
+        plugin.getConfig().set(commandPath(command), value);
+        plugin.saveConfig();
+    }
+
+    /**
+     * Menu extra de edição do módulo (ex: editor da loja), mostrado como botão nas configurações do /painel.
+     * Módulos que têm editor sobrescrevem este método e {@link #hasEditor()}.
+     */
+    public com.ultracore.gui.Menu editor(Player p, com.ultracore.gui.Menu parent) {
+        return null;
+    }
+
+    public boolean hasEditor() {
+        return false;
     }
 
     public void setValue(String key, Object value) {

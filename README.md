@@ -55,9 +55,11 @@ Testado automaticamente ligando um **servidor Paper real** de cada versão com o
   - Textos: clique e digite o novo valor no chat (`cancelar` para desistir, `vazio` para deixar em branco).
   - Listas (linhas do scoreboard, anúncios...): esquerdo adiciona linha, direito remove a última, Shift+direito limpa.
   - **Restaurar padrão** 🆕 (balde de água): volta todas as opções daquele módulo para o valor original. Clique duas vezes para confirmar. Não liga nem desliga o módulo e não mexe em dados salvos (loja, kits, warps...).
+  - **Comandos** 🆕 (bloco de comando): liga/desliga **cada comando** do módulo separadamente. Ex: em **Utilidades**, desligar só o `/craft` e deixar o resto. Comando desligado responde "Este comando está desativado".
+  - **Abrir editor** 🆕 (bigorna): aparece em módulos com editor visual, como a **Loja**.
 - Botões: **Recarregar config**, **Ativar todos**, **Desativar todos**.
 
-Pelo console: `/painel lista`, `/painel ativar <módulo>`, `/painel desativar <módulo>`, `/painel padrao <módulo>`, `/painel reload`.
+Pelo console: `/painel lista`, `/painel ativar <módulo>`, `/painel desativar <módulo>`, `/painel padrao <módulo>`, `/painel comando <comando> <ativar|desativar>`, `/painel reload`.
 
 ## Arquivos de configuração
 
@@ -119,7 +121,13 @@ Tempos nos comandos aceitam `30s`, `10m`, `2h`, `7d`, `1w` (ex: `/tempban Fulano
 - `/loja` abre o menu. **Esquerdo** compra, **Shift+Esquerdo** compra 10x, **Direito** vende, **Shift+Direito** vende todos.
 - `/vender` vende o item da mão; `/vender tudo` vende tudo o que a loja aceita.
 - Só são aceitos itens "puros" (sem nome ou encantamento), para ninguém vender item especial por engano.
-- **Admins:** segure um item e use `/loja add <preço de compra> <preço de venda>` (a quantidade na mão vira o tamanho do pacote; preço `0` desativa compra ou venda). `/loja remover` tira o item da mão da loja. Ou edite o `shop.yml`.
+- **Editor visual (admins)** 🆕: `/loja editar`, o botão **Editar loja** (bigorna) dentro da `/loja`, ou `/painel` → Loja → **Abrir editor**.
+  - **Adicionar:** com o editor aberto, clique em um item do **seu inventário**. Abre a tela do item com:
+    - **Preço de compra** e **preço de venda**: botões vermelhos/verdes de -100, -10, -1, +1, +10, +100, ou clique no lingote/esmeralda e digite o valor exato no chat (ex: `12.5`). `0` = desativado.
+    - **Tamanho do pacote**: -16, -4, -1, +1, +4, +16, ou digite.
+    - **SALVAR**, **Remover da loja** (clique duas vezes) ou **Voltar sem salvar**.
+  - **Editar:** clique no item na lista do editor.
+- **Pelo chat (admins):** segure um item e use `/loja add <preço de compra> <preço de venda>` (a quantidade na mão vira o tamanho do pacote; preço `0` desativa compra ou venda). `/loja remover` tira o item da mão da loja. Ou edite o `shop.yml`.
 
 ### Tags (chat e TAB)
 

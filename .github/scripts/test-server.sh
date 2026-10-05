@@ -56,6 +56,7 @@ if grep -q "Done (" server.log; then
              "painel ativar discord" "painel desativar discord" "painel desativar nick" "painel ativar nick" \
              "tag lista" "tag criar lenda &5[Lenda]" "tag dar Ninguem lenda" "tag apagar lenda" \
              "painel desativar tags" "painel ativar tags" "painel padrao chat" "painel padrao tags" \
+             "painel comando broadcast desativar" "broadcast nao deveria aparecer" "painel comando broadcast ativar" \
              "painel lista"; do
     echo "$cmd" >&3
     sleep 2
@@ -102,9 +103,10 @@ if [ ! -f plugins/UltraCore/shop.yml ]; then
   echo "::error::[$VERSION] shop.yml não foi criado"
   FAIL=1
 fi
-for esperado in "Tag lenda criada" "Tag lenda apagada" "restauradas para o padrão"; do
+for esperado in "Tag lenda criada" "Tag lenda apagada" "restauradas para o padrão" \
+                "Comando /broadcast desligado" "Este comando está desativado" "Comando /broadcast ligado"; do
   if ! grep -q "$esperado" server.log; then
-    echo "::error::Não encontrei \"$esperado\" no log (tags / restaurar padrão)"
+    echo "::error::Não encontrei \"$esperado\" no log (tags / restaurar padrão / comandos)"
     FAIL=1
   fi
 done

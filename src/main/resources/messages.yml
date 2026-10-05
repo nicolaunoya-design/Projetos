@@ -10,6 +10,7 @@ common:
   no-permission: '&cVocê não tem permissão para isso.'
   player-only: '&cApenas jogadores podem usar este comando.'
   module-disabled: '&cEste recurso está desativado no servidor.'
+  command-disabled: '&cEste comando está desativado no servidor.'
   error: '&cOcorreu um erro ao executar o comando.'
   player-offline: '&cJogador &f{player} &cnão está online.'
   never-joined: '&cJogador nunca entrou no servidor.'

@@ -72,7 +72,21 @@ public final class PanelCommand implements TabExecutor {
                 m.resetDefaults();
                 Msg.send(sender, "&fConfigurações de &b" + m.getName() + " &frestauradas para o padrão.");
             }
-            default -> Msg.send(sender, "&fUso: /" + label + " [lista|reload|ativar <módulo>|desativar <módulo>|padrao <módulo>]");
+            case "comando", "command" -> {
+                if (args.length < 3 || !List.of("ativar", "desativar").contains(args[2].toLowerCase())) {
+                    Msg.send(sender, "&cUso: /" + label + " comando <comando> <ativar|desativar>");
+                    return true;
+                }
+                com.ultracore.module.ModuleCommand c = plugin.modules().command(args[1].replace("/", ""));
+                if (c == null) {
+                    Msg.send(sender, "&cEsse comando não é do UltraCore.");
+                    return true;
+                }
+                boolean on = args[2].equalsIgnoreCase("ativar");
+                c.getModule().setCommandEnabled(c.getName(), on);
+                Msg.send(sender, (on ? "&aComando /" + c.getName() + " ligado." : "&cComando /" + c.getName() + " desligado."));
+            }
+            default -> Msg.send(sender, "&fUso: /" + label + " [lista|reload|ativar <módulo>|desativar <módulo>|padrao <módulo>|comando <comando> <ativar|desativar>]");
         }
         return true;
     }
@@ -80,11 +94,19 @@ public final class PanelCommand implements TabExecutor {
     @Override
     public List<String> onTabComplete(CommandSender sender, Command cmd, String alias, String[] args) {
         if (!sender.hasPermission("ultracore.admin")) return List.of();
-        if (args.length == 1) return Msg.filter(List.of("lista", "reload", "ativar", "desativar", "padrao"), args[0]);
+        if (args.length == 1) return Msg.filter(List.of("lista", "reload", "ativar", "desativar", "padrao", "comando"), args[0]);
         if (args.length == 2 && List.of("ativar", "desativar", "padrao").contains(args[0].toLowerCase())) {
             List<String> ids = new ArrayList<>();
             plugin.modules().all().forEach(m -> ids.add(m.getId()));
             return Msg.filter(ids, args[1]);
+        }
+        if (args[0].equalsIgnoreCase("comando")) {
+            if (args.length == 2) {
+                List<String> names = new ArrayList<>();
+                plugin.modules().all().forEach(m -> m.getCommands().forEach(c -> names.add(c.getName())));
+                return Msg.filter(names, args[1]);
+            }
+            if (args.length == 3) return Msg.filter(List.of("ativar", "desativar"), args[2]);
         }
         return List.of();
     }

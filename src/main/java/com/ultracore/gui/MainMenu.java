@@ -43,14 +43,15 @@ public final class MainMenu extends Menu {
             }
             lore.add("");
             lore.add("&eClique esquerdo &7para " + (on ? "&cdesativar" : "&aativar"));
-            lore.add(m.getSettings().isEmpty() ? "&8Sem configurações extras" : "&eClique direito &7para configurar");
+            boolean configurable = !m.getSettings().isEmpty() || !m.getCommands().isEmpty() || m.hasEditor();
+            lore.add(configurable ? "&eClique direito &7para configurar" : "&8Sem configurações extras");
 
             ItemBuilder b = new ItemBuilder(m.getIcon()).name((on ? "&a" : "&c") + m.getName()).lore(lore).glow(on);
             set(i, b.build(), e -> {
                 Player p = (Player) e.getWhoClicked();
                 click(p);
                 if (e.isRightClick()) {
-                    if (!m.getSettings().isEmpty()) openLater(p, new SettingsMenu(plugin, m, this));
+                    if (configurable) openLater(p, new SettingsMenu(plugin, m, this));
                     return;
                 }
                 m.setEnabledPersist(!m.isEnabled());

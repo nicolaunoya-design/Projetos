@@ -41,7 +41,7 @@ public class ShopModule extends Module {
         bool("allow-sell", true, Material.HOPPER, "Permitir vender", "Se desligado, a loja só vende itens (jogadores não podem vender).");
 
         command("loja", "ultracore.loja", this::shop).playerOnly()
-                .tab((s, a) -> a.length == 1 && s.hasPermission("ultracore.loja.admin") ? Msg.filter(List.of("add", "remover"), a[0]) : List.of());
+                .tab((s, a) -> a.length == 1 && s.hasPermission("ultracore.loja.admin") ? Msg.filter(List.of("editar", "add", "remover"), a[0]) : List.of());
         command("vender", "ultracore.vender", this::sellCommand).playerOnly()
                 .tab((s, a) -> a.length == 1 ? Msg.filter(List.of("mao", "tudo"), a[0]) : List.of());
     }
@@ -199,6 +199,10 @@ public class ShopModule extends Module {
         if (a.length > 0 && p.hasPermission("ultracore.loja.admin")) {
             ItemStack hand = p.getInventory().getItemInMainHand();
             switch (a[0].toLowerCase()) {
+                case "editar", "editor", "edit" -> {
+                    new ShopEditor(p, null, 0).open(p);
+                    return;
+                }
                 case "add" -> {
                     if (a.length < 3 || hand.getType().isAir()) {
                         msg(p, "common.usage", "usage", "/loja add <preço de compra> <preço de venda> &7(segurando o item; a quantidade na mão vira o pacote; 0 = desativado)");
@@ -299,6 +303,10 @@ public class ShopModule extends Module {
                     build();
                 });
             }
+            if (viewer.hasPermission("ultracore.loja.admin")) {
+                set(47, new ItemBuilder(Material.ANVIL).name("&6Editar loja").lore("&7Só admins veem este botão.").build(),
+                        e -> openLater(viewer, new ShopEditor(viewer, null, 0)));
+            }
             set(49, new ItemBuilder(Material.GOLD_INGOT).name(Lang.get("shop.balance-item",
                     "money", eco().format(eco().getBalance(viewer)))).build(), null);
             if (page > 0) {
@@ -309,6 +317,230 @@ public class ShopModule extends Module {
                 set(53, new ItemBuilder(Material.ARROW).name(Lang.get("shop.next")).build(),
                         e -> openLater(viewer, new ShopMenu(viewer, page + 1)));
             }
+        }
+    }
+
+    // ---------- editor (admins) ----------
+
+    @Override
+    public boolean hasEditor() {
+        return true;
+    }
+
+    @Override
+    public Menu editor(Player p, Menu parent) {
+        return new ShopEditor(p, parent, 0);
+    }
+
+    private String money(double v) {
+        if (v <= 0) return "&cdesativado";
+        EconomyModule e = eco();
+        return "&a" + (e != null ? e.format(v) : String.format(java.util.Locale.ROOT, "%.2f", v));
+    }
+
+    private int indexOf(Material m) {
+        for (int i = 0; i < items.size(); i++) if (items.get(i).material() == m) return i;
+        return -1;
+    }
+
+    /** Lista de itens da loja: clique para editar, ou clique num item do seu inventário para adicionar. */
+    private final class ShopEditor extends Menu {
+        private final Player viewer;
+        private final Menu parent;
+        private final int page;
+
+        ShopEditor(Player viewer, Menu parent, int page) {
+            super(54, "&8Editor da Loja");
+            this.viewer = viewer;
+            this.parent = parent;
+            this.page = page;
+        }
+
+        @Override
+        public void build() {
+            clear();
+            for (int i = 45; i < 54; i++) set(i, ItemBuilder.filler(), null);
+            int start = page * 45;
+            for (int slot = 0; slot < 45 && start + slot < items.size(); slot++) {
+                ShopItem item = items.get(start + slot);
+                set(slot, new ItemBuilder(item.material()).amount(Math.min(64, item.amount()))
+                        .name("&f" + pretty(item.material()))
+                        .lore("&7Pacote: &f" + item.amount() + "x",
+                                "&7Compra: " + money(item.buy()),
+                                "&7Venda: " + money(item.sell()),
+                                "",
+                                "&eClique &7para editar").build(), e -> {
+                    click(viewer);
+                    openLater(viewer, new ItemEditor(viewer, this, item.material(), item.amount(), item.buy(), item.sell(), true));
+                });
+            }
+            set(45, new ItemBuilder(Material.ARROW).name(parent != null ? "&7Voltar" : "&7Abrir a loja").build(), e -> {
+                click(viewer);
+                if (parent != null) openLater(viewer, parent);
+                else if (!items.isEmpty()) openLater(viewer, new ShopMenu(viewer, 0));
+            });
+            if (page > 0) set(48, new ItemBuilder(Material.SPECTRAL_ARROW).name("&7Página anterior").build(),
+                    e -> openLater(viewer, new ShopEditor(viewer, parent, page - 1)));
+            set(49, new ItemBuilder(Material.HOPPER).name("&a&lAdicionar item").glow(true)
+                    .lore("&7Clique em um item do &fSEU inventário",
+                            "&7(parte de baixo) para colocar na loja.",
+                            "",
+                            "&7A quantidade do item clicado vira",
+                            "&7o tamanho do pacote (dá para mudar depois).",
+                            "",
+                            "&8Itens na loja: " + items.size()).build(), null);
+            if (start + 45 < items.size()) set(50, new ItemBuilder(Material.SPECTRAL_ARROW).name("&7Próxima página").build(),
+                    e -> openLater(viewer, new ShopEditor(viewer, parent, page + 1)));
+            set(53, new ItemBuilder(Material.BARRIER).name("&cFechar").build(), e -> closeLater(viewer));
+        }
+
+        @Override
+        protected void handleBottom(org.bukkit.event.inventory.InventoryClickEvent e) {
+            ItemStack it = e.getCurrentItem();
+            if (it == null || it.getType().isAir()) return;
+            click(viewer);
+            int i = indexOf(it.getType());
+            if (i >= 0) {
+                ShopItem old = items.get(i);
+                openLater(viewer, new ItemEditor(viewer, this, old.material(), old.amount(), old.buy(), old.sell(), true));
+            } else {
+                openLater(viewer, new ItemEditor(viewer, this, it.getType(), it.getAmount(), 0, 0, false));
+            }
+        }
+    }
+
+    /** Edição de um item: preço de compra, de venda e tamanho do pacote, com botões de +/-. */
+    private final class ItemEditor extends Menu {
+        private final Player viewer;
+        private final ShopEditor parent;
+        private final Material material;
+        private final boolean existing;
+        private int amount;
+        private double buy;
+        private double sell;
+        private boolean confirmDelete;
+
+        ItemEditor(Player viewer, ShopEditor parent, Material material, int amount, double buy, double sell, boolean existing) {
+            super(54, "&8Loja: &0" + pretty(material));
+            this.viewer = viewer;
+            this.parent = parent;
+            this.material = material;
+            this.amount = amount;
+            this.buy = buy;
+            this.sell = sell;
+            this.existing = existing;
+        }
+
+        @Override
+        public void build() {
+            clear();
+            for (int i = 0; i < 54; i++) set(i, ItemBuilder.filler(), null);
+
+            set(4, new ItemBuilder(material).amount(Math.min(64, amount)).name("&f&l" + pretty(material)).glow(true)
+                    .lore("&7Pacote: &f" + amount + "x",
+                            "&7Compra: " + money(buy),
+                            "&7Venda: " + money(sell),
+                            "",
+                            existing ? "&8Já está na loja" : "&eNovo item (ainda não salvo)").build(), null);
+
+            priceRow(9, Material.GOLD_INGOT, "&6&lPreço de COMPRA", "o jogador paga", buy, v -> buy = v);
+            priceRow(18, Material.EMERALD, "&a&lPreço de VENDA", "o jogador recebe", sell, v -> sell = v);
+
+            // linha do pacote
+            int[] steps = {-16, -4, -1};
+            for (int i = 0; i < 3; i++) {
+                int d = steps[i];
+                set(28 + i, new ItemBuilder(Material.RED_STAINED_GLASS_PANE).name("&c" + d).build(), e -> {
+                    click(viewer);
+                    amount = Math.max(1, amount + d);
+                    build();
+                });
+                set(34 - i, new ItemBuilder(Material.LIME_STAINED_GLASS_PANE).name("&a+" + (-d)).build(), e -> {
+                    click(viewer);
+                    amount = Math.min(64 * 36, amount - d);
+                    build();
+                });
+            }
+            set(31, new ItemBuilder(Material.CHEST).amount(Math.min(64, amount)).name("&b&lTamanho do pacote: &f" + amount)
+                    .lore("&7Quantos itens vêm em cada compra/venda.", "&7Os preços são por pacote.", "",
+                            "&eClique &7para digitar o valor").build(), e -> {
+                closeLater(viewer);
+                plugin.chatInput().await(viewer, "&fDigite o &btamanho do pacote &f(1 a 2304):", input -> {
+                    try {
+                        amount = Math.max(1, Math.min(64 * 36, Integer.parseInt(input.trim())));
+                    } catch (NumberFormatException ex) {
+                        msg(viewer, "common.invalid-number");
+                    }
+                    open(viewer);
+                });
+            });
+
+            set(45, new ItemBuilder(Material.ARROW).name("&7Voltar sem salvar").build(), e -> {
+                click(viewer);
+                openLater(viewer, parent);
+            });
+            if (existing) {
+                set(47, new ItemBuilder(confirmDelete ? Material.TNT : Material.LAVA_BUCKET)
+                        .name(confirmDelete ? "&c&lCLIQUE DE NOVO PARA REMOVER" : "&cRemover da loja").glow(confirmDelete).build(), e -> {
+                    click(viewer);
+                    if (!confirmDelete) {
+                        confirmDelete = true;
+                        build();
+                        return;
+                    }
+                    items.removeIf(i -> i.material() == material);
+                    saveItems();
+                    msg(viewer, "shop.admin-removed", "item", pretty(material));
+                    openLater(viewer, parent);
+                });
+            }
+            set(49, new ItemBuilder(Material.LIME_CONCRETE).name("&a&lSALVAR").glow(true)
+                    .lore("&7Pacote: &f" + amount + "x", "&7Compra: " + money(buy), "&7Venda: " + money(sell),
+                            "", buy <= 0 && sell <= 0 ? "&cAviso: compra e venda desativadas" : "&eClique &7para salvar").build(), e -> {
+                click(viewer);
+                ShopItem item = new ShopItem(material, amount, buy, sell);
+                int i = indexOf(material);
+                if (i >= 0) items.set(i, item);
+                else items.add(item);
+                saveItems();
+                msg(viewer, "shop.admin-added", "item", pretty(material), "amount", amount);
+                openLater(viewer, parent);
+            });
+            set(51, new ItemBuilder(Material.OAK_SIGN).name("&fDicas")
+                    .lore("&7Preço &f0 &7= desativado", "&7(ex: venda 0 = jogador só compra).",
+                            "&7Clique no lingote/esmeralda para", "&7digitar um preço exato (ex: 12.5).").build(), null);
+            set(53, new ItemBuilder(Material.BARRIER).name("&cFechar sem salvar").build(), e -> closeLater(viewer));
+        }
+
+        /** Linha com [-100][-10][-1] PREÇO [+1][+10][+100] começando no slot "row". */
+        private void priceRow(int row, Material icon, String title, String who, double value, java.util.function.DoubleConsumer setter) {
+            int[] steps = {-100, -10, -1};
+            for (int i = 0; i < 3; i++) {
+                int d = steps[i];
+                set(row + 1 + i, new ItemBuilder(Material.RED_STAINED_GLASS_PANE).name("&c" + d).build(), e -> {
+                    click(viewer);
+                    setter.accept(Math.max(0, round(value + d)));
+                    build();
+                });
+                set(row + 7 - i, new ItemBuilder(Material.LIME_STAINED_GLASS_PANE).name("&a+" + (-d)).build(), e -> {
+                    click(viewer);
+                    setter.accept(round(value - d));
+                    build();
+                });
+            }
+            set(row + 4, new ItemBuilder(icon).name(title + "&7: " + money(value))
+                    .lore("&7Quanto " + who + " por pacote.", "",
+                            "&eBotões dos lados: &7-100 até +100", "&eClique aqui &7para digitar o valor", "&8(0 = desativado)").build(), e -> {
+                closeLater(viewer);
+                plugin.chatInput().await(viewer, "&fDigite o valor de " + title + " &f(0 = desativado):", input -> {
+                    try {
+                        setter.accept(Math.max(0, round(Double.parseDouble(input.trim().replace(",", ".")))));
+                    } catch (NumberFormatException ex) {
+                        msg(viewer, "common.invalid-number");
+                    }
+                    open(viewer);
+                });
+            });
         }
     }
 }

@@ -71,6 +71,22 @@ public final class SettingsMenu extends Menu {
             module.setEnabledPersist(!module.isEnabled());
             build();
         });
+        if (!module.getCommands().isEmpty()) {
+            int total = module.getCommands().size();
+            long off = module.getCommands().stream().filter(c -> !module.isCommandEnabled(c.getName())).count();
+            set(51, new ItemBuilder(Material.COMMAND_BLOCK).name("&bComandos &7(" + (total - off) + "/" + total + " ligados)")
+                    .lore("&7Ligue ou desligue cada comando", "&7deste módulo separadamente.", "", "&eClique &7para abrir").build(), e -> {
+                click((Player) e.getWhoClicked());
+                openLater((Player) e.getWhoClicked(), new CommandsMenu(plugin, module, this));
+            });
+        }
+        if (module.hasEditor()) {
+            set(52, new ItemBuilder(Material.ANVIL).name("&6Abrir editor").glow(true)
+                    .lore("&7Editor visual deste módulo.", "", "&eClique &7para abrir").build(), e -> {
+                click((Player) e.getWhoClicked());
+                openLater((Player) e.getWhoClicked(), module.editor((Player) e.getWhoClicked(), this));
+            });
+        }
         set(53, new ItemBuilder(Material.BARRIER).name("&cFechar").build(), e -> closeLater((Player) e.getWhoClicked()));
     }
 

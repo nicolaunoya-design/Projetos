@@ -11,7 +11,9 @@ public final class MenuListener implements Listener {
     public void onClick(InventoryClickEvent e) {
         if (!(e.getView().getTopInventory().getHolder() instanceof Menu menu)) return;
         e.setCancelled(true);
-        if (e.getRawSlot() >= 0 && e.getRawSlot() < e.getView().getTopInventory().getSize()) menu.handle(e);
+        int top = e.getView().getTopInventory().getSize();
+        if (e.getRawSlot() >= 0 && e.getRawSlot() < top) menu.handle(e);
+        else if (e.getRawSlot() >= top) menu.handleBottom(e);
     }
 
     @EventHandler
