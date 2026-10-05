@@ -153,6 +153,10 @@ commands:
   nick:
     description: Define um apelido.
     aliases: [apelido, nickname]
+  # Entrada silenciosa
+  silentjoin:
+    description: Entra e sai do servidor sem avisar ninguém.
+    aliases: [entradasilenciosa, silencioso, sj]
   # Tags
   tag:
     description: Escolhe a tag que aparece no chat e na TAB.
@@ -278,6 +282,8 @@ permissions:
       ultracore.warn: true
       ultracore.historico: true
       ultracore.report.see: true
+      ultracore.silentjoin: true
+      ultracore.silentjoin.see: true
   ultracore.admin:
     description: Acesso total, incluindo o /painel.
     default: op

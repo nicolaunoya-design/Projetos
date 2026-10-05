@@ -168,6 +168,12 @@ public final class UltraCore extends JavaPlugin {
         p.setPlayerListName(full.equals(p.getName()) ? null : full);
     }
 
+    /** Se o jogador está com entrada silenciosa ligada (/silentjoin). */
+    public boolean isSilentJoin(Player p) {
+        JoinQuitModule jq = moduleManager == null ? null : moduleManager.get(JoinQuitModule.class);
+        return jq != null && jq.isSilent(p);
+    }
+
     public PlayerDataManager data() { return dataManager; }
     public ModuleManager modules() { return moduleManager; }
     public Teleporter teleporter() { return teleporter; }

@@ -95,7 +95,7 @@ Textos aceitam cores `&a`, `&l`... e hex `&#FF8800`.
 | Mensagens Privadas | Conversas privadas + socialspy | `/msg`, `/r`, `/socialspy` |
 | **Apelidos** 🆕 | Apelido no chat e na TAB, com cores para VIP | `/nick` |
 | **Tags** 🆕 | Tags como [VIP], [Admin] no chat e na TAB; o jogador escolhe a sua | `/tag` |
-| Entrada e Saída | Mensagens de entrada/saída, boas-vindas, título | — |
+| Entrada e Saída | Mensagens de entrada/saída, boas-vindas, título, **entrada silenciosa** 🆕 | `/silentjoin` |
 | Anúncios Automáticos | Mensagens periódicas no chat | — |
 | Scoreboard | Placar lateral com placeholders | — |
 | Tablist | Cabeçalho e rodapé da TAB | — |
@@ -142,6 +142,13 @@ Tempos nos comandos aceitam `30s`, `10m`, `2h`, `7d`, `1w` (ex: `/tempban Fulano
 
 A TAB junta tudo: `[AFK]` + tag + apelido. Os nomes na TAB não são reordenados pela tag.
 
+### Entrada silenciosa (`/silentjoin`)
+
+- Quem tem `ultracore.silentjoin` (staff/admin) digita `/silentjoin` (ou `/sj`) para ligar/desligar. Fica salvo.
+- Ligado: **ninguém vê** a mensagem de entrada/saída, nem a de novato, e o aviso de entrada/saída **não vai** para o Discord/WhatsApp.
+- A staff com `ultracore.silentjoin.see` recebe um aviso discreto (`[Silencioso] Fulano entrou`); dá para desligar isso no `/painel` → Entrada e Saída.
+- Para sumir também da TAB e do mundo, use junto com o `/vanish`.
+
 ### Avisos e punição automática
 
 Cada `/warn` soma um aviso. Com as opções padrão (ajustáveis no `/painel` → Moderação):
@@ -180,7 +187,7 @@ O passo a passo está no [README da ponte](integracoes/whatsapp-bot/README.md).
 | `ultracore.staff` | OP | kick, mute, ban, warn, histórico, ver denúncias, staffchat, vanish, invsee, gm, heal, feed, tphere... |
 | `ultracore.admin` | OP | tudo + `/painel`, setspawn, setwarp, eco, createkit, banip, editar a loja, gerenciar tags, god, speed... |
 
-Outras úteis: `ultracore.homes.unlimited`, `ultracore.bypass.delay`, `ultracore.bypass.cooldown`, `ultracore.kit.<nome>`, `ultracore.warp.<nome>`, `ultracore.tag.<id>` (cada tag), `ultracore.tags.admin` (/tag dar, tirar, criar, apagar), `ultracore.nick.others`, `ultracore.report.see`.
+Outras úteis: `ultracore.homes.unlimited`, `ultracore.bypass.delay`, `ultracore.bypass.cooldown`, `ultracore.kit.<nome>`, `ultracore.warp.<nome>`, `ultracore.tag.<id>` (cada tag), `ultracore.tags.admin` (/tag dar, tirar, criar, apagar), `ultracore.nick.others`, `ultracore.report.see`, `ultracore.silentjoin` e `ultracore.silentjoin.see` (staff).
 
 ## Para desenvolvedores
 

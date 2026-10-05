@@ -148,6 +148,12 @@ nick:
   too-long: '&cApelido muito grande (máximo {max} letras).'
   taken: '&cEsse apelido é o nome de outro jogador.'
   set: '&aApelido definido: &r{nick}'
+joinquit:
+  silent-on: '&aEntrada silenciosa ligada. &7Ninguém será avisado quando você entrar ou sair.'
+  silent-off: '&eEntrada silenciosa desligada. &7Todos verão quando você entrar e sair.'
+  silent-reminder: '&8[&7Silencioso&8] &7Você entrou sem aviso. Use &f/silentjoin &7para desligar.'
+  silent-join-staff: '&8[&7Silencioso&8] &7{player} entrou.'
+  silent-quit-staff: '&8[&7Silencioso&8] &7{player} saiu.'
 tags:
   set: '&aTag definida: &r{tag}'
   none: '&aVocê agora está sem tag.'

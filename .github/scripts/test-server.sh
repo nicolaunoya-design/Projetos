@@ -56,7 +56,7 @@ if grep -q "Done (" server.log; then
              "painel ativar discord" "painel desativar discord" "painel desativar nick" "painel ativar nick" \
              "tag lista" "tag criar lenda &5[Lenda]" "tag dar Ninguem lenda" "tag apagar lenda" \
              "painel desativar tags" "painel ativar tags" "painel padrao chat" "painel padrao tags" \
-             "painel comando broadcast desativar" "broadcast nao deveria aparecer" "painel comando broadcast ativar" \
+             "painel comando broadcast desativar" "broadcast nao deveria aparecer" "painel comando broadcast ativar" "silentjoin" \
              "painel lista"; do
     echo "$cmd" >&3
     sleep 2

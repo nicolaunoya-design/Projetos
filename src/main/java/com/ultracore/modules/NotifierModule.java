@@ -80,11 +80,13 @@ public abstract class NotifierModule extends Module {
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onJoin(PlayerJoinEvent e) {
+        if (plugin.isSilentJoin(e.getPlayer())) return;
         post("join-quit", Lang.get("notify.join", "player", e.getPlayer().getName()));
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onQuit(PlayerQuitEvent e) {
+        if (plugin.isSilentJoin(e.getPlayer())) return;
         post("join-quit", Lang.get("notify.quit", "player", e.getPlayer().getName()));
     }
 
