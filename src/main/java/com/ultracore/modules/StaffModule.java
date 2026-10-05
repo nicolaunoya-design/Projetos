@@ -211,15 +211,18 @@ public class StaffModule extends Module {
 
     private void setVanish(Player p, boolean on) {
         plugin.data().get(p).setVanished(on);
+        // quem está com /silentjoin não deve "sair" nem "entrar" de mentira no chat
+        JoinQuitModule jq = plugin.modules().get(JoinQuitModule.class);
+        boolean fake = getBool("vanish-fake-messages") && (jq == null || !jq.isSilent(p));
         if (on) {
             hide(p);
             msg(p, "staff.vanish-on");
-            if (getBool("vanish-fake-messages")) Bukkit.broadcastMessage(Msg.color(Lang.get("staff.vanish-fake-quit", "player", p.getName())));
+            if (fake) Bukkit.broadcastMessage(Msg.color(Lang.get("staff.vanish-fake-quit", "player", p.getName())));
         } else {
             vanished.remove(p.getUniqueId());
             for (Player o : Bukkit.getOnlinePlayers()) o.showPlayer(plugin, p);
             msg(p, "staff.vanish-off");
-            if (getBool("vanish-fake-messages")) Bukkit.broadcastMessage(Msg.color(Lang.get("staff.vanish-fake-join", "player", p.getName())));
+            if (fake) Bukkit.broadcastMessage(Msg.color(Lang.get("staff.vanish-fake-join", "player", p.getName())));
         }
     }
 

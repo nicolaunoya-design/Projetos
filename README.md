@@ -168,6 +168,7 @@ Cada um pode ser desligado no `/painel` → Diversão → **Comandos**.
 
 - Quem tem `ultracore.silentjoin` (staff/admin) digita `/silentjoin` (ou `/sj`) para ligar/desligar. Fica salvo.
 - Ligado: **ninguém vê** a mensagem de entrada/saída, nem a de novato, e o aviso de entrada/saída **não vai** para o Discord/WhatsApp.
+- Com a entrada silenciosa ligada, o `/vanish` também não mostra as mensagens falsas de saída/entrada.
 - A staff com `ultracore.silentjoin.see` recebe um aviso discreto (`[Silencioso] Fulano entrou`); dá para desligar isso no `/painel` → Entrada e Saída.
 - Para sumir também da TAB e do mundo, use o `/vanish`. 🆕 O **vanish continua ligado** quando você sai e entra de novo (entra invisível e sem mensagem de entrada/saída, nem no Discord/WhatsApp). `/vanish` de novo para aparecer.
 
