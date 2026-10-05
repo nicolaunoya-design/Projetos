@@ -189,7 +189,7 @@ Todos aceitam `[jogador]` (sem nome = em você mesmo) ou `todos`. São **secreto
 
 | Comando | O que faz |
 |---|---|
-| `/trovao [jogador]` (`/raio`) | Cai um raio. No `/painel` dá para deixar o raio sem dano. |
+| `/trovao [jogador]` (`/raio`) | Cai um raio (não põe fogo no mapa). No `/painel` dá para deixar o raio sem dano. |
 | `/explodir [jogador] [força 1-10]` | Explosão. Por padrão **não quebra blocos** (configurável). |
 | `/foguete [jogador]` | Lança para o alto. Sem dano de queda. |
 | `/fogos [jogador]` | Fogos de artifício coloridos em volta. |

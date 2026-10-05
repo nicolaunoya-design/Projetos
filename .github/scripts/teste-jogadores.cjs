@@ -39,11 +39,16 @@ const bots = {}
 
 function criar (nome) {
   const bot = mineflayer.createBot({ host: '127.0.0.1', port: 25565, username: nome, version: process.env.MC_VERSAO, auth: 'offline' })
-  bot.on('messagestr', (m, pos) => {
-    if (pos === 'game_info') { barra[nome].push(m); return }
-    msgs[nome].push(m)
-    console.log(`  [${nome}] ${m}`)
+  bot.on('messagestr', (m, pos, obj) => {
+    // no chat de jogador, o texto com o formato do servidor (tags, @menções) vem no "unsigned"
+    const t = pos === 'chat' && obj && obj.unsigned ? obj.unsigned.toString() : m
+    if (pos === 'game_info') { barra[nome].push(t); return }
+    msgs[nome].push(t)
+    console.log(`  [${nome}] ${t}`)
   })
+  // a barra de ação (action bar) chega num pacote próprio que o mineflayer não trata
+  bot._client.on('action_bar', (p) => barra[nome].push(texto(p.text ?? p)))
+  bot._client.on('set_action_bar_text', (p) => barra[nome].push(texto(p.text ?? p)))
   bot.on('error', (e) => console.log(`  [${nome}] erro:`, e.message))
   bot.on('kicked', (r) => { console.log(`  [${nome}] expulso:`, JSON.stringify(r)); anotar('warning', `${nome} foi expulso: ${JSON.stringify(r)}`) })
   bots[nome] = bot

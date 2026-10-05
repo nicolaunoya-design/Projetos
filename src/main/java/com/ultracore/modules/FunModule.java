@@ -53,7 +53,7 @@ public class FunModule extends Module {
                         + "/arremessar, /falsoop, /fazerfalar, /chuvadeitens e /girar. Sem nome = você mesmo; \"todos\" = todo mundo.");
 
         bool("lightning-damage", true, Material.LIGHTNING_ROD, "Raio dá dano",
-                "Se desligado, o /trovao só mostra o raio e o som, sem machucar nem pôr fogo.");
+                "Se ligado, o /trovao tira 2,5 corações e queima o alvo por 3s; desligado, só mostra o raio e o som. Nunca põe fogo no mapa.");
         integer("explosion-power", 3, 1, 10, 1, Material.TNT, "Força da explosão", "Força padrão do /explodir (TNT = 4).");
         bool("explosion-breaks-blocks", false, Material.GRASS_BLOCK, "Explosão quebra blocos",
                 "Se ligado, o /explodir destrói o terreno. Cuidado!");
@@ -62,8 +62,12 @@ public class FunModule extends Module {
         fun("trovao", "&eRaio", t -> {
             Location l = t.getLocation();
             markNearby(t, 4);
-            if (getBool("lightning-damage")) t.getWorld().strikeLightning(l);
-            else t.getWorld().strikeLightningEffect(l);
+            // raio "de efeito": mostra o raio e o trovão sem pôr fogo no mapa nem queimar quem está perto
+            t.getWorld().strikeLightningEffect(l);
+            if (getBool("lightning-damage")) {
+                t.damage(5.0);
+                t.setFireTicks(Math.max(t.getFireTicks(), 60));
+            }
         });
         command("explodir", PERM, (s, a) -> {
             List<Player> targets = targets(s, a, 0);
