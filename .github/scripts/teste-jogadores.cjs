@@ -228,6 +228,18 @@ async function main () {
   checar(await comando('Robo', '/esconder', /Visível na TAB/), '/esconder de novo desliga')
   checar(await aguardar(() => bots.Alvo.players.Robo && !!bots.Alvo.players.Robo.listed, 8000), 'volta a aparecer na TAB')
 
+  // ---------- /luz (visão noturna sem fim) ----------
+  const efeitoNv = () => {
+    const r = bots.Alvo.registry
+    const ef = (r.effectsByName && (r.effectsByName.NightVision || r.effectsByName.night_vision)) ||
+      Object.values(r.effects || {}).find((x) => /night.?vision/i.test(String(x.name)))
+    return ef ? (bots.Alvo.entity.effects || {})[ef.id] : undefined
+  }
+  checar(await comando('Alvo', '/luz', /Luz ligada/), '/luz liga (jogador comum)')
+  checar(await aguardar(() => !!efeitoNv(), 8000), '/luz dá visão noturna')
+  checar(await comando('Alvo', '/luz', /Luz desligada/), '/luz de novo desliga')
+  checar(await aguardar(() => !efeitoNv(), 8000), '/luz tira a visão noturna')
+
   // ---------- /escondernick (some o nome em cima da cabeça) ----------
   const timeDoRobo = () => bots.Alvo.teamMap && bots.Alvo.teamMap.Robo
   checar(await comando('Robo', '/escondernick', /Nome escondido/), '/escondernick liga')

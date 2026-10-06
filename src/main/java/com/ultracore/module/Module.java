@@ -248,6 +248,20 @@ public abstract class Module implements Listener {
         Msg.tell(to, key, placeholders);
     }
 
+    /** O jogador do argumento (se tiver permissão para outros) ou quem usou o comando. */
+    protected Player self(CommandSender s, String[] a, int index, String othersPerm) {
+        if (a.length > index) {
+            if (!s.hasPermission(othersPerm)) {
+                msg(s, "common.others-no-permission");
+                return null;
+            }
+            return online(s, a[index]);
+        }
+        if (s instanceof Player p) return p;
+        msg(s, "common.specify-player");
+        return null;
+    }
+
     /** Procura um jogador online; envia erro se não encontrar. */
     protected Player online(CommandSender sender, String name) {
         Player p = Bukkit.getPlayer(name);

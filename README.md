@@ -145,7 +145,7 @@ Textos aceitam cores `&a`, `&l`... e hex `&#FF8800`.
 | MOTD | Descrição na lista de servidores (desligado por padrão) | — |
 | Moderação | Ban, tempban, ban por IP, kick, mute com tempo, **avisos com punição automática**, **histórico**, **denúncias** | `/ban`, `/tempban`, `/unban`, `/banip`, `/unbanip`, `/kick`, `/mute`, `/unmute`, `/warn`, `/limparavisos`, `/historico`, `/report` |
 | Ferramentas da Staff | Voo, cura, gamemode, deus, vanish, invsee... | `/fly`, `/heal`, `/feed`, `/gm`, `/god`, `/vanish`, `/esconder`, `/escondernick`, `/invsee`, `/ecsee`, `/clearinv`, `/speed`, `/tphere` |
-| Utilidades | Bancada, enderchest, chapéu, ping, lixeira, regras | `/craft`, `/ec`, `/hat`, `/ping`, `/lixo`, `/regras` |
+| Utilidades | Bancada, enderchest, chapéu, ping, lixeira, regras, luz (visão noturna que continua ao morrer, beber leite e relogar) | `/craft`, `/ec`, `/hat`, `/ping`, `/lixo`, `/regras`, `/luz` |
 | Proteção do Mundo | Creeper/TNT sem quebrar blocos, fogo, enderman, phantoms, keep inventory, clima, queda, plantações, **desligar o Nether e o The End** 🆕 | — |
 | AFK | Detecta ausentes, tag [AFK], expulsão opcional | `/afk` |
 | Dormir | % de jogadores necessários para pular a noite | — |

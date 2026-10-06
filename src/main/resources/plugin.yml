@@ -267,6 +267,9 @@ commands:
   regras:
     description: Mostra as regras.
     aliases: [rules]
+  luz:
+    description: Liga/desliga a visão noturna (fullbright).
+    aliases: [fullbright, fb, visaonoturna, nightvision, nv]
   afk:
     description: Fica AFK.
     aliases: [ausente]
@@ -284,6 +287,9 @@ permissions:
   ultracore.tabhide.see:
     description: Continua vendo na TAB quem usou /esconder. Ninguém tem por padrão (nem OP); dê pelo LuckPerms.
     default: false
+  ultracore.luz.others:
+    description: /luz em outros jogadores. Só OP por padrão.
+    default: op
   ultracore.hidenick:
     description: /escondernick (some o nome em cima da cabeça). Só OP por padrão.
     default: op
@@ -312,6 +318,7 @@ permissions:
       ultracore.afk: true
       ultracore.regras: true
       ultracore.lixo: true
+      ultracore.luz: true
       ultracore.loja: true
       ultracore.vender: true
       ultracore.daily: true

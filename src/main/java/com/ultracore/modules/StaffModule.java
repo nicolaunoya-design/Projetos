@@ -195,19 +195,6 @@ public class StaffModule extends Module {
     }
 
     /** Retorna o alvo: o próprio jogador, ou args[index] se tiver a permissão de "outros". */
-    private Player self(CommandSender s, String[] a, int index, String othersPerm) {
-        if (a.length > index) {
-            if (!s.hasPermission(othersPerm)) {
-                msg(s, "common.others-no-permission");
-                return null;
-            }
-            return online(s, a[index]);
-        }
-        if (s instanceof Player p) return p;
-        msg(s, "common.specify-player");
-        return null;
-    }
-
     private void report(CommandSender s, Player t, String what) {
         msg(t, "staff.done-self", "action", what);
         if (s != t) msg(s, "staff.done-other", "action", what, "player", t.getName());

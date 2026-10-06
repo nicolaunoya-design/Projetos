@@ -271,6 +271,9 @@ utilities:
   ping: 'Seu ping: {ping}ms'
   ping-other: 'Ping de &f{player}&7: {ping}ms'
   trash-title: '&8Lixeira &7(itens serão apagados)'
+  light-on: '&eLuz ligada! &7(visão noturna; /luz de novo para desligar)'
+  light-off: '&7Luz desligada.'
+  light-other: '&f{player}&7: {state}'
 afk:
   kick: '&cVocê foi expulso por ficar AFK por muito tempo.'
   broadcast-on: '&7* &f{player} &7está AFK.'
