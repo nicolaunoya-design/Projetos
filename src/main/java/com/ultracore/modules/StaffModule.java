@@ -233,9 +233,16 @@ public class StaffModule extends Module {
         p.setCollidable(true);
     }
 
-    /** Se está invisível agora (seguro fora da thread principal). */
+    /** Quem usou /esconder e está online (lido no chat e na lista de servidores, fora da thread principal). */
+    private final Set<UUID> tabHiddenNow = java.util.concurrent.ConcurrentHashMap.newKeySet();
+
+    /** Se está invisível (/vanish) ou escondido (/esconder) agora. Seguro fora da thread principal. */
     public boolean isHiddenNow(Player p) {
-        return vanished.contains(p.getUniqueId());
+        return ghost(p.getUniqueId());
+    }
+
+    private boolean ghost(UUID id) {
+        return vanished.contains(id) || tabHiddenNow.contains(id);
     }
 
     // ---------- modo fantasma: o que mais esconde quem está invisível ----------
@@ -245,13 +252,13 @@ public class StaffModule extends Module {
         if (!getBool("vanish-hide-deaths")) return;
         Player victim = e.getEntity();
         Player killer = victim.getKiller();
-        if (vanished.contains(victim.getUniqueId()) || (killer != null && vanished.contains(killer.getUniqueId()))) e.deathMessage(null);
+        if (ghost(victim.getUniqueId()) || (killer != null && ghost(killer.getUniqueId()))) e.deathMessage(null);
     }
 
     @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
     public void onGhostChat(org.bukkit.event.player.AsyncPlayerChatEvent e) {
         Player p = e.getPlayer();
-        if (!vanished.contains(p.getUniqueId()) || !getBool("vanish-block-chat")) return;
+        if (!ghost(p.getUniqueId()) || !getBool("vanish-block-chat")) return;
         if (e.getMessage().startsWith("!") && e.getMessage().length() > 1) {
             e.setMessage(e.getMessage().substring(1));
             return;
@@ -267,15 +274,15 @@ public class StaffModule extends Module {
 
     @EventHandler(priority = EventPriority.HIGH)
     public void onGhostAdvancement(org.bukkit.event.player.PlayerAdvancementDoneEvent e) {
-        if (vanished.contains(e.getPlayer().getUniqueId())) e.message(null);
+        if (ghost(e.getPlayer().getUniqueId())) e.message(null);
     }
 
     @EventHandler
     public void onGhostPing(org.bukkit.event.server.ServerListPingEvent e) {
-        if (vanished.isEmpty() || !getBool("vanish-hide-count")) return;
+        if ((vanished.isEmpty() && tabHiddenNow.isEmpty()) || !getBool("vanish-hide-count")) return;
         try {
             java.util.Iterator<Player> it = e.iterator();
-            while (it.hasNext()) if (vanished.contains(it.next().getUniqueId())) it.remove();
+            while (it.hasNext()) if (ghost(it.next().getUniqueId())) it.remove();
         } catch (UnsupportedOperationException ignored) {
             // algumas versões não deixam mexer na lista; aí só o número fica igual
         }
@@ -317,6 +324,8 @@ public class StaffModule extends Module {
     /** Tira (ou devolve) o jogador da TAB de todos que não têm ultracore.tabhide.see. */
     private void refreshTabHidden(Player p) {
         boolean hide = isTabHidden(p);
+        if (hide) tabHiddenNow.add(p.getUniqueId());
+        else tabHiddenNow.remove(p.getUniqueId());
         for (Player o : Bukkit.getOnlinePlayers()) {
             if (o == p) continue;
             if (hide && !o.hasPermission("ultracore.tabhide.see")) o.unlistPlayer(p);
@@ -355,6 +364,7 @@ public class StaffModule extends Module {
 
     @EventHandler
     public void onQuit(PlayerQuitEvent e) {
+        tabHiddenNow.remove(e.getPlayer().getUniqueId());
         UUID id = e.getPlayer().getUniqueId();
         if (vanished.remove(id)) for (Player o : Bukkit.getOnlinePlayers()) o.showPlayer(plugin, e.getPlayer());
         god.remove(id);

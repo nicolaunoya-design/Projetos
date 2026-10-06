@@ -258,9 +258,9 @@ staff:
   done-self: '{action}&7.'
   done-other: '{action} &7para &f{player}&7.'
   vanish-on: '&aVocê está invisível &7(modo fantasma: fora da TAB, sem mortes no chat, sem pegar itens; chat bloqueado, comece com ! para falar).'
-  vanish-chat-blocked: '&cVocê está invisível: a mensagem não foi enviada. &7Comece com &f! &7para falar mesmo assim.'
+  vanish-chat-blocked: '&cVocê está escondido: a mensagem não foi enviada. &7Comece com &f! &7para falar mesmo assim.'
   vanish-off: '&cVocê está visível novamente.'
-  tabhide-on: '&aEscondido da TAB &7(continua visível no mundo; /esconder de novo para voltar)'
+  tabhide-on: '&aEscondido da TAB e do chat &7(seu personagem continua aparecendo no mundo; chat bloqueado, comece com ! para falar; /esconder de novo para voltar)'
   tabhide-off: '&eVisível na TAB de novo'
   vanish-rejoin: '&aVocê entrou &linvisível&a (vanish continua ligado). Use &f/vanish &apara aparecer.'
 utilities:

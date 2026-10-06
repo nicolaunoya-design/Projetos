@@ -175,7 +175,7 @@ public final class UltraCore extends JavaPlugin {
         if (moduleManager == null) return false;
         JoinQuitModule jq = moduleManager.get(JoinQuitModule.class);
         StaffModule staff = moduleManager.get(StaffModule.class);
-        return (jq != null && jq.isSilent(p)) || (staff != null && staff.isVanished(p));
+        return (jq != null && jq.isSilent(p)) || (staff != null && (staff.isVanished(p) || staff.isTabHidden(p)));
     }
 
     /** Menu principal dos jogadores (/menu), ou null se o módulo Menus estiver desligado. */
@@ -189,7 +189,7 @@ public final class UltraCore extends JavaPlugin {
         StaffModule staff = moduleManager == null ? null : moduleManager.get(StaffModule.class);
         if (staff == null || !staff.isEnabled() || !staff.getBool("vanish-hide-count")) return Bukkit.getOnlinePlayers().size();
         int n = 0;
-        for (Player o : Bukkit.getOnlinePlayers()) if (o == viewer || !staff.isHiddenNow(o) || viewer.hasPermission("ultracore.vanish.see")) n++;
+        for (Player o : Bukkit.getOnlinePlayers()) if (o == viewer || !staff.isHiddenNow(o) || viewer.hasPermission("ultracore.vanish.see") || viewer.hasPermission("ultracore.tabhide.see")) n++;
         return n;
     }
 

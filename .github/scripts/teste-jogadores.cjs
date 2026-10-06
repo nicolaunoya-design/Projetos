@@ -220,6 +220,11 @@ async function main () {
   // ---------- /esconder (some da TAB, continua no mundo) ----------
   checar(await comando('Robo', '/esconder', /Escondido da TAB/), '/esconder liga')
   checar(await aguardar(() => bots.Alvo.players.Robo && !bots.Alvo.players.Robo.listed, 8000), 'quem usou /esconder some da TAB dos outros')
+  checar(!!bots.Alvo.players.Robo && !!bots.Alvo.players.Robo.entity, 'quem usou /esconder continua visível no mundo')
+  desde = marca('Alvo')
+  checar(await comando('Robo', 'mensagem do oculto', /não foi enviada/), 'oculto não fala no chat sem querer')
+  await espera(1500)
+  checar(!msgs.Alvo.slice(desde).some((m) => /mensagem do oculto/.test(m)), 'ninguém vê a mensagem de quem está oculto')
   checar(await comando('Robo', '/esconder', /Visível na TAB/), '/esconder de novo desliga')
   checar(await aguardar(() => bots.Alvo.players.Robo && !!bots.Alvo.players.Robo.listed, 8000), 'volta a aparecer na TAB')
 

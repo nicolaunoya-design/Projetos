@@ -231,7 +231,7 @@ commands:
     description: Modo fantasma (invisível no mundo, na TAB, no chat e nas mortes).
     aliases: [v, invisivel, fantasma, ghost]
   esconder:
-    description: Esconde (ou mostra) alguém da lista TAB para sempre.
+    description: Modo oculto - o personagem continua no mundo, mas some da TAB, do chat (entrada, saída, mortes) e da contagem de online.
     aliases: [tabhide, hidetab, escondertab]
   invsee:
     description: Vê o inventário de um jogador.
