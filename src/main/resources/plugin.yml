@@ -54,6 +54,9 @@ commands:
   back:
     description: Volta para o local anterior.
     aliases: [voltar]
+  ultimamorte:
+    description: Mostra onde você (ou outro jogador) morreu pela última vez.
+    aliases: [mortecoords, deathcoords, ondemorri, ultmorte]
   rtp:
     description: Teleporte aleatório.
     aliases: [wild, aleatorio]
@@ -287,6 +290,9 @@ permissions:
   ultracore.tabhide.see:
     description: Continua vendo na TAB quem usou /esconder. Ninguém tem por padrão (nem OP); dê pelo LuckPerms.
     default: false
+  ultracore.ultimamorte.others:
+    description: /ultimamorte de outros jogadores (mesmo offline). Só OP por padrão.
+    default: op
   ultracore.luz.others:
     description: /luz em outros jogadores. Só OP por padrão.
     default: op
@@ -308,6 +314,7 @@ permissions:
       ultracore.warp: true
       ultracore.tpa: true
       ultracore.back: true
+      ultracore.ultimamorte: true
       ultracore.rtp: true
       ultracore.money: true
       ultracore.pay: true

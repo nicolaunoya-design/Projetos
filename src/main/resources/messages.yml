@@ -68,6 +68,10 @@ tpa:
 back:
   none: '&cNão há nenhum local salvo para voltar.'
   death-hint: '&7Use &f/back &7para voltar ao local da sua morte.'
+  no-death: '&cNão encontrei nenhuma morte salva de &f{player}&c.'
+  death-info: '&7Última morte de &f{player}&7: &fX {x} Y {y} Z {z} &7em &f{world}{ago}'
+  ago: ' &8(há {time})'
+  death-tp: '&7Para levar até lá: &f{cmd}'
 rtp:
   wrong-world: '&cO /rtp só funciona no mundo normal.'
   cooldown: '&cAguarde &f{time} &cpara usar de novo.'

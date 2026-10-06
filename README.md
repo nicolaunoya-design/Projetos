@@ -126,7 +126,7 @@ Textos aceitam cores `&a`, `&l`... e hex `&#FF8800`.
 | Homes | Casas por jogador, com limite configurável | `/sethome`, `/home`, `/delhome`, `/homes` |
 | Warps | Pontos públicos com menu visual | `/warp`, `/warps`, `/setwarp`, `/delwarp` |
 | TPA | Pedidos de teleporte, com menu e cooldown | `/tpa`, `/tpahere`, `/tpaccept`, `/tpdeny`, `/tptoggle` |
-| Back | Voltar ao local anterior ou da morte | `/back` |
+| Back | Voltar ao local anterior ou da morte (continua valendo depois de reiniciar o servidor); ver onde morreu | `/back`, `/ultimamorte [jogador]` |
 | Teleporte Aleatório | Local aleatório e seguro, com cooldown | `/rtp` |
 | Economia | Dinheiro, pagamentos, ranking, prêmio por abate, integração com Vault | `/money`, `/pay`, `/baltop`, `/eco` |
 | **Loja** 🆕 | Loja em menu para comprar e vender itens | `/loja`, `/vender`, `/vender tudo` |

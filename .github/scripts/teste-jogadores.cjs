@@ -228,6 +228,13 @@ async function main () {
   checar(await comando('Robo', '/esconder', /Visível na TAB/), '/esconder de novo desliga')
   checar(await aguardar(() => bots.Alvo.players.Robo && !!bots.Alvo.players.Robo.listed, 8000), 'volta a aparecer na TAB')
 
+  // ---------- /ultimamorte (local salvo da morte) ----------
+  await comando('Robo', '/kill Alvo')
+  await espera(2500)
+  checar(await comando('Robo', '/ultimamorte Alvo', /Última morte de Alvo: X -?\d+ Y -?\d+ Z -?\d+/), '/ultimamorte mostra onde o jogador morreu')
+  checar(await comando('Alvo', '/ultimamorte', /Última morte de Alvo/), 'jogador vê a própria última morte')
+  checar(await comando('Alvo', '/ultimamorte Robo', /permiss/i), 'jogador comum não vê a morte dos outros')
+
   // ---------- /luz (visão noturna sem fim) ----------
   const efeitoNv = () => {
     const r = bots.Alvo.registry

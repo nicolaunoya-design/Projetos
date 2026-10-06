@@ -40,6 +40,10 @@ public final class PlayerData {
     private boolean nickHidden;
     /** Visão noturna permanente (/luz). */
     private boolean fullbright;
+    /** Local do /back e da última morte (mundo;x;y;z;yaw;pitch), salvos para valer depois de reiniciar. */
+    private String backLocation = "";
+    private String lastDeath = "";
+    private long lastDeathTime;
     /** Preferências (/preferencias): não receber pedidos de TPA, mensagens privadas ou som de menção. */
     private boolean tpaDisabled;
     private boolean msgDisabled;
@@ -79,6 +83,9 @@ public final class PlayerData {
         d.tabHidden = c.getBoolean("tab-hidden");
         d.nickHidden = c.getBoolean("nick-hidden");
         d.fullbright = c.getBoolean("fullbright");
+        d.backLocation = c.getString("back.location", "");
+        d.lastDeath = c.getString("back.last-death", "");
+        d.lastDeathTime = c.getLong("back.last-death-time");
         d.tpaDisabled = c.getBoolean("prefs.tpa-off");
         d.msgDisabled = c.getBoolean("prefs.msg-off");
         d.mentionsDisabled = c.getBoolean("prefs.mentions-off");
@@ -114,6 +121,9 @@ public final class PlayerData {
         c.set("tab-hidden", tabHidden);
         c.set("nick-hidden", nickHidden);
         c.set("fullbright", fullbright);
+        c.set("back.location", backLocation);
+        c.set("back.last-death", lastDeath);
+        c.set("back.last-death-time", lastDeathTime);
         c.set("prefs.tpa-off", tpaDisabled);
         c.set("prefs.msg-off", msgDisabled);
         c.set("prefs.mentions-off", mentionsDisabled);
@@ -163,6 +173,14 @@ public final class PlayerData {
     public void setNickHidden(boolean nickHidden) { this.nickHidden = nickHidden; }
     public boolean isFullbright() { return fullbright; }
     public void setFullbright(boolean fullbright) { this.fullbright = fullbright; }
+    public String getBackLocation() { return backLocation; }
+    public void setBackLocation(String backLocation) { this.backLocation = backLocation == null ? "" : backLocation; }
+    public String getLastDeath() { return lastDeath; }
+    public long getLastDeathTime() { return lastDeathTime; }
+    public void setLastDeath(String lastDeath, long time) {
+        this.lastDeath = lastDeath == null ? "" : lastDeath;
+        this.lastDeathTime = time;
+    }
     public boolean isTpaDisabled() { return tpaDisabled; }
     public void setTpaDisabled(boolean v) { this.tpaDisabled = v; }
     public boolean isMsgDisabled() { return msgDisabled; }
