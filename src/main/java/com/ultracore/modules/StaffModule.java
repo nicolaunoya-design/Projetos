@@ -36,7 +36,7 @@ public class StaffModule extends Module {
 
     public StaffModule(UltraCore plugin) {
         super(plugin, "staff", "Ferramentas da Staff", Material.DIAMOND_SWORD, true,
-                "/fly, /heal, /feed, /gm, /god, /vanish, /invsee, /ecsee, /clearinv, /speed e /tphere.");
+                "/fly, /heal, /feed, /gm, /god, /vanish, /esconder, /escondernick, /invsee, /ecsee, /clearinv, /speed e /tphere.");
 
         bool("vanish-hide-deaths", true, Material.SKELETON_SKULL, "Invisível: esconder mortes e abates",
                 "Se quem está invisível morrer ou matar alguém, a mensagem de morte não aparece (nem no Discord/WhatsApp).");
@@ -111,6 +111,15 @@ public class StaffModule extends Module {
             refreshTabHidden(t);
             report(s, t, Lang.get(on ? "staff.tabhide-on" : "staff.tabhide-off"));
         }).tab((s, a) -> a.length == 1 && s.hasPermission("ultracore.tabhide.others") ? onlineNames(a[0]) : none);
+
+        command("escondernick", "ultracore.hidenick", (s, a) -> {
+            Player t = self(s, a, 0, "ultracore.hidenick.others");
+            if (t == null) return;
+            boolean on = !plugin.data().get(t).isNickHidden();
+            plugin.data().get(t).setNickHidden(on);
+            syncNameTags();
+            report(s, t, Lang.get(on ? "staff.hidenick-on" : "staff.hidenick-off"));
+        }).tab((s, a) -> a.length == 1 && s.hasPermission("ultracore.hidenick.others") ? onlineNames(a[0]) : none);
 
         command("invsee", "ultracore.invsee", (s, a) -> {
             if (a.length == 0) {
@@ -333,6 +342,48 @@ public class StaffModule extends Module {
         }
     }
 
+    // ---------- nome escondido (/escondernick): some o nome que fica em cima da cabeça ----------
+
+    private static final String NICK_TEAM = "uc_hidenick";
+
+    /** Quem tem o nome escondido e está online. */
+    private Set<String> hiddenNickNames() {
+        Set<String> names = new HashSet<>();
+        if (!isEnabled()) return names;
+        for (Player p : Bukkit.getOnlinePlayers()) if (plugin.data().get(p).isNickHidden()) names.add(p.getName());
+        return names;
+    }
+
+    /** Todos os placares em uso (o principal e os do /scoreboard de cada jogador). */
+    private Set<org.bukkit.scoreboard.Scoreboard> scoreboards() {
+        Set<org.bukkit.scoreboard.Scoreboard> boards = java.util.Collections.newSetFromMap(new java.util.IdentityHashMap<>());
+        boards.add(Bukkit.getScoreboardManager().getMainScoreboard());
+        for (Player p : Bukkit.getOnlinePlayers()) boards.add(p.getScoreboard());
+        return boards;
+    }
+
+    /** Coloca quem escondeu o nome num time com o nome invisível, em todos os placares. */
+    private void syncNameTags() {
+        Set<String> names = hiddenNickNames();
+        for (org.bukkit.scoreboard.Scoreboard sb : scoreboards()) {
+            org.bukkit.scoreboard.Team team = sb.getTeam(NICK_TEAM);
+            if (team == null) {
+                if (names.isEmpty()) continue;
+                team = sb.registerNewTeam(NICK_TEAM);
+                team.setOption(org.bukkit.scoreboard.Team.Option.NAME_TAG_VISIBILITY, org.bukkit.scoreboard.Team.OptionStatus.NEVER);
+            }
+            for (String entry : new HashSet<>(team.getEntries())) if (!names.contains(entry)) team.removeEntry(entry);
+            for (String name : names) if (!team.hasEntry(name)) team.addEntry(name);
+        }
+    }
+
+    private void clearNameTags() {
+        for (org.bukkit.scoreboard.Scoreboard sb : scoreboards()) {
+            org.bukkit.scoreboard.Team team = sb.getTeam(NICK_TEAM);
+            if (team != null) team.unregister();
+        }
+    }
+
     @EventHandler(priority = EventPriority.MONITOR)
     public void onJoinTabHidden(PlayerJoinEvent e) {
         Player p = e.getPlayer();
@@ -391,6 +442,8 @@ public class StaffModule extends Module {
             if (isVanished(p)) hide(p);
             if (isTabHidden(p)) refreshTabHidden(p);
         }
+        // a cada segundo: cobre quem entrou e os placares novos (o /scoreboard cria um por jogador)
+        timer(20L, 20L, this::syncNameTags);
     }
 
     @Override
@@ -401,6 +454,7 @@ public class StaffModule extends Module {
         }
         vanished.clear();
         god.clear();
+        clearNameTags();
         for (Player p : Bukkit.getOnlinePlayers()) {
             if (!plugin.data().get(p).isTabHidden()) continue;
             for (Player o : Bukkit.getOnlinePlayers()) if (o != p) o.listPlayer(p);

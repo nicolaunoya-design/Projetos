@@ -36,6 +36,8 @@ public final class PlayerData {
     private boolean vanished;
     /** Escondido da lista TAB (/esconder), continua visível no mundo. */
     private boolean tabHidden;
+    /** Nome em cima da cabeça escondido (/escondernick). */
+    private boolean nickHidden;
     /** Preferências (/preferencias): não receber pedidos de TPA, mensagens privadas ou som de menção. */
     private boolean tpaDisabled;
     private boolean msgDisabled;
@@ -73,6 +75,7 @@ public final class PlayerData {
         d.silentJoin = c.getBoolean("silent-join");
         d.vanished = c.getBoolean("vanished");
         d.tabHidden = c.getBoolean("tab-hidden");
+        d.nickHidden = c.getBoolean("nick-hidden");
         d.tpaDisabled = c.getBoolean("prefs.tpa-off");
         d.msgDisabled = c.getBoolean("prefs.msg-off");
         d.mentionsDisabled = c.getBoolean("prefs.mentions-off");
@@ -106,6 +109,7 @@ public final class PlayerData {
         c.set("silent-join", silentJoin);
         c.set("vanished", vanished);
         c.set("tab-hidden", tabHidden);
+        c.set("nick-hidden", nickHidden);
         c.set("prefs.tpa-off", tpaDisabled);
         c.set("prefs.msg-off", msgDisabled);
         c.set("prefs.mentions-off", mentionsDisabled);
@@ -151,6 +155,8 @@ public final class PlayerData {
     public void setVanished(boolean vanished) { this.vanished = vanished; }
     public boolean isTabHidden() { return tabHidden; }
     public void setTabHidden(boolean tabHidden) { this.tabHidden = tabHidden; }
+    public boolean isNickHidden() { return nickHidden; }
+    public void setNickHidden(boolean nickHidden) { this.nickHidden = nickHidden; }
     public boolean isTpaDisabled() { return tpaDisabled; }
     public void setTpaDisabled(boolean v) { this.tpaDisabled = v; }
     public boolean isMsgDisabled() { return msgDisabled; }

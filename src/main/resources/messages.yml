@@ -262,6 +262,8 @@ staff:
   vanish-off: '&cVocê está visível novamente.'
   tabhide-on: '&aEscondido da TAB e do chat &7(seu personagem continua aparecendo no mundo; chat bloqueado, comece com ! para falar; /esconder de novo para voltar)'
   tabhide-off: '&eVisível na TAB de novo'
+  hidenick-on: '&aNome escondido &7(ninguém vê o nome em cima da sua cabeça; /escondernick de novo para mostrar)'
+  hidenick-off: '&eNome em cima da cabeça visível de novo'
   vanish-rejoin: '&aVocê entrou &linvisível&a (vanish continua ligado). Use &f/vanish &apara aparecer.'
 utilities:
   hat-empty: '&cSegure um item/bloco na mão.'

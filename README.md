@@ -144,7 +144,7 @@ Textos aceitam cores `&a`, `&l`... e hex `&#FF8800`.
 | Tablist | Cabeçalho e rodapé da TAB | — |
 | MOTD | Descrição na lista de servidores (desligado por padrão) | — |
 | Moderação | Ban, tempban, ban por IP, kick, mute com tempo, **avisos com punição automática**, **histórico**, **denúncias** | `/ban`, `/tempban`, `/unban`, `/banip`, `/unbanip`, `/kick`, `/mute`, `/unmute`, `/warn`, `/limparavisos`, `/historico`, `/report` |
-| Ferramentas da Staff | Voo, cura, gamemode, deus, vanish, invsee... | `/fly`, `/heal`, `/feed`, `/gm`, `/god`, `/vanish`, `/esconder`, `/invsee`, `/ecsee`, `/clearinv`, `/speed`, `/tphere` |
+| Ferramentas da Staff | Voo, cura, gamemode, deus, vanish, invsee... | `/fly`, `/heal`, `/feed`, `/gm`, `/god`, `/vanish`, `/esconder`, `/escondernick`, `/invsee`, `/ecsee`, `/clearinv`, `/speed`, `/tphere` |
 | Utilidades | Bancada, enderchest, chapéu, ping, lixeira, regras | `/craft`, `/ec`, `/hat`, `/ping`, `/lixo`, `/regras` |
 | Proteção do Mundo | Creeper/TNT sem quebrar blocos, fogo, enderman, phantoms, keep inventory, clima, queda, plantações, **desligar o Nether e o The End** 🆕 | — |
 | AFK | Detecta ausentes, tag [AFK], expulsão opcional | `/afk` |
@@ -217,6 +217,10 @@ Seu **personagem continua aparecendo no mundo** (dá para ver, bater, conversar 
 - continua assim ao sair e entrar de novo. `/esconder` outra vez para voltar ao normal.
 
 `/esconder <jogador>` faz o mesmo com outra pessoa. Só OP pode usar (`ultracore.tabhide`, `ultracore.tabhide.others`). Quem receber `ultracore.tabhide.see` pelo LuckPerms continua vendo. Para sumir **também do mundo**, use o `/vanish`.
+
+### Nome escondido (`/escondernick`)
+
+Some o **nome que aparece em cima da sua cabeça**: os outros veem o personagem, mas não sabem quem é. Você continua na TAB e no chat normalmente (junte com o `/esconder` para sumir de lá também). Fica salvo ao sair e entrar; `/escondernick` de novo mostra o nome. `/escondernick <jogador>` faz o mesmo com outra pessoa. Só OP pode usar (`ultracore.hidenick`, `ultracore.hidenick.others`).
 
 ### Entrada silenciosa (`/silentjoin`)
 

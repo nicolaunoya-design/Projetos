@@ -233,6 +233,9 @@ commands:
   esconder:
     description: Modo oculto - o personagem continua no mundo, mas some da TAB, do chat (entrada, saída, mortes) e da contagem de online.
     aliases: [tabhide, hidetab, escondertab]
+  escondernick:
+    description: Esconde (ou mostra) o nome que aparece em cima da sua cabeça.
+    aliases: [hidenick, escondernome, semnome, nomeinvisivel]
   invsee:
     description: Vê o inventário de um jogador.
   ecsee:
@@ -281,6 +284,12 @@ permissions:
   ultracore.tabhide.see:
     description: Continua vendo na TAB quem usou /esconder. Ninguém tem por padrão (nem OP); dê pelo LuckPerms.
     default: false
+  ultracore.hidenick:
+    description: /escondernick (some o nome em cima da cabeça). Só OP por padrão.
+    default: op
+  ultracore.hidenick.others:
+    description: /escondernick em outros jogadores. Só OP por padrão.
+    default: op
   ultracore.diversao:
     description: Comandos de diversão (/trovao, /explodir, /foguete...). Só OP por padrão.
     default: op

@@ -228,6 +228,13 @@ async function main () {
   checar(await comando('Robo', '/esconder', /Visível na TAB/), '/esconder de novo desliga')
   checar(await aguardar(() => bots.Alvo.players.Robo && !!bots.Alvo.players.Robo.listed, 8000), 'volta a aparecer na TAB')
 
+  // ---------- /escondernick (some o nome em cima da cabeça) ----------
+  const timeDoRobo = () => bots.Alvo.teamMap && bots.Alvo.teamMap.Robo
+  checar(await comando('Robo', '/escondernick', /Nome escondido/), '/escondernick liga')
+  checar(await aguardar(() => timeDoRobo() && String(timeDoRobo().nameTagVisibility) === 'never', 8000), 'os outros não veem o nome em cima da cabeça')
+  checar(await comando('Robo', '/escondernick', /visível de novo/), '/escondernick de novo desliga')
+  checar(await aguardar(() => !timeDoRobo() || String(timeDoRobo().nameTagVisibility) !== 'never', 8000), 'o nome volta a aparecer')
+
   // ---------- vanish continua ao relogar ----------
   checar(await comando('Robo', '/vanish', /invisível/), '/vanish liga')
   await espera(1000)
