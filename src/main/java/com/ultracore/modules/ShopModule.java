@@ -217,6 +217,11 @@ public class ShopModule extends Module {
                         msg(p, "common.invalid-number");
                         return;
                     }
+                    if (!Double.isFinite(buy) || !Double.isFinite(sell)) {
+                        msg(p, "common.invalid-number");
+                        return;
+                    }
+                    if (buy > 0 && sell > buy) msg(p, "shop.admin-profit-warning");
                     items.removeIf(i -> i.material() == hand.getType());
                     items.add(new ShopItem(hand.getType(), hand.getAmount(), Math.max(0, buy), Math.max(0, sell)));
                     saveItems();
@@ -496,7 +501,8 @@ public class ShopModule extends Module {
             }
             set(49, new ItemBuilder(Material.LIME_CONCRETE).name("&a&lSALVAR").glow(true)
                     .lore("&7Pacote: &f" + amount + "x", "&7Compra: " + money(buy), "&7Venda: " + money(sell),
-                            "", buy <= 0 && sell <= 0 ? "&cAviso: compra e venda desativadas" : "&eClique &7para salvar").build(), e -> {
+                            "", buy <= 0 && sell <= 0 ? "&cAviso: compra e venda desativadas"
+                                    : buy > 0 && sell > buy ? "&c&lCuidado: &cvenda maior que a compra = dinheiro infinito!" : "&eClique &7para salvar").build(), e -> {
                 click(viewer);
                 ShopItem item = new ShopItem(material, amount, buy, sell);
                 int i = indexOf(material);
@@ -504,6 +510,7 @@ public class ShopModule extends Module {
                 else items.add(item);
                 saveItems();
                 msg(viewer, "shop.admin-added", "item", pretty(material), "amount", amount);
+                if (buy > 0 && sell > buy) msg(viewer, "shop.admin-profit-warning");
                 openLater(viewer, parent);
             });
             set(51, new ItemBuilder(Material.OAK_SIGN).name("&fDicas")
@@ -534,7 +541,9 @@ public class ShopModule extends Module {
                 closeLater(viewer);
                 plugin.chatInput().await(viewer, "&fDigite o valor de " + title + " &f(0 = desativado):", input -> {
                     try {
-                        setter.accept(Math.max(0, round(Double.parseDouble(input.trim().replace(",", ".")))));
+                        double v = Double.parseDouble(input.trim().replace(",", "."));
+                        if (Double.isFinite(v)) setter.accept(Math.max(0, round(v)));
+                        else msg(viewer, "common.invalid-number");
                     } catch (NumberFormatException ex) {
                         msg(viewer, "common.invalid-number");
                     }

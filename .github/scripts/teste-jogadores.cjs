@@ -235,6 +235,77 @@ async function main () {
   checar(await comando('Alvo', '/ultimamorte', /Última morte de Alvo/), 'jogador vê a própria última morte')
   checar(await comando('Alvo', '/ultimamorte Robo', /permiss/i), 'jogador comum não vê a morte dos outros')
 
+  // ---------- /troca (só com quem está perto) ----------
+  const conta = (bot, nome) => bot.inventory.items().filter((i) => i.name === nome).reduce((n, i) => n + i.count, 0)
+  const abreJanela = (bot, ms = 10000) => new Promise((resolve) => {
+    const t = setTimeout(() => resolve(null), ms)
+    bot.once('windowOpen', (w) => { clearTimeout(t); resolve(w) })
+  })
+  for (const n of ['Robo', 'Alvo']) await rcon.comando(`gamemode survival ${n}`)
+  await rcon.comando('clear Alvo')
+  await rcon.comando('clear Robo')
+  await rcon.comando('give Alvo minecraft:nautilus_shell 3')
+  await rcon.comando('give Robo minecraft:heart_of_the_sea 1')
+  await rcon.comando('execute as Robo at @s run tp @s ~60 ~ ~')
+  await espera(1500)
+  checar(await comando('Alvo', '/troca Robo', /longe demais/), '/troca não funciona com quem está longe')
+  await rcon.comando('tp Robo Alvo')
+  await espera(1500)
+  desde = marca('Robo')
+  checar(await comando('Alvo', '/troca Robo', /Pedido de troca enviado/), '/troca envia o pedido para quem está perto')
+  checar(await esperarMsg('Robo', /quer trocar/, desde), 'quem recebe o pedido é avisado')
+  let jAlvo = abreJanela(bots.Alvo)
+  let jRobo = abreJanela(bots.Robo)
+  bots.Robo.chat('/troca aceitar')
+  const [wa, wr] = await Promise.all([jAlvo, jRobo])
+  checar(/Troca/.test(tituloDe(wa)) && /Troca/.test(tituloDe(wr)), '/troca aceitar abre o menu da troca para os dois')
+  if (wa && wr) {
+    const conchas = wa.slots.findIndex((it, i) => i >= wa.inventoryStart && it && it.name === 'nautilus_shell')
+    await clicar(bots.Alvo, conchas, 0, 1) // shift-clique: vai para o lado do Alvo
+    await espera(800)
+    const coracao = wr.slots.findIndex((it, i) => i >= wr.inventoryStart && it && it.name === 'heart_of_the_sea')
+    await clicar(bots.Robo, coracao, 0, 0)
+    await clicar(bots.Robo, 5, 0, 0) // coloca no lado do Robo
+    await espera(800)
+    await clicar(bots.Robo, 0, 0, 0) // tenta pegar do lado do Alvo (tem que ser bloqueado)
+    await espera(800)
+    desde = marca('Alvo')
+    await clicar(bots.Alvo, 47, 0, 0)
+    await clicar(bots.Robo, 51, 0, 0)
+    checar(await esperarMsg('Alvo', /Troca concluída/, desde, 10000), 'os dois confirmam e a troca é concluída')
+    await espera(1500)
+    checar(conta(bots.Robo, 'nautilus_shell') === 3 && conta(bots.Alvo, 'nautilus_shell') === 0,
+      `os itens do Alvo foram para o Robo, sem duplicar (Robo ${conta(bots.Robo, 'nautilus_shell')}, Alvo ${conta(bots.Alvo, 'nautilus_shell')})`)
+    checar(conta(bots.Alvo, 'heart_of_the_sea') === 1 && conta(bots.Robo, 'heart_of_the_sea') === 0, 'o item do Robo foi para o Alvo')
+  }
+  // fechar o menu cancela e devolve
+  await espera(5500) // cooldown do pedido
+  jAlvo = abreJanela(bots.Alvo)
+  jRobo = abreJanela(bots.Robo)
+  await comando('Alvo', '/troca Robo')
+  await espera(800)
+  bots.Robo.chat('/troca Alvo') // pedir de volta também aceita
+  const [wa2] = await Promise.all([jAlvo, jRobo])
+  if (wa2) {
+    const c = wa2.slots.findIndex((it, i) => i >= wa2.inventoryStart && it && it.name === 'heart_of_the_sea')
+    await clicar(bots.Alvo, c, 0, 1)
+    await espera(800)
+    desde = marca('Alvo')
+    bots.Alvo.closeWindow(wa2)
+    checar(await esperarMsg('Alvo', /Troca cancelada/, desde), 'fechar o menu cancela a troca')
+    await espera(1500)
+    checar(conta(bots.Alvo, 'heart_of_the_sea') === 1, 'ao cancelar, o item volta para o dono')
+  } else {
+    checar(false, '/troca <nome> de volta aceita o pedido')
+  }
+  await espera(1000)
+  if (bots.Robo.currentWindow) bots.Robo.closeWindow(bots.Robo.currentWindow)
+
+  // ---------- limpeza dos itens do chão: liga/desliga ----------
+  checar(await comando('Robo', '/limparitens desligar', /automática desligada/), '/limparitens desligar')
+  checar(await comando('Robo', '/limparitens status', /desligada/), '/limparitens status mostra desligada')
+  checar(await comando('Robo', '/limparitens ligar', /automática ligada/), '/limparitens ligar')
+
   // ---------- /luz (visão noturna sem fim) ----------
   const efeitoNv = () => {
     const r = bots.Alvo.registry

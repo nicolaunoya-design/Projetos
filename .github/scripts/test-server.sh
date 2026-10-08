@@ -57,7 +57,7 @@ if grep -q "Done (" server.log; then
              "tag lista" "tag criar lenda &5[Lenda]" "tag dar Ninguem lenda" "tag apagar lenda" \
              "painel desativar tags" "painel ativar tags" "painel padrao chat" "painel padrao tags" \
              "painel comando broadcast desativar" "broadcast nao deveria aparecer" "painel comando broadcast ativar" "silentjoin" \
-             "esconder Ninguem" "escondernick Ninguem" "luz Ninguem" "ultimamorte Ninguem" "painel desativar menus" "painel ativar menus" "painel comando top desativar" "painel comando top ativar" \
+             "esconder Ninguem" "escondernick Ninguem" "luz Ninguem" "ultimamorte Ninguem" "troca Ninguem" "limparitens desligar" "limparitens status" "limparitens ligar" "painel desativar menus" "painel ativar menus" "painel comando top desativar" "painel comando top ativar" \
              "msgtoggle" "menu" "painel nether desativar" "painel nether ativar" "trovao" "trovao Ninguem" "explodir todos" "foguete todos" "painel desativar fun" "painel ativar fun" \
              "painel lista"; do
     echo "$cmd" >&3

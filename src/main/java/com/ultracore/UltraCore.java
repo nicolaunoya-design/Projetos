@@ -76,6 +76,7 @@ public final class UltraCore extends JavaPlugin {
         moduleManager.register(new DeathModule(this));
         moduleManager.register(new ClearLagModule(this));
         moduleManager.register(new ShopModule(this));
+        moduleManager.register(new TradeModule(this));
         moduleManager.register(new RewardsModule(this));
         moduleManager.register(new NickModule(this));
         moduleManager.register(new TagsModule(this));

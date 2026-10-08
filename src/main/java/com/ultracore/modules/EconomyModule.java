@@ -79,7 +79,7 @@ public class EconomyModule extends Module {
     }
 
     public synchronized boolean withdraw(UUID id, double amount) {
-        if (amount < 0) return false;
+        if (amount < 0 || !Double.isFinite(amount)) return false; // NaN/infinito (de outro plugin) estragaria o saldo
         PlayerData d = plugin.data().getOffline(id);
         if (d.getBalance() < amount) return false;
         d.setBalance(d.getBalance() - amount);
@@ -88,7 +88,7 @@ public class EconomyModule extends Module {
     }
 
     public synchronized boolean deposit(UUID id, double amount) {
-        if (amount < 0) return false;
+        if (amount < 0 || !Double.isFinite(amount)) return false;
         PlayerData d = plugin.data().getOffline(id);
         d.setBalance(d.getBalance() + amount);
         persist(d);

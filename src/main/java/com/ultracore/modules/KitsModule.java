@@ -134,6 +134,7 @@ public class KitsModule extends Module {
         }
         give(p, kit);
         d.getKitUses().put(kit, System.currentTimeMillis());
+        plugin.data().save(d); // salva na hora: se o servidor cair, o kit não pode ser pego de novo
         msg(p, "kits.received", "kit", kit);
     }
 
@@ -155,7 +156,7 @@ public class KitsModule extends Module {
             return;
         }
         long cooldownSec;
-        if (a[1].matches("-1|\\d+")) cooldownSec = Long.parseLong(a[1]); // número puro = segundos
+        if (a[1].matches("-1|\\d{1,10}")) cooldownSec = Long.parseLong(a[1]); // número puro = segundos (até ~300 anos)
         else {
             long ms = TimeUtil.parse(a[1]);
             if (ms < 0) {

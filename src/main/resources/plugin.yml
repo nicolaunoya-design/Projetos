@@ -54,6 +54,9 @@ commands:
   back:
     description: Volta para o local anterior.
     aliases: [voltar]
+  troca:
+    description: Troca segura de itens e dinheiro com um jogador perto de você.
+    aliases: [trocar, trade]
   ultimamorte:
     description: Mostra onde você (ou outro jogador) morreu pela última vez.
     aliases: [mortecoords, deathcoords, ondemorri, ultmorte]
@@ -315,6 +318,7 @@ permissions:
       ultracore.tpa: true
       ultracore.back: true
       ultracore.ultimamorte: true
+      ultracore.troca: true
       ultracore.rtp: true
       ultracore.money: true
       ultracore.pay: true

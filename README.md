@@ -4,6 +4,12 @@ Plugin para **Paper 1.21 até 26.x** (e forks como Purpur) que junta num só lug
 
 Cada recurso é um **módulo** que pode ser **ligado, desligado e configurado dentro do jogo** pelo comando `/painel`, sem mexer em arquivos nem reiniciar o servidor. Todas as mensagens podem ser editadas no `messages.yml`.
 
+## ✨ Novidades da 2.6
+
+- **`/troca`**: troca segura de itens e dinheiro com quem está **perto** de você (ou agache e clique com o botão direito no jogador). Veja [Troca](#troca-troca).
+- **Limpeza dos itens do chão**: `/limparitens desligar` / `ligar` / `status`, opção para **proteger itens novos** (ex: o que caiu de quem acabou de morrer) e itens com nome.
+- **Correções**: teleporte montado (cavalo, barco) agora funciona; o teleporte com contagem é cancelado se você levar dano; kits de uso único não podem mais ser pegos de novo se o servidor cair; valores absurdos em `/ban`, `/loja add` e na economia são recusados; aviso quando o preço de venda da loja é maior que o de compra (dinheiro infinito); menus mais leves.
+
 ## ✨ Novidades da 2.0
 
 - **`/menu`**: central do servidor para os jogadores, com perfil (dinheiro, abates, tempo de jogo) e botões para spawn, homes, warps, teleporte, loja, kits, recompensa diária, rankings, tags e preferências.
@@ -130,6 +136,7 @@ Textos aceitam cores `&a`, `&l`... e hex `&#FF8800`.
 | Teleporte Aleatório | Local aleatório e seguro, com cooldown | `/rtp` |
 | Economia | Dinheiro, pagamentos, ranking, prêmio por abate, integração com Vault | `/money`, `/pay`, `/baltop`, `/eco` |
 | **Loja** 🆕 | Loja em menu para comprar e vender itens | `/loja`, `/vender`, `/vender tudo` |
+| **Troca** 🆕 | Troca segura de itens e dinheiro com quem está perto | `/troca <jogador>`, `/troca aceitar`, `/troca recusar` |
 | Kits | Kits com cooldown ou uso único, kit inicial | `/kit`, `/createkit`, `/delkit` |
 | **Recompensas** 🆕 | Recompensa diária com bônus por dias seguidos, tempo de jogo | `/daily`, `/tempo` |
 | Chat | Formato, anti-spam, anti-CAPS, filtro, **menções @nome** 🆕 | `/staffchat`, `/clearchat`, `/broadcast` |
@@ -151,13 +158,22 @@ Textos aceitam cores `&a`, `&l`... e hex `&#FF8800`.
 | Dormir | % de jogadores necessários para pular a noite | — |
 | Colheita Fácil | Botão direito colhe e replanta | — |
 | Mortes | Coordenadas da morte, cabeça do jogador em PvP | — |
-| Limpeza de Itens | Remove itens do chão com aviso | `/limparitens` |
+| Limpeza de Itens | Remove itens do chão com aviso (automática pode ser desligada; protege itens novos e com nome) | `/limparitens`, `/limparitens ligar\|desligar\|status` |
 | **Discord** 🆕 | Envia punições, denúncias, staffchat e mais para um canal do Discord (desligado por padrão) | — |
 | **Bot do WhatsApp** 🆕 | Envia os mesmos avisos para o seu bot do WhatsApp, além do **feed do jogo** (chat, conquistas e mortes); com a ponte, o bot também executa comandos no servidor (desligado por padrão) | — |
 
 A maioria dos comandos também aceita apelidos em português: `/casa`, `/pagar`, `/voar`, `/curar`, `/avisar`, `/denunciar`, `/diario`, `/apelido`...
 
 Tempos nos comandos aceitam `30s`, `10m`, `2h`, `7d`, `1w` (ex: `/tempban Fulano 7d hack`, `/mute Fulano 30m spam`).
+
+### Troca (`/troca`)
+
+1. Chegue perto do outro jogador (até **10 blocos**, ajustável) e use `/troca <nome>`, ou **agache e clique com o botão direito** nele.
+2. Ele aceita clicando em **[ACEITAR]** no chat (ou `/troca aceitar`). `/troca <seu nome>` de volta também aceita.
+3. Abre um menu: cada um coloca os itens **do seu lado** (esquerda = quem pediu, direita = quem aceitou) e, se quiser, dinheiro no lingote de ouro.
+4. Os dois clicam em **confirmar**. A troca acontece depois de **3 segundos**. Qualquer mudança nesse tempo desfaz as confirmações, o que evita golpe de última hora.
+
+Fechar o menu, sair, morrer, se afastar ou clicar em **Cancelar** devolve tudo para os donos. Ninguém consegue mexer no lado do outro. Quem está no criativo não troca (dá para mudar). Cada troca fica registrada no console. No `/painel` → Economia → Troca: distância, tempo do pedido, cooldown, agachar + clique, dinheiro e bloqueio do criativo.
 
 ### Loja
 

@@ -5,14 +5,15 @@ import java.util.regex.Pattern;
 
 public final class TimeUtil {
 
-    private static final Pattern PART = Pattern.compile("(\\d+)([smhdw])", Pattern.CASE_INSENSITIVE);
+    private static final Pattern PART = Pattern.compile("(\\d{1,6})([smhdw])", Pattern.CASE_INSENSITIVE);
 
     private TimeUtil() {
     }
 
     /** Converte "1d2h30m" em milissegundos. Retorna -1 se inválido. */
     public static long parse(String input) {
-        if (input == null || !input.matches("(?i)(\\d+[smhdw])+")) return -1;
+        // até 6 dígitos por parte: números gigantes estouravam a conta (ex: /ban 99999999999999999999d)
+        if (input == null || !input.matches("(?i)(\\d{1,6}[smhdw])+")) return -1;
         Matcher m = PART.matcher(input);
         long total = 0;
         while (m.find()) {

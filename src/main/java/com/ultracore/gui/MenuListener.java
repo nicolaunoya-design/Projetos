@@ -9,7 +9,8 @@ public final class MenuListener implements Listener {
 
     @EventHandler
     public void onClick(InventoryClickEvent e) {
-        if (!(e.getView().getTopInventory().getHolder() instanceof Menu menu)) return;
+        // getHolder(false): não copia o bloco (baú, fornalha...) a cada clique, bem mais leve
+        if (!(e.getView().getTopInventory().getHolder(false) instanceof Menu menu)) return;
         e.setCancelled(true);
         int top = e.getView().getTopInventory().getSize();
         if (e.getRawSlot() >= 0 && e.getRawSlot() < top) menu.handle(e);
@@ -18,6 +19,6 @@ public final class MenuListener implements Listener {
 
     @EventHandler
     public void onDrag(InventoryDragEvent e) {
-        if (e.getView().getTopInventory().getHolder() instanceof Menu) e.setCancelled(true);
+        if (e.getView().getTopInventory().getHolder(false) instanceof Menu) e.setCancelled(true);
     }
 }
