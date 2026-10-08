@@ -5,6 +5,7 @@ import com.ultracore.module.Module;
 import com.ultracore.module.ModuleCommand;
 import com.ultracore.util.ItemBuilder;
 import com.ultracore.util.Msg;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -107,6 +108,18 @@ public final class MainMenu extends Menu {
                 Player p = (Player) e.getWhoClicked();
                 click(p);
                 openLater(p, new DimensionsMenu(world));
+            });
+        }
+
+        com.ultracore.modules.DeathModule deaths = plugin.modules().get(com.ultracore.modules.DeathModule.class);
+        if (deaths != null) {
+            set(47, new ItemBuilder(Material.SKELETON_SKULL).name("&4&lMortes").lore(
+                    "&7Quem morreu, onde, quando, a causa", "&7e os itens perdidos (dá para devolver).", "",
+                    "&7Mortes guardadas: &f" + deaths.logSize(), "",
+                    "&e▸ Clique para abrir").build(), e -> {
+                Player p = (Player) e.getWhoClicked();
+                click(p);
+                Bukkit.getScheduler().runTask(plugin, () -> deaths.openLog(p, () -> new MainMenu(plugin), null));
             });
         }
 

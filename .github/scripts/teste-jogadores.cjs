@@ -301,6 +301,39 @@ async function main () {
   await espera(1000)
   if (bots.Robo.currentWindow) bots.Robo.closeWindow(bots.Robo.currentWindow)
 
+  // ---------- registro de mortes (/painel → Mortes ou /mortes) ----------
+  await rcon.comando('clear Alvo')
+  await rcon.comando('give Alvo minecraft:heart_of_the_sea 1')
+  await rcon.comando('execute as Alvo at @s run tp @s ~ ~ ~40')
+  await espera(1000)
+  await rcon.comando('kill Alvo')
+  await espera(3000)
+  let wm = await janela(bots.Robo, () => bots.Robo.chat('/mortes Alvo'))
+  checar(/Mortes/.test(tituloDe(wm)), '/mortes abre o registro de mortes')
+  checar(!!wm && !!wm.slots[10] && nomeItem(wm.slots[10]).includes('Alvo'), 'a morte do Alvo aparece no registro')
+  const wi = wm ? await janela(bots.Robo, () => clicar(bots.Robo, 10, 1, 0)) : null
+  checar(/Itens de/.test(tituloDe(wi)) && !!wi && wi.slots.slice(0, 45).some((it) => it && it.name === 'heart_of_the_sea'),
+    'clique direito mostra os itens perdidos na morte')
+  if (wi) {
+    await rcon.comando('clear Alvo')
+    await espera(500)
+    desde = marca('Alvo')
+    await clicar(bots.Robo, 49, 0, 0)
+    await espera(500)
+    await clicar(bots.Robo, 49, 0, 0)
+    checar(await esperarMsg('Alvo', /devolveu os itens/, desde), 'admin devolve os itens da morte')
+    await espera(1000)
+    checar(conta(bots.Alvo, 'heart_of_the_sea') === 1, 'os itens voltam para o jogador')
+    await clicar(bots.Robo, 49, 0, 0)
+    await espera(1000)
+    checar(conta(bots.Alvo, 'heart_of_the_sea') === 1, 'não dá para devolver duas vezes')
+  }
+  if (bots.Robo.currentWindow) bots.Robo.closeWindow(bots.Robo.currentWindow)
+  await espera(500)
+  const wp = await janela(bots.Robo, () => bots.Robo.chat('/painel'))
+  checar(temItem(wp, 'Mortes'), 'o /painel tem o botão Mortes')
+  if (bots.Robo.currentWindow) bots.Robo.closeWindow(bots.Robo.currentWindow)
+
   // ---------- limpeza dos itens do chão: liga/desliga ----------
   checar(await comando('Robo', '/limparitens desligar', /automática desligada/), '/limparitens desligar')
   checar(await comando('Robo', '/limparitens status', /desligada/), '/limparitens status mostra desligada')

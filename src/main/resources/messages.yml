@@ -291,6 +291,10 @@ sleep:
 death:
   coords: '&cVocê morreu em &fX: {x} Y: {y} Z: {z} &7({world})'
   head-name: '&eCabeça de &f{player}'
+  log-no-world: '&cO mundo dessa morte não existe mais.'
+  log-teleported: '&aVocê foi até o local da morte de &f{player}&a.'
+  log-restored: '&aItens devolvidos para &f{player}&a.'
+  log-restored-you: '&aUm admin devolveu os itens que você perdeu na morte!'
 clearlag:
   manual: '&aForam removidas &f{count} &aentidades.'
   warning: '&eOs itens no chão serão removidos em &f{seconds} segundos&e!'

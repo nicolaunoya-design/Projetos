@@ -4,9 +4,10 @@ Plugin para **Paper 1.21 até 26.x** (e forks como Purpur) que junta num só lug
 
 Cada recurso é um **módulo** que pode ser **ligado, desligado e configurado dentro do jogo** pelo comando `/painel`, sem mexer em arquivos nem reiniciar o servidor. Todas as mensagens podem ser editadas no `messages.yml`.
 
-## ✨ Novidades da 2.6
+## ✨ Novidades da 2.6 e 2.7
 
 - **`/troca`**: troca segura de itens e dinheiro com quem está **perto** de você (ou agache e clique com o botão direito no jogador). Veja [Troca](#troca-troca).
+- **Registro de mortes**: botão **Mortes** na tela inicial do `/painel` (ou `/mortes [jogador]`): quem morreu, onde, quando, a causa e os itens que caíram. Dá para ir até o local e **devolver os itens** se algo bugar. Veja [Mortes](#registro-de-mortes).
 - **Limpeza dos itens do chão**: `/limparitens desligar` / `ligar` / `status`, opção para **proteger itens novos** (ex: o que caiu de quem acabou de morrer) e itens com nome.
 - **Correções**: teleporte montado (cavalo, barco) agora funciona; o teleporte com contagem é cancelado se você levar dano; kits de uso único não podem mais ser pegos de novo se o servidor cair; valores absurdos em `/ban`, `/loja add` e na economia são recusados; aviso quando o preço de venda da loja é maior que o de compra (dinheiro infinito); menus mais leves.
 
@@ -165,6 +166,14 @@ Textos aceitam cores `&a`, `&l`... e hex `&#FF8800`.
 A maioria dos comandos também aceita apelidos em português: `/casa`, `/pagar`, `/voar`, `/curar`, `/avisar`, `/denunciar`, `/diario`, `/apelido`...
 
 Tempos nos comandos aceitam `30s`, `10m`, `2h`, `7d`, `1w` (ex: `/tempban Fulano 7d hack`, `/mute Fulano 30m spam`).
+
+### Registro de mortes
+
+Botão **Mortes** (caveira) na tela inicial do `/painel`, ou `/mortes` (`/mortes <jogador>` mostra só as dele). Só OP (`ultracore.mortes`).
+
+- Cada morte mostra **quem**, **quando**, **onde** (coordenadas e mundo), a **causa** e quantos itens caíram. Fica salvo no `deaths.yml` e continua depois de reiniciar.
+- **Clique esquerdo**: vai até o local. **Clique direito**: vê os itens perdidos e pode **devolver tudo** para o jogador (precisa estar online; dois cliques para confirmar; só dá para devolver uma vez). **Shift + clique**: mostra só as mortes daquele jogador. **Buscar jogador**: digita o nome no chat.
+- No `/painel` → Mundo → Mortes: ligar/desligar o registro, guardar ou não os itens e quantas mortes guardar (200 por padrão).
 
 ### Troca (`/troca`)
 

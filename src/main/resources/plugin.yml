@@ -54,6 +54,9 @@ commands:
   back:
     description: Volta para o local anterior.
     aliases: [voltar]
+  mortes:
+    description: Registro de mortes (onde, quando, causa e itens perdidos, com botão para devolver).
+    aliases: [deaths, registromortes]
   troca:
     description: Troca segura de itens e dinheiro com um jogador perto de você.
     aliases: [trocar, trade]
@@ -293,6 +296,9 @@ permissions:
   ultracore.tabhide.see:
     description: Continua vendo na TAB quem usou /esconder. Ninguém tem por padrão (nem OP); dê pelo LuckPerms.
     default: false
+  ultracore.mortes:
+    description: /mortes e o botão Mortes do /painel (ver e devolver itens de mortes). Só OP por padrão.
+    default: op
   ultracore.ultimamorte.others:
     description: /ultimamorte de outros jogadores (mesmo offline). Só OP por padrão.
     default: op
