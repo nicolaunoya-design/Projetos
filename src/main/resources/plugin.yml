@@ -54,6 +54,9 @@ commands:
   back:
     description: Volta para o local anterior.
     aliases: [voltar]
+  pvp:
+    description: Mostra se o PvP está ligado; admins ligam/desligam com /pvp ligar|desligar.
+    aliases: [combate]
   mortes:
     description: Registro de mortes (onde, quando, causa e itens perdidos, com botão para devolver).
     aliases: [deaths, registromortes]
@@ -296,6 +299,9 @@ permissions:
   ultracore.tabhide.see:
     description: Continua vendo na TAB quem usou /esconder. Ninguém tem por padrão (nem OP); dê pelo LuckPerms.
     default: false
+  ultracore.pvp.admin:
+    description: /pvp ligar|desligar (PvP do servidor todo). Só OP por padrão.
+    default: op
   ultracore.mortes:
     description: /mortes e o botão Mortes do /painel (ver e devolver itens de mortes). Só OP por padrão.
     default: op
@@ -325,6 +331,7 @@ permissions:
       ultracore.back: true
       ultracore.ultimamorte: true
       ultracore.troca: true
+      ultracore.pvp: true
       ultracore.rtp: true
       ultracore.money: true
       ultracore.pay: true

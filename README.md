@@ -4,7 +4,9 @@ Plugin para **Paper 1.21 até 26.x** (e forks como Purpur) que junta num só lug
 
 Cada recurso é um **módulo** que pode ser **ligado, desligado e configurado dentro do jogo** pelo comando `/painel`, sem mexer em arquivos nem reiniciar o servidor. Todas as mensagens podem ser editadas no `messages.yml`.
 
-## ✨ Novidades da 2.6 e 2.7
+## ✨ Novidades da 2.6 a 2.8
+
+- **Ligar/desligar o PvP**: botão **PvP** na tela inicial do `/painel`, `/pvp ligar` / `/pvp desligar` ou `/painel pvp ativar|desativar`. Também dá para deixar mundos sem PvP e liberar o PvP pessoal (`/pvp eu`). Veja [PvP](#pvp).
 
 - **`/troca`**: troca segura de itens e dinheiro com quem está **perto** de você (ou agache e clique com o botão direito no jogador). Veja [Troca](#troca-troca).
 - **Registro de mortes**: botão **Mortes** na tela inicial do `/painel` (ou `/mortes [jogador]`): quem morreu, onde, quando, a causa e os itens que caíram. Dá para ir até o local e **devolver os itens** se algo bugar. Veja [Mortes](#registro-de-mortes).
@@ -166,6 +168,15 @@ Textos aceitam cores `&a`, `&l`... e hex `&#FF8800`.
 A maioria dos comandos também aceita apelidos em português: `/casa`, `/pagar`, `/voar`, `/curar`, `/avisar`, `/denunciar`, `/diario`, `/apelido`...
 
 Tempos nos comandos aceitam `30s`, `10m`, `2h`, `7d`, `1w` (ex: `/tempban Fulano 7d hack`, `/mute Fulano 30m spam`).
+
+### PvP
+
+- **Botão PvP** (espada) na tela inicial do `/painel`: um clique liga ou desliga o PvP do servidor todo. Também: `/pvp ligar`, `/pvp desligar` (permissão `ultracore.pvp.admin`, só OP) ou `/painel pvp ativar|desativar`. Todo mundo é avisado no chat.
+- Com o PvP desligado ninguém machuca outro jogador: espada, machado, flecha, tridente, poções de dano/veneno, lobo domesticado, TNT acesa por jogador, fogo e vara de pescar. Mobs continuam normais.
+- `/pvp` mostra se está ligado.
+- No `/painel` → Mundo → PvP:
+  - **Mundos sem PvP**: lista de mundos onde nunca tem PvP (ex: o mundo do spawn).
+  - **PvP pessoal** (desligado por padrão): cada jogador usa `/pvp eu` para desligar o próprio PvP (não apanha e não bate). Quem brigou há menos de 15 segundos não pode desligar, para não fugir da luta.
 
 ### Registro de mortes
 

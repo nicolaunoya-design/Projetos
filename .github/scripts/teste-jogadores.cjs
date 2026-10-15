@@ -339,6 +339,37 @@ async function main () {
   checar(await comando('Robo', '/limparitens status', /desligada/), '/limparitens status mostra desligada')
   checar(await comando('Robo', '/limparitens ligar', /automática ligada/), '/limparitens ligar')
 
+  // ---------- PvP liga/desliga ----------
+  for (const n of ['Robo', 'Alvo']) await rcon.comando(`gamemode survival ${n}`)
+  await rcon.comando('tp Robo Alvo')
+  await rcon.comando('effect give Alvo minecraft:instant_health 1 5')
+  await espera(2000)
+  const bater = async () => {
+    const alvo = bots.Robo.players.Alvo && bots.Robo.players.Alvo.entity
+    if (!alvo) return false
+    await bots.Robo.lookAt(alvo.position.offset(0, 1.6, 0), true)
+    bots.Robo.attack(alvo)
+    return true
+  }
+  desde = marca('Alvo')
+  checar(await comando('Robo', '/pvp desligar', /PvP DESLIGADO/), '/pvp desligar')
+  checar(await esperarMsg('Alvo', /PvP DESLIGADO/, desde), 'todos são avisados que o PvP desligou')
+  const vidaAntes = bots.Alvo.health
+  checar(await bater(), 'Robo encontra o Alvo para bater')
+  await espera(1200)
+  await bater()
+  await espera(1500)
+  checar(bots.Alvo.health >= vidaAntes, `com o PvP desligado o Alvo não perde vida (${vidaAntes} -> ${bots.Alvo.health})`)
+  checar(await comando('Robo', '/pvp ligar', /PvP LIGADO/), '/pvp ligar')
+  await espera(1200)
+  await bater()
+  checar(await aguardar(() => bots.Alvo.health < vidaAntes, 5000), `com o PvP ligado o Alvo perde vida (${vidaAntes} -> ${bots.Alvo.health})`)
+  checar(await comando('Robo', '/pvp', /PvP do servidor: LIGADO/), '/pvp mostra o estado')
+  await rcon.comando('effect give Alvo minecraft:instant_health 1 5')
+  const wpv = await janela(bots.Robo, () => bots.Robo.chat('/painel'))
+  checar(temItem(wpv, 'PvP'), 'o /painel tem o botão PvP')
+  if (bots.Robo.currentWindow) bots.Robo.closeWindow(bots.Robo.currentWindow)
+
   // ---------- /luz (visão noturna sem fim) ----------
   const efeitoNv = () => {
     const r = bots.Alvo.registry

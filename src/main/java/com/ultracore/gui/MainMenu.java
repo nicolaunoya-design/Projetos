@@ -25,7 +25,7 @@ public final class MainMenu extends Menu {
         CHAT("&e&lChat e Social", Material.OAK_SIGN, Material.ORANGE_STAINED_GLASS_PANE, "chat", "privatemsg", "nick", "tags", "joinquit", "announcer", "menus"),
         VISUAL("&d&lVisual", Material.PAINTING, Material.MAGENTA_STAINED_GLASS_PANE, "scoreboard", "tablist", "motd"),
         STAFF("&c&lStaff e Moderação", Material.DIAMOND_SWORD, Material.RED_STAINED_GLASS_PANE, "moderation", "staff", "afk"),
-        WORLD("&a&lMundo", Material.GRASS_BLOCK, Material.LIME_STAINED_GLASS_PANE, "world", "sleep", "harvest", "death", "clearlag"),
+        WORLD("&a&lMundo", Material.GRASS_BLOCK, Material.LIME_STAINED_GLASS_PANE, "world", "pvp", "sleep", "harvest", "death", "clearlag"),
         FUN("&5&lDiversão", Material.FIREWORK_ROCKET, Material.PURPLE_STAINED_GLASS_PANE, "fun"),
         INTEGRATIONS("&9&lIntegrações", Material.LIGHTNING_ROD, Material.BLUE_STAINED_GLASS_PANE, "discord", "webhook"),
         OTHER("&7&lOutros", Material.CHEST, Material.GRAY_STAINED_GLASS_PANE);
@@ -120,6 +120,20 @@ public final class MainMenu extends Menu {
                 Player p = (Player) e.getWhoClicked();
                 click(p);
                 Bukkit.getScheduler().runTask(plugin, () -> deaths.openLog(p, () -> new MainMenu(plugin), null));
+            });
+        }
+
+        com.ultracore.modules.PvpModule pvp = plugin.modules().get(com.ultracore.modules.PvpModule.class);
+        if (pvp != null) {
+            boolean on = pvp.isGlobalOn();
+            set(51, new ItemBuilder(on ? Material.DIAMOND_SWORD : Material.WOODEN_SWORD).name("&c&lPvP: " + (on ? "&a&lLIGADO" : "&c&lDESLIGADO"))
+                    .glow(on).lore(on ? "&7Jogadores podem se machucar." : "&7Ninguém machuca outro jogador.", "",
+                            "&e▸ Clique para " + (on ? "&cdesligar" : "&aligar"),
+                            "&8Mais opções: Mundo → PvP (mundos sem PvP, PvP pessoal...)").build(), e -> {
+                Player p = (Player) e.getWhoClicked();
+                click(p);
+                pvp.setGlobal(!pvp.isGlobalOn(), p);
+                build();
             });
         }
 

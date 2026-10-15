@@ -40,6 +40,8 @@ public final class PlayerData {
     private boolean nickHidden;
     /** Visão noturna permanente (/luz). */
     private boolean fullbright;
+    /** PvP pessoal desligado (/pvp eu). */
+    private boolean pvpOff;
     /** Local do /back e da última morte (mundo;x;y;z;yaw;pitch), salvos para valer depois de reiniciar. */
     private String backLocation = "";
     private String lastDeath = "";
@@ -83,6 +85,7 @@ public final class PlayerData {
         d.tabHidden = c.getBoolean("tab-hidden");
         d.nickHidden = c.getBoolean("nick-hidden");
         d.fullbright = c.getBoolean("fullbright");
+        d.pvpOff = c.getBoolean("pvp-off");
         d.backLocation = c.getString("back.location", "");
         d.lastDeath = c.getString("back.last-death", "");
         d.lastDeathTime = c.getLong("back.last-death-time");
@@ -121,6 +124,7 @@ public final class PlayerData {
         c.set("tab-hidden", tabHidden);
         c.set("nick-hidden", nickHidden);
         c.set("fullbright", fullbright);
+        c.set("pvp-off", pvpOff);
         c.set("back.location", backLocation);
         c.set("back.last-death", lastDeath);
         c.set("back.last-death-time", lastDeathTime);
@@ -173,6 +177,8 @@ public final class PlayerData {
     public void setNickHidden(boolean nickHidden) { this.nickHidden = nickHidden; }
     public boolean isFullbright() { return fullbright; }
     public void setFullbright(boolean fullbright) { this.fullbright = fullbright; }
+    public boolean isPvpOff() { return pvpOff; }
+    public void setPvpOff(boolean pvpOff) { this.pvpOff = pvpOff; }
     public String getBackLocation() { return backLocation; }
     public void setBackLocation(String backLocation) { this.backLocation = backLocation == null ? "" : backLocation; }
     public String getLastDeath() { return lastDeath; }
