@@ -214,6 +214,50 @@ commands:
     aliases: [itemrain, chuva]
   girar:
     description: Faz alguém girar.
+  bigorna:
+    description: Uma bigorna cai na cabeça de alguém (não fica no mapa).
+  chuvadegalinhas:
+    description: Chuva de galinhas em cima de alguém.
+    aliases: [galinhas]
+  bebado:
+    description: Deixa alguém bêbado (tela girando e andando torto).
+    aliases: [bebada]
+  cegar:
+    description: Deixa tudo escuro para alguém por 10 segundos.
+    aliases: [escuridao]
+  levitar:
+    description: Faz alguém flutuar.
+  terremoto:
+    description: Terremoto em volta de alguém.
+  tornado:
+    description: Tornado que gira e levanta alguém.
+  gigante:
+    description: Deixa alguém gigante (de novo = normal).
+  anao:
+    description: Deixa alguém pequeno (de novo = normal).
+    aliases: [pequeno, mini]
+  tamanho:
+    description: Muda o tamanho de alguém (0.1 a 10 ou normal).
+  explosaofalsa:
+    description: Barulho e fumaça de explosão, sem dano.
+    aliases: [boom]
+  amor:
+    description: Corações em volta de alguém.
+    aliases: [coracoes]
+  chuvadetnt:
+    description: TNT caindo do céu em alguém (não quebra o mapa).
+  meteoro:
+    description: Uma bola de fogo cai do céu em alguém (não quebra o mapa).
+  inverter:
+    description: Vira alguém de costas.
+  pipoca:
+    description: Faz alguém pular sem parar.
+  abduzir:
+    description: Um disco voador leva alguém para cima.
+    aliases: [et, ovni]
+  diversao:
+    description: Menu de diversão (escolhe o alvo e a brincadeira).
+    aliases: [zoar, brincadeiras]
     aliases: [spin]
   # Entrada silenciosa
   silentjoin:

@@ -4,8 +4,9 @@ Plugin para **Paper 1.21 até 26.x** (e forks como Purpur) que junta num só lug
 
 Cada recurso é um **módulo** que pode ser **ligado, desligado e configurado dentro do jogo** pelo comando `/painel`, sem mexer em arquivos nem reiniciar o servidor. Todas as mensagens podem ser editadas no `messages.yml`.
 
-## ✨ Novidades da 2.6 a 2.8
+## ✨ Novidades da 2.6 a 2.9
 
+- **15 brincadeiras novas na Diversão** e o menu **`/diversao`** (escolhe o alvo e clica na brincadeira): bigorna, chuva de galinhas, bêbado, cegar, levitar, terremoto, tornado, gigante, anão, tamanho, explosão falsa, amor, chuva de TNT, meteoro, inverter, pipoca e abduzir.
 - **Ligar/desligar o PvP**: botão **PvP** na tela inicial do `/painel`, `/pvp ligar` / `/pvp desligar` ou `/painel pvp ativar|desativar`. Também dá para deixar mundos sem PvP e liberar o PvP pessoal (`/pvp eu`). Veja [PvP](#pvp).
 
 - **`/troca`**: troca segura de itens e dinheiro com quem está **perto** de você (ou agache e clique com o botão direito no jogador). Veja [Troca](#troca-troca).
@@ -147,7 +148,7 @@ Textos aceitam cores `&a`, `&l`... e hex `&#FF8800`.
 | **Menus dos Jogadores** 🆕 | Central do servidor, rankings e preferências | `/menu`, `/top`, `/preferencias` |
 | **Apelidos** 🆕 | Apelido no chat e na TAB, com cores para VIP | `/nick` |
 | **Tags** 🆕 | Tags como [VIP], [Admin] no chat e na TAB; o jogador escolhe a sua | `/tag` |
-| **Diversão (só OP)** 🆕 | Raio, explosão, foguete, fogos, congelar, susto... Sem nome = você; `todos` = todo mundo | `/trovao`, `/explodir`, `/foguete`, `/fogos`, `/queimar`, `/congelar`, `/assustar`, `/arremessar`, `/falsoop`, `/fazerfalar`, `/chuvadeitens`, `/girar` |
+| **Diversão (só OP)** 🆕 | Raio, explosão, foguete, fogos, congelar, susto... Sem nome = você; `todos` = todo mundo | `/trovao`, `/explodir`, `/foguete`, `/fogos`, `/queimar`, `/congelar`, `/assustar`, `/arremessar`, `/falsoop`, `/fazerfalar`, `/chuvadeitens`, `/girar`, `/bigorna`, `/chuvadegalinhas`, `/bebado`, `/cegar`, `/levitar`, `/terremoto`, `/tornado`, `/gigante`, `/anao`, `/tamanho`, `/explosaofalsa`, `/amor`, `/chuvadetnt`, `/meteoro`, `/inverter`, `/pipoca`, `/abduzir`, menu `/diversao` |
 | Entrada e Saída | Mensagens de entrada/saída, boas-vindas, título, **entrada silenciosa** 🆕 | `/silentjoin` |
 | Anúncios Automáticos | Mensagens periódicas no chat | — |
 | Scoreboard | Placar lateral com placeholders | — |
@@ -239,6 +240,23 @@ Todos aceitam `[jogador]` (sem nome = em você mesmo) ou `todos`. São **secreto
 | `/fazerfalar <jogador> <mensagem>` | Faz a pessoa falar no chat (comandos não são permitidos). |
 | `/chuvadeitens [jogador]` | Chuva de diamantes, esmeraldas... só enfeite, ninguém pega. |
 | `/girar [jogador]` | Faz a pessoa girar. |
+| `/bigorna [jogador]` | Uma bigorna cai na cabeça (3 corações; não vira bloco no mapa). |
+| `/chuvadegalinhas [jogador]` | Chuva de galinhas (somem sozinhas depois de 8s). |
+| `/bebado [jogador]` | Tela girando, lento e andando torto por 15s. |
+| `/cegar [jogador]` | Cegueira e escuridão por 10s. |
+| `/levitar [jogador]` | Flutua por 5s (sem dano de queda). |
+| `/terremoto [jogador]` | Treme o chão de todo mundo num raio de 15 blocos. |
+| `/tornado [jogador]` | Gira e sobe como um tornado (sem dano de queda). |
+| `/gigante [jogador]` / `/anao [jogador]` | Fica gigante ou pequeno. De novo volta ao normal. Fica salvo até voltar. |
+| `/tamanho <jogador\|todos> <0.1 a 10\|normal>` | Tamanho exato. |
+| `/explosaofalsa [jogador]` | Barulho e fumaça de explosão, sem dano. |
+| `/amor [jogador]` | Corações em volta. |
+| `/chuvadetnt [jogador]` | 6 TNTs caem do céu. Não quebram o mapa (a não ser que "Explosão quebra blocos" esteja ligado). |
+| `/meteoro [jogador]` | Bola de fogo cai do céu. Não quebra o mapa nem põe fogo. |
+| `/inverter [jogador]` | Vira a pessoa de costas. |
+| `/pipoca [jogador]` | Pula sem parar como pipoca. |
+| `/abduzir [jogador]` | Um feixe de luz e a pessoa sobe como se fosse abduzida (sem dano de queda). |
+| `/diversao` | **Menu**: escolha o jogador (ou todos) e clique na brincadeira. |
 
 Cada um pode ser desligado no `/painel` → Diversão → **Comandos**.
 

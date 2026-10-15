@@ -370,6 +370,35 @@ async function main () {
   checar(temItem(wpv, 'PvP'), 'o /painel tem o botão PvP')
   if (bots.Robo.currentWindow) bots.Robo.closeWindow(bots.Robo.currentWindow)
 
+  // ---------- brincadeiras novas (2.9) ----------
+  for (const n of ['Robo', 'Alvo']) await rcon.comando(`effect give ${n} minecraft:resistance 90 4 true`)
+  await rcon.comando('tp Alvo Robo')
+  await espera(1000)
+  desde = marca('Alvo')
+  const novas = ['bigorna', 'chuvadegalinhas', 'bebado', 'cegar', 'levitar', 'terremoto', 'tornado', 'gigante', 'anao',
+    'explosaofalsa', 'amor', 'chuvadetnt', 'meteoro', 'inverter', 'pipoca', 'abduzir']
+  const falharam = []
+  for (const c of novas) {
+    if (!(await comando('Robo', `/${c} Alvo`, / em Alvo/, 6000))) falharam.push(c)
+    await espera(400)
+  }
+  checar(falharam.length === 0, `as ${novas.length} brincadeiras novas funcionam${falharam.length ? ' (falharam: ' + falharam.join(', ') + ')' : ''}`)
+  checar(await comando('Robo', '/tamanho Alvo normal', /Tamanho normal em Alvo/), '/tamanho volta ao normal')
+  await espera(6000)
+  checar(!msgs.Alvo.slice(desde).some((m) => /robo|fun\.|bigorna|tornado|gigante|meteoro|diversão/i.test(m)), 'as brincadeiras novas também são secretas para o alvo')
+  checar(bots.Alvo.health > 0, 'o alvo sobreviveu (com resistência) e o servidor não deu erro')
+  for (const n of ['Robo', 'Alvo']) await rcon.comando(`effect clear ${n}`)
+  await rcon.comando('tp Alvo Robo')
+  const wd = await janela(bots.Robo, () => bots.Robo.chat('/diversao'))
+  checar(/Diversão/.test(tituloDe(wd)) && temItem(wd, 'TODOS'), '/diversao abre o menu de escolher o alvo')
+  if (wd) {
+    const cab = wd.slots.findIndex((it, i) => i < wd.inventoryStart && it && it.name === 'player_head' && nomeItem(it).includes('Alvo'))
+    const we = cab >= 0 ? await janela(bots.Robo, () => clicar(bots.Robo, cab, 0, 0)) : null
+    checar(temItem(we, 'Bigorna') && temItem(we, 'Abduzir'), 'clicar no jogador mostra as brincadeiras')
+  }
+  if (bots.Robo.currentWindow) bots.Robo.closeWindow(bots.Robo.currentWindow)
+  await espera(1000)
+
   // ---------- /luz (visão noturna sem fim) ----------
   const efeitoNv = () => {
     const r = bots.Alvo.registry
