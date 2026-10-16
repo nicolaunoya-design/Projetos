@@ -42,6 +42,9 @@ public final class PlayerData {
     private boolean fullbright;
     /** PvP pessoal desligado (/pvp eu). */
     private boolean pvpOff;
+    /** Tag personalizada feita no criador de tags (texto já com cores) e o desenho dela (para editar depois). */
+    private String customTag = "";
+    private String customTagDesign = "";
     /** Local do /back e da última morte (mundo;x;y;z;yaw;pitch), salvos para valer depois de reiniciar. */
     private String backLocation = "";
     private String lastDeath = "";
@@ -86,6 +89,8 @@ public final class PlayerData {
         d.nickHidden = c.getBoolean("nick-hidden");
         d.fullbright = c.getBoolean("fullbright");
         d.pvpOff = c.getBoolean("pvp-off");
+        d.customTag = c.getString("tag.custom", "");
+        d.customTagDesign = c.getString("tag.custom-design", "");
         d.backLocation = c.getString("back.location", "");
         d.lastDeath = c.getString("back.last-death", "");
         d.lastDeathTime = c.getLong("back.last-death-time");
@@ -125,6 +130,8 @@ public final class PlayerData {
         c.set("nick-hidden", nickHidden);
         c.set("fullbright", fullbright);
         c.set("pvp-off", pvpOff);
+        c.set("tag.custom", customTag);
+        c.set("tag.custom-design", customTagDesign);
         c.set("back.location", backLocation);
         c.set("back.last-death", lastDeath);
         c.set("back.last-death-time", lastDeathTime);
@@ -179,6 +186,12 @@ public final class PlayerData {
     public void setFullbright(boolean fullbright) { this.fullbright = fullbright; }
     public boolean isPvpOff() { return pvpOff; }
     public void setPvpOff(boolean pvpOff) { this.pvpOff = pvpOff; }
+    public String getCustomTag() { return customTag; }
+    public String getCustomTagDesign() { return customTagDesign; }
+    public void setCustomTag(String tag, String design) {
+        this.customTag = tag == null ? "" : tag;
+        this.customTagDesign = design == null ? "" : design;
+    }
     public String getBackLocation() { return backLocation; }
     public void setBackLocation(String backLocation) { this.backLocation = backLocation == null ? "" : backLocation; }
     public String getLastDeath() { return lastDeath; }

@@ -399,6 +399,43 @@ async function main () {
   if (bots.Robo.currentWindow) bots.Robo.closeWindow(bots.Robo.currentWindow)
   await espera(1000)
 
+  // ---------- criador de tag ----------
+  checar(await comando('Alvo', '/tag criador', /não pode criar tags/), 'jogador sem permissão não abre o criador de tag')
+  let wc = await janela(bots.Robo, () => bots.Robo.chat('/tag criador'))
+  checar(/Criador de Tag/.test(tituloDe(wc)), '/tag criador abre o criador')
+  const digitarTexto = async (txt) => {
+    const d0 = marca('Robo')
+    await clicar(bots.Robo, 10, 0, 0)
+    await esperarMsg('Robo', /texto da tag/, d0, 5000)
+    return janela(bots.Robo, () => bots.Robo.chat(txt))
+  }
+  if (wc) {
+    wc = await digitarTexto('Lenda')
+    checar(!!wc && !!wc.slots[4] && nomeItem(wc.slots[4]).includes('Lenda'), 'o texto digitado aparece na prévia')
+    await clicar(bots.Robo, 19, 0, 0) // cor vermelha
+    await clicar(bots.Robo, 20, 1, 0) // degradê até dourado
+    await clicar(bots.Robo, 12, 0, 0) // negrito
+    await espera(500)
+    const d1 = marca('Robo')
+    await clicar(bots.Robo, 50, 0, 0)
+    checar(await esperarMsg('Robo', /Tag lenda\d* criada/, d1), 'admin cria uma tag do servidor com degradê')
+  }
+  await espera(1000)
+  if (bots.Robo.currentWindow) bots.Robo.closeWindow(bots.Robo.currentWindow)
+  wc = await janela(bots.Robo, () => bots.Robo.chat('/tag criador'))
+  if (wc) {
+    wc = await digitarTexto('Rei')
+    const d0 = marca('Robo')
+    await clicar(bots.Robo, 48, 0, 0)
+    checar(await esperarMsg('Robo', /tag personalizada está pronta/, d0), 'jogador salva a própria tag personalizada')
+  }
+  await espera(1000)
+  desde = marca('Alvo')
+  bots.Robo.chat('testando a tag nova')
+  checar(await esperarMsg('Alvo', /Rei.*testando a tag nova/, desde), 'a tag personalizada aparece no chat')
+  await comando('Robo', '/tag auto')
+  if (bots.Robo.currentWindow) bots.Robo.closeWindow(bots.Robo.currentWindow)
+
   // ---------- /luz (visão noturna sem fim) ----------
   const efeitoNv = () => {
     const r = bots.Alvo.registry

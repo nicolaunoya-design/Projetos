@@ -4,8 +4,9 @@ Plugin para **Paper 1.21 até 26.x** (e forks como Purpur) que junta num só lug
 
 Cada recurso é um **módulo** que pode ser **ligado, desligado e configurado dentro do jogo** pelo comando `/painel`, sem mexer em arquivos nem reiniciar o servidor. Todas as mensagens podem ser editadas no `messages.yml`.
 
-## ✨ Novidades da 2.6 a 2.9
+## ✨ Novidades da 2.6 a 2.10
 
+- **Criador de tag**: no `/tag`, botão **Criador de tag** (ou `/tag criador`): escreva o texto, escolha a cor, **degradê**, negrito/itálico/sublinhado e o tipo de colchete, vendo a prévia. Admins criam tags do servidor; VIPs (`ultracore.tag.personalizada`) criam a própria tag. Veja [Criador de tag](#criador-de-tag).
 - **15 brincadeiras novas na Diversão** e o menu **`/diversao`** (escolhe o alvo e clica na brincadeira): bigorna, chuva de galinhas, bêbado, cegar, levitar, terremoto, tornado, gigante, anão, tamanho, explosão falsa, amor, chuva de TNT, meteoro, inverter, pipoca e abduzir.
 - **Ligar/desligar o PvP**: botão **PvP** na tela inicial do `/painel`, `/pvp ligar` / `/pvp desligar` ou `/painel pvp ativar|desativar`. Também dá para deixar mundos sem PvP e liberar o PvP pessoal (`/pvp eu`). Veja [PvP](#pvp).
 
@@ -169,6 +170,17 @@ Textos aceitam cores `&a`, `&l`... e hex `&#FF8800`.
 A maioria dos comandos também aceita apelidos em português: `/casa`, `/pagar`, `/voar`, `/curar`, `/avisar`, `/denunciar`, `/diario`, `/apelido`...
 
 Tempos nos comandos aceitam `30s`, `10m`, `2h`, `7d`, `1w` (ex: `/tempban Fulano 7d hack`, `/mute Fulano 30m spam`).
+
+### Criador de tag
+
+Abra o `/tag` e clique em **Criador de tag** (bigorna), ou use `/tag criador`.
+
+- **Texto**: clique na placa e digite no chat o que a tag vai escrever.
+- **Cores**: clique esquerdo numa lã escolhe a cor; **clique direito em outra cor faz um degradê** (ex: vermelho → amarelo).
+- **Negrito, itálico, sublinhado**, **colchetes** (`[ ]`, `( )`, `« »`, `{ }`, `| |`, `< >` ou nenhum) e a **cor dos colchetes**. **Aleatório** sorteia um estilo.
+- A prévia em cima mostra como fica no chat e na TAB.
+- **Usar como minha tag** (quem tem `ultracore.tag.personalizada`, que vem no grupo VIP): vira a tag pessoal do jogador. Dá para editar depois (shift + clique nela no `/tag`). Palavras como "admin", "dono" e "mod" são bloqueadas para jogadores (lista no `/painel` → Tags).
+- **Criar tag do servidor** (admins): entra na lista de tags; depois use `/tag dar <jogador> <id>` ou a permissão `ultracore.tag.<id>`. No `/tag`, admins apagam uma tag com **shift + clique direito** duas vezes.
 
 ### PvP
 

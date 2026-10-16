@@ -205,6 +205,11 @@ tags:
   menu-auto: '&eTag automática'
   menu-auto-lore: '&7Usa a melhor tag que você tiver.'
   menu-none: '&cSem tag'
+  creator-no-permission: '&cVocê não pode criar tags. &7(precisa de ultracore.tag.personalizada)'
+  creator-empty: '&cA tag precisa ter pelo menos uma letra.'
+  creator-blocked: '&cA tag não pode ter a palavra &f{word}&c.'
+  creator-saved: '&aSua tag personalizada está pronta: &r{tag}'
+  creator-server-hint: '&7Para dar a tag: &f/tag dar <jogador> {id} &7ou a permissão &fultracore.tag.{id}&7.'
 moderation:
   permanent: permanente
   no-reason: Sem motivo informado

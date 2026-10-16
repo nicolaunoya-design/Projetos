@@ -343,6 +343,9 @@ permissions:
   ultracore.tabhide.see:
     description: Continua vendo na TAB quem usou /esconder. Ninguém tem por padrão (nem OP); dê pelo LuckPerms.
     default: false
+  ultracore.tag.personalizada:
+    description: Criar a própria tag no criador de tags (/tag criador). Vem no grupo VIP; OP também tem.
+    default: op
   ultracore.pvp.admin:
     description: /pvp ligar|desligar (PvP do servidor todo). Só OP por padrão.
     default: op
@@ -406,6 +409,7 @@ permissions:
       ultracore.chat.color: true
       ultracore.fly: true
       ultracore.tag.vip: true
+      ultracore.tag.personalizada: true
       ultracore.nick: true
       ultracore.nick.color: true
   ultracore.staff:
