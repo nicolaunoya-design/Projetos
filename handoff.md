@@ -50,12 +50,10 @@ Pedido mais recente, já implementado (v3.0.0):
 - A loja calcula de 1183 itens com preço (1.21) até 1427 (26.3).
 - O "preço embaixo do nome" funciona em todas as versões, inclusive na 26.3.
 
-**Release v3.0.0: NÃO publicada**
-- O job `release` não iniciou. Mensagem do GitHub: *"recent account payments have failed or your spending limit needs to be increased"*. O "re-run failed jobs" deu o mesmo erro.
-- O repositório é privado, então o limite de minutos do Actions provavelmente acabou.
-- Só o dono pode resolver, em GitHub → Settings → Billing and plans.
-- O .jar já compilado está no artifact `plugin-jar` do run 39003265917: https://github.com/nicolaunoya-design/Projetos/actions/runs/39003265917
-- A última release publicada é a v2.10.0.
+**Release v3.0.0: publicada**
+- https://github.com/nicolaunoya-design/Projetos/releases/tag/v3.0.0
+- Download: https://github.com/nicolaunoya-design/Projetos/releases/download/v3.0.0/UltraCore-3.0.0.jar
+- A cobrança do GitHub bloqueou o Actions enquanto o repositório era privado. O dono deixou o repositório **público** (Actions grátis) e o run 39003265917 foi rodado de novo: tudo passou e a release saiu sozinha.
 
 ## O que foi feito na 3.0.0 (arquivos)
 ### Novos
@@ -153,11 +151,6 @@ Pedido mais recente, já implementado (v3.0.0):
 - **Mensagens já instaladas:** quem atualiza guarda as mensagens antigas no `messages.yml`. Se os placeholders de uma chave mudarem, crie uma **chave nova** (por isso existem `shop.item-buy`, `shop.item-sell` e `shop.admin-saved`).
 
 ## Próximo passo exato
-1. **Publicar a v3.0.0.** Depois que o dono arrumar a cobrança do GitHub, rode o job que falhou:
-   ```
-   gh api -X POST repos/nicolaunoya-design/Projetos/actions/runs/39003265917/rerun-failed-jobs
-   ```
-   Confira com `gh api repos/nicolaunoya-design/Projetos/releases/latest`. Deve aparecer `v3.0.0`.
-   - Se o run expirar, faça um commit pequeno (ex.: README) e dê push; o CI publica sozinho, porque a versão do pom é nova.
-2. Avisar o usuário, em português, com o link da release.
-3. O usuário pode querer um **CI mais leve**, para gastar menos minutos. A sessão anterior ofereceu isso e o usuário ainda não respondeu. Uma ideia: testar menos versões em cada push e o conjunto completo só ao lançar versão.
+Nada pendente. A v3.0.0 está publicada. Esperar o próximo pedido do usuário e seguir o "Fluxo de cada versão".
+- O repositório agora é público: nunca commitar senhas, tokens, URLs de webhook ou números reais.
+- Esta sessão não pode criar releases pela API (HTTP 403) nem baixar artifacts; a release só sai pelo CI.
