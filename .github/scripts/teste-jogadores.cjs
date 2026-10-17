@@ -453,10 +453,9 @@ async function main () {
   // preço embaixo do nome: só na tela do jogador, o item de verdade não muda
   await rcon.comando('give Alvo minecraft:cobblestone 32')
   checar(await aguardar(() => /Vende por/.test(loreDe(itemInv(bots.Alvo, 'cobblestone'))), 8000), 'o preço de venda aparece embaixo do nome do item')
-  // no servidor: tem 32 pedregulhos e nenhum deles tem lore (o preço é só na tela do jogador)
-  const tem = semCor(await rcon.comando('execute if items entity Alvo container.* minecraft:cobblestone'))
-  const comLore = semCor(await rcon.comando('execute if items entity Alvo container.* minecraft:cobblestone[minecraft:lore]'))
-  checar(/passed/i.test(tem) && !/passed/i.test(comLore), `no servidor o item continua igual (o preço é só visual) [${tem.slice(0, 80)} | ${comLore.slice(0, 80)}]`)
+  // no servidor os 32 pedregulhos continuam com a lore vazia (o preço é só na tela do jogador)
+  const semLore = semCor(await rcon.comando('execute if items entity Alvo container.* minecraft:cobblestone[minecraft:lore=[]]'))
+  checar(/count: 32/.test(semLore), `no servidor o item continua igual (o preço é só visual) [${semLore.slice(0, 100)}]`)
   await rcon.comando('gamemode creative Alvo')
   checar(await aguardar(() => !/Vende por/.test(loreDe(itemInv(bots.Alvo, 'cobblestone'))), 8000), 'no criativo o preço some (não estraga o item)')
   await rcon.comando('gamemode survival Alvo')
