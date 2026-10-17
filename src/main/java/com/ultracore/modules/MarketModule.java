@@ -425,6 +425,12 @@ public class MarketModule extends Module {
             lore.add(Msg.loreLine(Lang.get("market.lore-price", "money", money(l.price))));
             if (l.item.getAmount() > 1) lore.add(Msg.loreLine(Lang.get("market.lore-each", "money", money(l.price / l.item.getAmount()))));
             lore.add(Msg.loreLine(Lang.get("market.lore-seller", "player", l.sellerName)));
+            // quanto valeria vendendo na loja (ajuda a ver se o preço está bom)
+            ShopModule shop = plugin.modules().get(ShopModule.class);
+            if (shop != null && shop.isEnabled() && l.item.isSimilar(new ItemStack(l.item.getType()))) {
+                double unit = shop.unitSell(viewer, shop.price(l.item.getType()));
+                if (unit > 0) lore.add(Msg.loreLine(Lang.get("market.lore-shop", "money", money(unit * l.item.getAmount()))));
+            }
             lore.add(Msg.loreLine(Lang.get("market.lore-expires", "time", TimeUtil.format(Math.max(0, l.created + duration() - System.currentTimeMillis())))));
             lore.add(Component.empty());
             boolean own = l.seller.equals(viewer.getUniqueId());

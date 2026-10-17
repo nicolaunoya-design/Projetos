@@ -416,6 +416,13 @@ async function main () {
 
   // ---------- loja nova (todos os itens vanilla) ----------
   const { Vec3 } = require('vec3')
+  /** Espera o bloco aparecer no cliente (chunk carregado depois do teleporte) e quebra. */
+  const cavar = async (bot, x, y, z, nome = 'stone') => {
+    await aguardar(() => { const b = bot.blockAt(new Vec3(x, y, z)); return !!b && b.name === nome }, 8000)
+    const b = bot.blockAt(new Vec3(x, y, z))
+    if (!b || b.name !== nome) { console.log(`  cavar: ${nome} não apareceu em ${x} ${y} ${z}`); return false }
+    try { await bot.dig(b, true); return true } catch (e) { console.log('  dig:', e.message); return false }
+  }
   const loreDe = (it) => it ? [it.components, it.nbt, it.customLore].map(texto).join(' ') : ''
   const itemInv = (bot, nome) => bot.inventory.items().find((i) => i.name === nome)
   const saldo = async (nome) => {
@@ -525,7 +532,7 @@ async function main () {
   const picareta = itemInv(bots.Alvo, 'iron_pickaxe')
   if (picareta) await bots.Alvo.equip(picareta, 'hand')
   let antes = barra.Alvo.length
-  try { await bots.Alvo.dig(bots.Alvo.blockAt(new Vec3(201, -60, 200)), true) } catch (e) { console.log('  dig:', e.message) }
+  await cavar(bots.Alvo, 201, -60, 200)
   checar(await aguardar(() => barra.Alvo.slice(antes).some((m) => /Minerador.*\+/.test(m)), 6000), 'quebrar pedra natural paga o Minerador (barra de ação)')
   // anti-abuso: bloco colocado pelo jogador não paga
   await rcon.comando('give Alvo minecraft:stone 2')
@@ -533,6 +540,7 @@ async function main () {
   const pedraMao = itemInv(bots.Alvo, 'stone')
   try {
     if (pedraMao) await bots.Alvo.equip(pedraMao, 'hand')
+    await aguardar(() => !!bots.Alvo.blockAt(new Vec3(202, -61, 200)), 5000)
     await bots.Alvo.placeBlock(bots.Alvo.blockAt(new Vec3(202, -61, 200)), new Vec3(0, 1, 0))
   } catch (e) { console.log('  colocar:', e.message) }
   await espera(800)
@@ -546,7 +554,7 @@ async function main () {
   checar(!barra.Alvo.slice(antes).some((m) => /Minerador.*\+/.test(m)), 'quebrar a pedra que o próprio jogador colocou NÃO paga')
   // fazendeiro: reproduzir vacas; caçador: mob de comando não paga, filhote nascido de cruzamento paga
   await rcon.comando('give Alvo minecraft:wheat 4')
-  for (let i = 0; i < 2; i++) await rcon.comando('summon minecraft:cow 203 -60 201 {Tags:["adulto"]}')
+  for (let i = 0; i < 2; i++) await rcon.comando('summon minecraft:cow 201.5 -60 201.5 {Tags:["adulto"]}')
   await espera(1500)
   const trigo = itemInv(bots.Alvo, 'wheat')
   if (trigo) await bots.Alvo.equip(trigo, 'hand')
@@ -574,8 +582,7 @@ async function main () {
   desde = marca('Alvo')
   for (const z of [199, 201]) {
     await rcon.comando(`setblock 199 -60 ${z} minecraft:stone`)
-    await espera(600)
-    try { await bots.Alvo.dig(bots.Alvo.blockAt(new Vec3(199, -60, z)), true) } catch (e) { console.log('  dig:', e.message) }
+    await cavar(bots.Alvo, 199, -60, z)
     await espera(600)
   }
   checar(await esperarMsg('Alvo', /Missão completa/, desde, 8000), 'completar a missão paga na hora')

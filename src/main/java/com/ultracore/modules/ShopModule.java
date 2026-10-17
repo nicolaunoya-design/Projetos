@@ -705,7 +705,7 @@ public class ShopModule extends Module {
                 }
                 if (buy > 0 && sell > buy) msg(p, "shop.admin-profit-warning");
                 setManual(m, Math.max(0, buy), Math.max(0, sell));
-                Msg.tellItem(p, "shop.admin-added", m);
+                Msg.tellItem(p, "shop.admin-saved", m);
             }
             case "remover", "remove" -> {
                 disabled.add(m);
@@ -945,10 +945,10 @@ public class ShopModule extends Module {
             if (pr == null) {
                 lore.add("&cFora da loja");
             } else {
-                if (pr.buy() > 0) lore.add(Lang.get("shop.lore-buy", "price", money(pr.buy()), "stack", money(round(pr.buy() * stack)), "amount", stack));
+                if (pr.buy() > 0) lore.add(Lang.get("shop.item-buy", "price", money(pr.buy()), "stack", money(round(pr.buy() * stack)), "amount", stack));
                 else lore.add(Lang.get("shop.lore-no-buy"));
                 double sell = unitSell(viewer, pr);
-                if (sell > 0) lore.add(Lang.get("shop.lore-sell", "price", money(sell), "stack", money(round(sell * stack)), "amount", stack));
+                if (sell > 0) lore.add(Lang.get("shop.item-sell", "price", money(sell), "stack", money(round(sell * stack)), "amount", stack));
                 else lore.add(Lang.get("shop.lore-no-sell"));
                 double f = dynamic.factor(m);
                 if (cfgDynamic && pr.sell() > 0 && f < 0.95) lore.add(Lang.get("shop.lore-dynamic", "percent", Math.round(f * 100)));
@@ -1320,7 +1320,7 @@ public class ShopModule extends Module {
                             : buy > 0 && sell > buy ? "&c&lCuidado: &cvenda maior que a compra = dinheiro infinito!" : "&eClique &7para salvar").build(), e -> {
                 click(viewer);
                 setManual(material, buy, sell);
-                Msg.tellItem(viewer, "shop.admin-added", material);
+                Msg.tellItem(viewer, "shop.admin-saved", material);
                 if (buy > 0 && sell > buy) msg(viewer, "shop.admin-profit-warning");
                 openLater(viewer, back);
             });
