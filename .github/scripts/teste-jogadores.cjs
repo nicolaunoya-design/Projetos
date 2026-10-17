@@ -453,8 +453,10 @@ async function main () {
   // preço embaixo do nome: só na tela do jogador, o item de verdade não muda
   await rcon.comando('give Alvo minecraft:cobblestone 32')
   checar(await aguardar(() => /Vende por/.test(loreDe(itemInv(bots.Alvo, 'cobblestone'))), 8000), 'o preço de venda aparece embaixo do nome do item')
-  const nbt = semCor(await rcon.comando('data get entity Alvo Inventory'))
-  checar(/cobblestone/.test(nbt) && !/Vende por/.test(nbt), 'no servidor o item continua igual (o preço é só visual)')
+  // no servidor: tem 32 pedregulhos e nenhum deles tem lore (o preço é só na tela do jogador)
+  const tem = semCor(await rcon.comando('execute if items entity Alvo container.* minecraft:cobblestone'))
+  const comLore = semCor(await rcon.comando('execute if items entity Alvo container.* minecraft:cobblestone[minecraft:lore]'))
+  checar(/passed/i.test(tem) && !/passed/i.test(comLore), `no servidor o item continua igual (o preço é só visual) [${tem.slice(0, 80)} | ${comLore.slice(0, 80)}]`)
   await rcon.comando('gamemode creative Alvo')
   checar(await aguardar(() => !/Vende por/.test(loreDe(itemInv(bots.Alvo, 'cobblestone'))), 8000), 'no criativo o preço some (não estraga o item)')
   await rcon.comando('gamemode survival Alvo')
@@ -579,6 +581,9 @@ async function main () {
   checar(/Missões/.test(tituloDe(wm2)) && !!wm2 && wm2.slots.some((it, i) => i < wm2.inventoryStart && it && /Progresso/.test(loreDe(it))), '/missoes abre com as missões do dia')
   if (bots.Alvo.currentWindow) bots.Alvo.closeWindow(bots.Alvo.currentWindow)
   checar(await comando('Robo', '/missoes trocar Alvo pedra 2', /Primeira missão de Alvo/), 'admin troca a missão de um jogador')
+  // pedra só conta com a ferramenta certa (na mão não dá nada)
+  const picaretaMissao = itemInv(bots.Alvo, 'iron_pickaxe')
+  if (picaretaMissao) await bots.Alvo.equip(picaretaMissao, 'hand')
   desde = marca('Alvo')
   for (const z of [199, 201]) {
     await rcon.comando(`setblock 199 -60 ${z} minecraft:stone`)

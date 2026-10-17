@@ -458,16 +458,7 @@ permissions:
       ultracore.nick: true
       ultracore.nick.color: true
       ultracore.loja.vip: true
-      ultracore.missoes.admin:
-    description: /missoes resetar|trocar (sortear de novo ou trocar a missão de alguém). Só OP por padrão.
-    default: op
-  ultracore.mercado.admin:
-    description: Remove anúncios de outros jogadores no /mercado (Shift+Direito). Só OP por padrão.
-    default: op
-  ultracore.quiz.admin:
-    description: /quiz agora e /quiz parar. Só OP por padrão.
-    default: op
-  ultracore.empregos.max.4: true
+      ultracore.empregos.max.4: true
   ultracore.staff:
     description: Ferramentas de moderação (dê via LuckPerms).
     default: op

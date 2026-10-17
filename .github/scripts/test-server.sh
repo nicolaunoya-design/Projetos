@@ -103,6 +103,11 @@ if grep -nE "at com\.ultracore\.|Error occurred while enabling UltraCore|Could n
   grep -nE "Exception|Error:|at com\.ultracore\." server.log | grep -v "No key layers" | head -6 | while read -r L; do echo "::error::[$VERSION] ${L:0:300}"; done
   FAIL=1
 fi
+# erro no plugin.yml (permissão ou comando mal escrito)
+if grep -nE "in plugin description file for UltraCore" server.log; then
+  grep -nE "in plugin description file for UltraCore" server.log | head -4 | while read -r L; do echo "::error::[$VERSION] plugin.yml: ${L:0:300}"; done
+  FAIL=1
+fi
 # quantos itens a loja calculou e se o preço embaixo do nome ficou ligado
 grep -m1 "Loja: " server.log | while read -r L; do echo "::notice::[$VERSION] ${L:0:300}"; done
 if grep -q "Preço embaixo do nome dos itens" server.log; then
