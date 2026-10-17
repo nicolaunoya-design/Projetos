@@ -38,6 +38,9 @@ modules:
     delay: 0
   afk:
     auto-afk-minutes: 0
+  rewards:
+    playtime-minutes: 2
+    playtime-money: 1
 CFG
 RCON_PORTA=25575 RCON_SENHA=senha-ci MC_VERSAO="$VERSION" \
   node "$ROOT/.github/scripts/teste-jogadores.cjs" > teste.log 2>&1 &

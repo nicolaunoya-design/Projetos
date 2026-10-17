@@ -84,8 +84,12 @@ public final class UltraCore extends JavaPlugin {
         moduleManager.register(new ClearLagModule(this));
         moduleManager.register(new ShopModule(this));
         moduleManager.register(new JobsModule(this));
+        moduleManager.register(new QuestsModule(this));
+        moduleManager.register(new MarketModule(this));
+        moduleManager.register(new BountyModule(this));
         moduleManager.register(new TradeModule(this));
         moduleManager.register(new RewardsModule(this));
+        moduleManager.register(new QuizModule(this));
         moduleManager.register(new NickModule(this));
         moduleManager.register(new TagsModule(this));
         moduleManager.register(new FunModule(this));
@@ -145,6 +149,8 @@ public final class UltraCore extends JavaPlugin {
                 .replace("{kills}", String.valueOf(d.getKills()))
                 .replace("{deaths}", String.valueOf(d.getDeaths()))
                 .replace("{ping}", String.valueOf(p.getPing()))
+                .replace("{empregos}", jobsOf(p))
+                .replace("{missoes}", questsOf(p))
                 .replace("{world}", p.getWorld().getName())
                 .replace("{x}", String.valueOf(p.getLocation().getBlockX()))
                 .replace("{y}", String.valueOf(p.getLocation().getBlockY()))
@@ -156,6 +162,22 @@ public final class UltraCore extends JavaPlugin {
             }
         }
         return Msg.color(s);
+    }
+
+    private String jobsOf(Player p) {
+        JobsModule jobs = moduleManager == null ? null : moduleManager.get(JobsModule.class);
+        if (jobs == null || !jobs.isEnabled()) return "-";
+        StringBuilder sb = new StringBuilder();
+        for (JobsModule.Job j : jobs.joinedJobs(p)) {
+            if (!sb.isEmpty()) sb.append("&7, ");
+            sb.append(j.display()).append(" &7").append(dataManager.get(p).job(j.id()).level);
+        }
+        return sb.isEmpty() ? "-" : sb.toString();
+    }
+
+    private String questsOf(Player p) {
+        QuestsModule quests = moduleManager == null ? null : moduleManager.get(QuestsModule.class);
+        return quests == null || !quests.isEnabled() ? "-" : quests.summary(p);
     }
 
     /** Tag atual do jogador (módulo Tags), já colorida; vazio se não tiver ou se o módulo estiver desligado. */

@@ -160,6 +160,18 @@ commands:
   empregos:
     description: Empregos (minerador, lenhador, fazendeiro, caçador, pescador...) para ganhar dinheiro e XP.
     aliases: [jobs, emprego, trabalho, trabalhos, profissao, profissoes, job]
+  missoes:
+    description: Missões diárias que pagam dinheiro (mudam todo dia).
+    aliases: [missao, quests, quest, desafios, diarias]
+  mercado:
+    description: Mercado dos jogadores (vender itens para outros jogadores pelo preço que quiser).
+    aliases: [market, leilao, ah, auction, mercadodosjogadores]
+  procurado:
+    description: Coloca dinheiro na cabeça de um jogador (quem matar leva) ou mostra os procurados.
+    aliases: [procurados, bounty, cabeca, premio, wanted]
+  quiz:
+    description: Mostra a pergunta do quiz do chat (admins podem começar uma agora).
+    aliases: [pergunta, chatgame]
   # Recompensas
   daily:
     description: Pega a recompensa diária.
@@ -349,6 +361,15 @@ permissions:
   ultracore.empregos.semlimite:
     description: Ignora o limite de dinheiro por hora dos empregos. Ninguém tem por padrão.
     default: false
+  ultracore.missoes.admin:
+    description: /missoes resetar|trocar (sortear de novo ou trocar a missão de alguém). Só OP por padrão.
+    default: op
+  ultracore.mercado.admin:
+    description: Remove anúncios de outros jogadores no /mercado (Shift+Direito). Só OP por padrão.
+    default: op
+  ultracore.quiz.admin:
+    description: /quiz agora e /quiz parar. Só OP por padrão.
+    default: op
   ultracore.empregos.max.4:
     description: Pode estar em 4 empregos ao mesmo tempo (ultracore.empregos.max.N até 13). Vem no grupo VIP.
     default: false
@@ -412,6 +433,10 @@ permissions:
       ultracore.vender: true
       ultracore.preco: true
       ultracore.empregos: true
+      ultracore.missoes: true
+      ultracore.mercado: true
+      ultracore.procurado: true
+      ultracore.quiz: true
       ultracore.daily: true
       ultracore.tempo: true
       ultracore.report: true
@@ -433,7 +458,16 @@ permissions:
       ultracore.nick: true
       ultracore.nick.color: true
       ultracore.loja.vip: true
-      ultracore.empregos.max.4: true
+      ultracore.missoes.admin:
+    description: /missoes resetar|trocar (sortear de novo ou trocar a missão de alguém). Só OP por padrão.
+    default: op
+  ultracore.mercado.admin:
+    description: Remove anúncios de outros jogadores no /mercado (Shift+Direito). Só OP por padrão.
+    default: op
+  ultracore.quiz.admin:
+    description: /quiz agora e /quiz parar. Só OP por padrão.
+    default: op
+  ultracore.empregos.max.4: true
   ultracore.staff:
     description: Ferramentas de moderação (dê via LuckPerms).
     default: op
@@ -491,4 +525,7 @@ permissions:
       ultracore.banip: true
       ultracore.loja.admin: true
       ultracore.empregos.admin: true
+      ultracore.missoes.admin: true
+      ultracore.mercado.admin: true
+      ultracore.quiz.admin: true
       ultracore.nick.others: true

@@ -59,6 +59,9 @@ if grep -q "Done (" server.log; then
              "painel comando broadcast desativar" "broadcast nao deveria aparecer" "painel comando broadcast ativar" "silentjoin" \
              "esconder Ninguem" "escondernick Ninguem" "luz Ninguem" "ultimamorte Ninguem" "troca Ninguem" "mortes" "pvp" "bigorna Ninguem" "tamanho Ninguem 2" "chuvadetnt todos" "meteoro todos" "diversao" "pvp desligar" "pvp ligar" "painel pvp desativar" "painel pvp ativar" "limparitens desligar" "limparitens status" "limparitens ligar" "painel desativar menus" "painel ativar menus" "painel comando top desativar" "painel comando top ativar" \
              "msgtoggle" "menu" "painel nether desativar" "painel nether ativar" "trovao" "trovao Ninguem" "explodir todos" "foguete todos" "painel desativar fun" "painel ativar fun" \
+             "loja recalcular" "preco diamond" "preco cobblestone" "loja zerar-dinamico" "empregos lista" "empregos top" "empregos stats Ninguem" \
+             "empregos admin recarregar" "painel desativar jobs" "painel ativar jobs" "missoes" "procurado" "quiz agora" "quiz parar" \
+             "painel desativar market" "painel ativar market" "painel desativar quests" "painel ativar quests" "painel desativar bounty" "painel ativar bounty" \
              "painel lista"; do
     echo "$cmd" >&3
     sleep 2
@@ -113,7 +116,8 @@ if [ ! -f plugins/UltraCore/shop.yml ]; then
   echo "::error::[$VERSION] shop.yml não foi criado"
   FAIL=1
 fi
-for esperado in "Tag lenda criada" "Tag lenda apagada" "restauradas para o padrão" \
+for esperado in "Preços recalculados" "Empregos recarregados" "Loja: " "Quiz parado" \
+                "Tag lenda criada" "Tag lenda apagada" "restauradas para o padrão" \
                 "Comando /broadcast desligado" "Este comando está desativado" "Comando /broadcast ligado" \
                 "Ninguém online" "Nether desligado" "Nether liberado"; do
   if ! grep -q "$esperado" server.log; then

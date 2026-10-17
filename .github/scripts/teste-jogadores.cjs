@@ -195,28 +195,6 @@ async function main () {
   if (bots.Robo.currentWindow) bots.Robo.closeWindow(bots.Robo.currentWindow)
   checar(await comando('Robo', '/painel end ativar', /The End liberado/), 'religar o The End pelo comando')
 
-  // ---------- editor da loja (OP) ----------
-  await rcon.comando('give Robo minecraft:amethyst_shard 4')
-  await espera(1000)
-  w = await janela(bots.Robo, () => bots.Robo.chat('/loja editar'))
-  checar(/Editor da Loja/.test(tituloDe(w)), '/loja editar abre o editor')
-  const cristal = w ? w.slots.findIndex((it, i) => i >= w.inventoryStart && it && it.name === 'amethyst_shard') : -1
-  w = await janela(bots.Robo, () => clicar(bots.Robo, cristal))
-  checar(/Loja/.test(tituloDe(w)) && temItem(w, 'SALVAR'), 'clicar num item do inventário abre a tela do item')
-  if (w) {
-    await clicar(bots.Robo, 15); await espera(400)  // compra +10
-    await clicar(bots.Robo, 15); await espera(400)  // compra +10
-    await clicar(bots.Robo, 23); await espera(400)  // venda +1
-    desde = marca('Robo')
-    await clicar(bots.Robo, 49)                     // salvar
-    checar(await esperarMsg('Robo', /Amethyst shard.*adicionado/, desde), 'item salvo na loja pelo editor')
-  }
-  if (bots.Robo.currentWindow) bots.Robo.closeWindow(bots.Robo.currentWindow)
-  await espera(800)
-  w = await janela(bots.Robo, () => bots.Robo.chat('/loja'))
-  checar(temItem(w, 'Amethyst shard'), 'item novo aparece na /loja')
-  if (bots.Robo.currentWindow) bots.Robo.closeWindow(bots.Robo.currentWindow)
-
   // ---------- /esconder (some da TAB, continua no mundo) ----------
   checar(await comando('Robo', '/esconder', /Escondido da TAB/), '/esconder liga')
   checar(await aguardar(() => bots.Alvo.players.Robo && !bots.Alvo.players.Robo.listed, 8000), 'quem usou /esconder some da TAB dos outros')
@@ -436,6 +414,237 @@ async function main () {
   await comando('Robo', '/tag auto')
   if (bots.Robo.currentWindow) bots.Robo.closeWindow(bots.Robo.currentWindow)
 
+  // ---------- loja nova (todos os itens vanilla) ----------
+  const { Vec3 } = require('vec3')
+  const loreDe = (it) => it ? [it.components, it.nbt, it.customLore].map(texto).join(' ') : ''
+  const itemInv = (bot, nome) => bot.inventory.items().find((i) => i.name === nome)
+  const saldo = async (nome) => {
+    const r = semCor(await rcon.comando(`money ${nome}`))
+    const m = /([\d.]+,\d{2})/.exec(r)
+    return m ? Number(m[1].replace(/\./g, '').replace(',', '.')) : NaN
+  }
+  for (const n of ['Robo', 'Alvo']) await rcon.comando(`gamemode survival ${n}`)
+  await rcon.comando('clear Alvo')
+  await rcon.comando('eco set Alvo 5000')
+  await rcon.comando('eco set Robo 5000')
+  let wl = await janela(bots.Alvo, () => bots.Alvo.chat('/loja'))
+  checar(/Loja do Servidor/.test(tituloDe(wl)) && temItem(wl, 'Minérios') && temItem(wl, 'Madeiras') && temItem(wl, 'Blocos'), '/loja abre com as seções (Blocos, Madeiras, Minérios...)')
+  wl = wl ? await janela(bots.Alvo, () => clicar(bots.Alvo, slotCom(wl, 'Minérios'))) : null
+  const slotDiamante = wl ? wl.slots.findIndex((it, i) => i < wl.inventoryStart && it && it.name === 'diamond') : -1
+  checar(slotDiamante >= 0 && /Comprar/.test(loreDe(wl.slots[slotDiamante])) && /Vender/.test(loreDe(wl.slots[slotDiamante])), 'a seção Minérios tem o diamante com preço de compra e venda')
+  const wq = slotDiamante >= 0 ? await janela(bots.Alvo, () => clicar(bots.Alvo, slotDiamante, 0, 0)) : null
+  checar(/Comprar/.test(tituloDe(wq)), 'clicar no item abre a tela de quantidade')
+  if (wq) {
+    desde = marca('Alvo')
+    await clicar(bots.Alvo, 49, 0, 0)
+    checar(await esperarMsg('Alvo', /Você comprou 1x .*Diamond|Você comprou 1x/i, desde), 'comprar 1 diamante pela tela de quantidade')
+    await espera(800)
+    checar(conta(bots.Alvo, 'diamond') === 1, 'o diamante comprado chegou no inventário')
+  }
+  if (bots.Alvo.currentWindow) bots.Alvo.closeWindow(bots.Alvo.currentWindow)
+  await espera(500)
+  // preço embaixo do nome: só na tela do jogador, o item de verdade não muda
+  await rcon.comando('give Alvo minecraft:cobblestone 32')
+  checar(await aguardar(() => /Vende por/.test(loreDe(itemInv(bots.Alvo, 'cobblestone'))), 8000), 'o preço de venda aparece embaixo do nome do item')
+  const nbt = semCor(await rcon.comando('data get entity Alvo Inventory'))
+  checar(/cobblestone/.test(nbt) && !/Vende por/.test(nbt), 'no servidor o item continua igual (o preço é só visual)')
+  await rcon.comando('gamemode creative Alvo')
+  checar(await aguardar(() => !/Vende por/.test(loreDe(itemInv(bots.Alvo, 'cobblestone'))), 8000), 'no criativo o preço some (não estraga o item)')
+  await rcon.comando('gamemode survival Alvo')
+  checar(await aguardar(() => /Vende por/.test(loreDe(itemInv(bots.Alvo, 'cobblestone'))), 8000), 'saindo do criativo o preço volta')
+  // /vender mao, ferramenta não vende, item de aldeão não vende
+  const pedra = itemInv(bots.Alvo, 'cobblestone')
+  if (pedra) await bots.Alvo.equip(pedra, 'hand')
+  checar(await comando('Alvo', '/vender mao', /Você vendeu 32x/), '/vender mao vende o item da mão')
+  checar(conta(bots.Alvo, 'cobblestone') === 0, 'os itens vendidos saíram do inventário')
+  await rcon.comando('give Alvo minecraft:iron_pickaxe')
+  await espera(800)
+  const pic = itemInv(bots.Alvo, 'iron_pickaxe')
+  if (pic) await bots.Alvo.equip(pic, 'hand')
+  checar(await comando('Alvo', '/vender mao', /não compra/), 'ferramenta não é vendida (evita abuso)')
+  await rcon.comando('give Alvo minecraft:cobblestone[custom_data={PublicBukkitValues:{"ultracore:aldeao":1b}}] 4')
+  await espera(800)
+  const deAldeao = bots.Alvo.inventory.items().find((i) => i.name === 'cobblestone')
+  if (deAldeao) await bots.Alvo.equip(deAldeao, 'hand')
+  checar(await comando('Alvo', '/vender mao', /aldeão/), 'item comprado de aldeão não é vendido na loja')
+  await rcon.comando('clear Alvo')
+  // /vender abre a tela: coloca os itens e fecha
+  await rcon.comando('give Alvo minecraft:oak_log 16')
+  await espera(800)
+  const wv = await janela(bots.Alvo, () => bots.Alvo.chat('/vender'))
+  checar(/Vender/.test(tituloDe(wv)), '/vender abre a tela de vender')
+  if (wv) {
+    const tora = wv.slots.findIndex((it, i) => i >= wv.inventoryStart && it && it.name === 'oak_log')
+    await clicar(bots.Alvo, tora, 0, 1)
+    await espera(800)
+    desde = marca('Alvo')
+    bots.Alvo.closeWindow(wv)
+    checar(await esperarMsg('Alvo', /Você vendeu 16 itens/, desde), 'fechar a tela vende o que foi colocado')
+  }
+  checar(await comando('Alvo', '/preco diamond', /compra .*venda/), '/preco mostra o preço de compra e venda')
+  const wb = await janela(bots.Alvo, () => bots.Alvo.chat('/loja buscar diamante'))
+  checar(!!wb && wb.slots.some((it, i) => i < wb.inventoryStart && it && it.name === 'diamond_pickaxe'), 'a busca em português (diamante) acha os itens de diamante')
+  if (bots.Alvo.currentWindow) bots.Alvo.closeWindow(bots.Alvo.currentWindow)
+  // editor do admin
+  await rcon.comando('give Robo minecraft:amethyst_shard 4')
+  await espera(800)
+  let we = await janela(bots.Robo, () => bots.Robo.chat('/loja editar'))
+  checar(/Editor da Loja/.test(tituloDe(we)), '/loja editar abre o editor')
+  const cristal = we ? we.slots.findIndex((it, i) => i >= we.inventoryStart && it && it.name === 'amethyst_shard') : -1
+  we = cristal >= 0 ? await janela(bots.Robo, () => clicar(bots.Robo, cristal)) : null
+  checar(/Preço/.test(tituloDe(we)) && temItem(we, 'SALVAR'), 'clicar num item do inventário abre a tela do preço')
+  if (we) {
+    await clicar(bots.Robo, 16); await espera(400) // compra +10
+    desde = marca('Robo')
+    await clicar(bots.Robo, 38) // salvar
+    checar(await esperarMsg('Robo', /Preço de .* salvo/, desde), 'admin muda o preço de um item pelo editor')
+  }
+  if (bots.Robo.currentWindow) bots.Robo.closeWindow(bots.Robo.currentWindow)
+  await espera(500)
+  checar(await comando('Robo', '/preco amethyst_shard', /compra/), 'o preço novo vale na hora')
+
+  // ---------- empregos ----------
+  await rcon.comando('clear Alvo')
+  await rcon.comando('tp Alvo 200 -60 200')
+  await rcon.comando('fill 196 -60 196 206 -56 206 air')
+  await espera(1500)
+  let wj = await janela(bots.Alvo, () => bots.Alvo.chat('/empregos'))
+  checar(/Empregos/.test(tituloDe(wj)) && temItem(wj, 'Minerador') && temItem(wj, 'Pescador') && temItem(wj, 'Cozinheiro'), '/empregos abre com os 13 empregos')
+  if (wj) {
+    desde = marca('Alvo')
+    await clicar(bots.Alvo, slotCom(wj, 'Minerador'), 0, 0)
+    checar(await esperarMsg('Alvo', /Você agora é Minerador/, desde), 'entrar no emprego Minerador pelo menu')
+  }
+  if (bots.Alvo.currentWindow) bots.Alvo.closeWindow(bots.Alvo.currentWindow)
+  checar(await comando('Alvo', '/empregos entrar fazendeiro', /Você agora é Fazendeiro/), '/empregos entrar fazendeiro')
+  checar(await comando('Alvo', '/empregos entrar cacador', /Você agora é Caçador/), '/empregos entrar cacador')
+  checar(await comando('Alvo', '/empregos entrar pescador', /máximo de empregos/), 'não dá para passar do máximo de empregos (3)')
+  await rcon.comando('give Alvo minecraft:iron_pickaxe')
+  await rcon.comando('setblock 201 -60 200 minecraft:stone')
+  await espera(1000)
+  const picareta = itemInv(bots.Alvo, 'iron_pickaxe')
+  if (picareta) await bots.Alvo.equip(picareta, 'hand')
+  let antes = barra.Alvo.length
+  try { await bots.Alvo.dig(bots.Alvo.blockAt(new Vec3(201, -60, 200)), true) } catch (e) { console.log('  dig:', e.message) }
+  checar(await aguardar(() => barra.Alvo.slice(antes).some((m) => /Minerador.*\+/.test(m)), 6000), 'quebrar pedra natural paga o Minerador (barra de ação)')
+  // anti-abuso: bloco colocado pelo jogador não paga
+  await rcon.comando('give Alvo minecraft:stone 2')
+  await espera(800)
+  const pedraMao = itemInv(bots.Alvo, 'stone')
+  try {
+    if (pedraMao) await bots.Alvo.equip(pedraMao, 'hand')
+    await bots.Alvo.placeBlock(bots.Alvo.blockAt(new Vec3(202, -61, 200)), new Vec3(0, 1, 0))
+  } catch (e) { console.log('  colocar:', e.message) }
+  await espera(800)
+  const colocada = bots.Alvo.blockAt(new Vec3(202, -60, 200))
+  checar(!!colocada && colocada.name === 'stone', 'Alvo colocou uma pedra')
+  if (picareta) await bots.Alvo.equip(itemInv(bots.Alvo, 'iron_pickaxe'), 'hand')
+  await espera(1500)
+  antes = barra.Alvo.length
+  try { if (colocada) await bots.Alvo.dig(colocada, true) } catch (e) { console.log('  dig:', e.message) }
+  await espera(3000)
+  checar(!barra.Alvo.slice(antes).some((m) => /Minerador.*\+/.test(m)), 'quebrar a pedra que o próprio jogador colocou NÃO paga')
+  // fazendeiro: reproduzir vacas; caçador: mob de comando não paga, filhote nascido de cruzamento paga
+  await rcon.comando('give Alvo minecraft:wheat 4')
+  for (let i = 0; i < 2; i++) await rcon.comando('summon minecraft:cow 203 -60 201 {Tags:["adulto"]}')
+  await espera(1500)
+  const trigo = itemInv(bots.Alvo, 'wheat')
+  if (trigo) await bots.Alvo.equip(trigo, 'hand')
+  antes = barra.Alvo.length
+  for (const ent of Object.values(bots.Alvo.entities).filter((x) => x.name === 'cow')) {
+    try { await bots.Alvo.lookAt(ent.position.offset(0, 1, 0), true); await bots.Alvo.activateEntity(ent) } catch (e) { console.log('  vaca:', e.message) }
+    await espera(400)
+  }
+  checar(await aguardar(() => barra.Alvo.slice(antes).some((m) => /Fazendeiro.*\+/.test(m)), 15000), 'reproduzir vacas paga o Fazendeiro')
+  antes = barra.Alvo.length
+  await rcon.comando('damage @e[type=minecraft:cow,tag=adulto,limit=1,sort=nearest] 100 minecraft:player_attack by Alvo')
+  await espera(2500)
+  checar(!barra.Alvo.slice(antes).some((m) => /Caçador.*\+/.test(m)), 'matar mob criado por comando NÃO paga o Caçador')
+  antes = barra.Alvo.length
+  await rcon.comando('damage @e[type=minecraft:cow,tag=!adulto,limit=1,sort=nearest] 100 minecraft:player_attack by Alvo')
+  checar(await aguardar(() => barra.Alvo.slice(antes).some((m) => /Caçador.*\+/.test(m)), 6000), 'matar o filhote nascido do cruzamento paga o Caçador')
+  checar(await comando('Alvo', '/empregos stats', /Minerador.*nível/), '/empregos stats mostra o nível')
+  await rcon.comando('kill @e[type=minecraft:cow]')
+
+  // ---------- missões diárias ----------
+  const wm2 = await janela(bots.Alvo, () => bots.Alvo.chat('/missoes'))
+  checar(/Missões/.test(tituloDe(wm2)) && !!wm2 && wm2.slots.some((it, i) => i < wm2.inventoryStart && it && /Progresso/.test(loreDe(it))), '/missoes abre com as missões do dia')
+  if (bots.Alvo.currentWindow) bots.Alvo.closeWindow(bots.Alvo.currentWindow)
+  checar(await comando('Robo', '/missoes trocar Alvo pedra 2', /Primeira missão de Alvo/), 'admin troca a missão de um jogador')
+  desde = marca('Alvo')
+  for (const z of [199, 201]) {
+    await rcon.comando(`setblock 199 -60 ${z} minecraft:stone`)
+    await espera(600)
+    try { await bots.Alvo.dig(bots.Alvo.blockAt(new Vec3(199, -60, z)), true) } catch (e) { console.log('  dig:', e.message) }
+    await espera(600)
+  }
+  checar(await esperarMsg('Alvo', /Missão completa/, desde, 8000), 'completar a missão paga na hora')
+
+  // ---------- mercado dos jogadores ----------
+  await rcon.comando('clear Alvo')
+  await rcon.comando('give Alvo minecraft:diamond 2')
+  await espera(800)
+  const dia = itemInv(bots.Alvo, 'diamond')
+  if (dia) await bots.Alvo.equip(dia, 'hand')
+  checar(await comando('Alvo', '/mercado vender 100', /Anunciado/), '/mercado vender anuncia o item da mão')
+  checar(conta(bots.Alvo, 'diamond') === 0, 'o item anunciado sai do inventário')
+  const saldoAlvo = await saldo('Alvo')
+  const wmk = await janela(bots.Robo, () => bots.Robo.chat('/mercado'))
+  const anuncio = wmk ? wmk.slots.findIndex((it, i) => i < wmk.inventoryStart && it && it.name === 'diamond') : -1
+  checar(/Mercado/.test(tituloDe(wmk)) && anuncio >= 0, 'o anúncio aparece no /mercado dos outros')
+  const wcf = anuncio >= 0 ? await janela(bots.Robo, () => clicar(bots.Robo, anuncio, 0, 0)) : null
+  checar(/Confirmar/.test(tituloDe(wcf)), 'clicar no anúncio pede confirmação')
+  if (wcf) {
+    desde = marca('Alvo')
+    await clicar(bots.Robo, 11, 0, 0)
+    checar(await esperarMsg('Alvo', /comprou seu/, desde), 'o vendedor é avisado da venda')
+    await espera(1000)
+    checar(conta(bots.Robo, 'diamond') === 2, 'o comprador recebe o item')
+    const depois = await saldo('Alvo')
+    checar(Math.abs(depois - saldoAlvo - 95) < 2, `o vendedor recebe o valor menos a taxa de 5% (${saldoAlvo} -> ${depois})`)
+  }
+  if (bots.Robo.currentWindow) bots.Robo.closeWindow(bots.Robo.currentWindow)
+
+  // ---------- procurados ----------
+  desde = marca('Alvo')
+  checar(await comando('Robo', '/procurado Alvo 100', /Você colocou/), '/procurado coloca dinheiro na cabeça de alguém')
+  checar(await esperarMsg('Alvo', /Sua cabeça agora vale/, desde), 'o procurado é avisado')
+  await rcon.comando('effect clear Alvo')
+  desde = marca('Robo')
+  await rcon.comando('damage Alvo 1000 minecraft:player_attack by Robo')
+  checar(await esperarMsg('Robo', /ganhou o prêmio/, desde), 'quem mata o procurado leva o prêmio')
+  await espera(2500)
+
+  // ---------- botões novos no /menu ----------
+  const wmenu = await janela(bots.Alvo, () => bots.Alvo.chat('/menu'))
+  checar(['Mercado', 'Empregos', 'Missões', 'Procurados'].every((t) => temItem(wmenu, t)), '/menu tem os botões novos (mercado, empregos, missões, procurados)')
+  if (bots.Alvo.currentWindow) bots.Alvo.closeWindow(bots.Alvo.currentWindow)
+
+  // ---------- quiz do chat ----------
+  const palavras = ['diamante', 'esmeralda', 'picareta', 'creeper', 'esqueleto', 'aldeao', 'obsidiana', 'netherita', 'redstone', 'fornalha', 'bancada',
+    'machado', 'espada', 'armadura', 'encantamento', 'abobora', 'melancia', 'galinha', 'ovelha', 'lobo', 'enderman', 'dragao', 'portal', 'minerio',
+    'carvao', 'lanterna', 'tocha', 'escudo', 'flecha', 'pocao', 'trigo', 'cenoura', 'batata', 'cogumelo', 'cacto', 'bambu', 'esponja', 'farol',
+    'bigorna', 'estante', 'elitro', 'tridente', 'ametista', 'cobre', 'quartzo', 'ouro', 'ferro', 'pedregulho', 'areia', 'cascalho', 'neve', 'gelo', 'lava']
+  const ordenar = (w) => w.split('').sort().join('')
+  desde = marca('Alvo')
+  await rcon.comando('quiz agora')
+  let resposta = null
+  await aguardar(() => {
+    for (const m of msgs.Alvo.slice(desde)) {
+      let r
+      if ((r = /Quanto é (\d+) ([+×-]) (\d+)\?/.exec(m))) resposta = String(r[2] === '+' ? +r[1] + +r[3] : r[2] === '-' ? r[1] - r[3] : r[1] * r[3])
+      else if ((r = /Desembaralhe a palavra: (\S+)/.exec(m))) resposta = palavras.find((w) => ordenar(w) === ordenar(r[1].toLowerCase()))
+      else if ((r = /Quem digitar primeiro: (\S+)/.exec(m))) resposta = r[1]
+    }
+    return !!resposta
+  }, 8000)
+  checar(!!resposta, 'o quiz aparece no chat')
+  if (resposta) {
+    desde = marca('Robo')
+    bots.Alvo.chat(resposta)
+    checar(await esperarMsg('Robo', /Alvo acertou/, desde), 'quem acerta o quiz ganha e todos são avisados')
+  }
+
   // ---------- /luz (visão noturna sem fim) ----------
   const efeitoNv = () => {
     const r = bots.Alvo.registry
@@ -471,6 +680,9 @@ async function main () {
   await espera(1500)
   checar(!msgs.Alvo.slice(desde).some((m) => /segredo do fantasma/.test(m)), 'ninguém vê a mensagem de quem está invisível')
   await comando('Robo', '/vanish', /visível novamente/)
+
+  // ---------- dinheiro por tempo online (no teste: 1 a cada 2 minutos) ----------
+  checar(await esperarMsg('Alvo', /por jogar 2 minutos/, 0, 30000), 'quem joga ganha dinheiro por tempo online')
 
   // ---------- mensagens "cruas" ----------
   const cruas = [...msgs.Robo, ...msgs.Alvo, ...barra.Robo, ...barra.Alvo].filter((m) => /^(\[UltraCore\]\s*)?[a-z]+(\.[a-z0-9-]+)+$/.test(m.trim()))

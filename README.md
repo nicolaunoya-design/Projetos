@@ -1,8 +1,22 @@
 # UltraCore — plugin tudo-em-um para servidores de Minecraft
 
-Plugin para **Paper 1.21 até 26.x** (e forks como Purpur) que junta num só lugar os recursos mais usados em servidores: teleportes, economia, loja, kits, chat, moderação, ferramentas da staff, recompensas e muito mais.
+Plugin para **Paper 1.21 até 26.x** (e forks como Purpur) que junta num só lugar os recursos mais usados em servidores: teleportes, economia completa (loja com todos os itens, empregos, missões, mercado dos jogadores), kits, chat, moderação, ferramentas da staff, recompensas e muito mais.
 
 Cada recurso é um **módulo** que pode ser **ligado, desligado e configurado dentro do jogo** pelo comando `/painel`, sem mexer em arquivos nem reiniciar o servidor. Todas as mensagens podem ser editadas no `messages.yml`.
+
+## ✨ Novidades da 3.0 (economia)
+
+- **Empregos** (estilo Jobs Reborn): `/empregos` com **13 empregos**: Minerador, Lenhador, Fazendeiro, Caçador, Pescador, Construtor, Escavador, Artesão, Ferreiro, Encantador, Alquimista, Explorador e Cozinheiro. Cada um tem níveis (até 100); quanto maior o nível, mais paga. O ganho aparece na barra de ação e o nível numa barra no topo da tela. Tem **proteções contra abuso**: bloco colocado não paga ao quebrar, gerador de pedra não paga, mob de spawner, ovo ou comando não paga (ou paga pouco), farm de mob paga 25%, AFK/criativo não contam, construtor só ganha se o bloco ficar no lugar, e há limite de ganho por hora. Veja [Empregos](#empregos).
+- **Loja nova, estilo EconomyShopGUI**: **todos os itens vanilla** (mais de 1.200) com preço de compra e venda, separados em **18 seções** (Blocos, Madeiras, Cores, Minérios, Cobre, Natureza, Agricultura, Comida, Drops de Mobs, Redstone, Decoração, Utilidades, Ferramentas, Nether, End, Oceano, Raros...). Os preços são **calculados pelas receitas do próprio servidor**, então **não dá para lucrar comprando, craftando e revendendo**. Tela de quantidade, busca em português (`/loja buscar diamante`), `/vender` (tela onde você coloca os itens), `/vender mao`, `/vender tudo` e `/preco`. Veja [Loja](#loja).
+- **Preço de venda embaixo do nome dos itens**: no inventário, nos baús e em todo lugar aparece "Vende por $X (64x: $Y)". É só visual: o item de verdade não muda (continua empilhando normal, outros plugins não percebem nada). Some no criativo.
+- **Proteções da loja**: ferramentas/armaduras não são vendidas (evita farm com aldeões), **itens comprados de aldeões não vendem**, só itens "normais" (sem nome/encantamento/dano), e **preço dinâmico**: quanto mais um item é vendido no servidor, mais o preço de venda dele cai (e volta sozinho com o tempo).
+- **Outras formas de ganhar dinheiro**:
+  - **Missões diárias** (`/missoes`): 3 missões novas por dia para cada jogador (quebrar pedra, matar zumbis, pescar, explorar...) com prêmio e bônus por fazer todas.
+  - **Mercado dos jogadores** (`/mercado`): anuncie seus itens pelo preço que quiser e venda para outros jogadores, mesmo offline.
+  - **Procurados** (`/procurado <jogador> <valor>`): coloque dinheiro na cabeça de alguém; quem matar leva.
+  - **Quiz no chat**: de tempos em tempos aparece uma pergunta; quem acertar primeiro ganha.
+  - **Dinheiro por tempo online** (sem contar AFK), além da recompensa diária que já existia.
+- `/menu` com os botões novos (Mercado, Empregos, Missões, Procurados) e placeholders `{empregos}` e `{missoes}`.
 
 ## ✨ Novidades da 2.6 a 2.10
 
@@ -121,7 +135,11 @@ Ficam em `plugins/UltraCore/`:
 |---|---|
 | `config.yml` | Prefixo das mensagens e todas as opções dos módulos (o mesmo que o `/painel` edita) |
 | `messages.yml` | **Todas as mensagens** que os jogadores veem. Edite e use `/painel reload` |
-| `shop.yml` | Itens e preços da loja |
+| `shop.yml` | Só os preços que o admin mudou e os itens tirados da loja (o resto é calculado sozinho) |
+| `loja-dinamica.yml` | Quanto de cada item já foi vendido (preço dinâmico). Não precisa mexer |
+| `empregos.yml` | Os empregos e quanto cada ação paga (dinheiro e XP). Depois de mudar: `/empregos admin recarregar` |
+| `mercado.yml` | Anúncios do mercado dos jogadores e caixa de coleta |
+| `procurados.yml` | Prêmios pela cabeça dos jogadores |
 | `kits.yml` | Kits (crie pelo jogo com `/createkit`) |
 | `warps.yml`, `spawn.yml` | Warps e spawn |
 | `bans.yml` | Banimentos e bans de IP |
@@ -140,10 +158,15 @@ Textos aceitam cores `&a`, `&l`... e hex `&#FF8800`.
 | Back | Voltar ao local anterior ou da morte (continua valendo depois de reiniciar o servidor); ver onde morreu | `/back`, `/ultimamorte [jogador]` |
 | Teleporte Aleatório | Local aleatório e seguro, com cooldown | `/rtp` |
 | Economia | Dinheiro, pagamentos, ranking, prêmio por abate, integração com Vault | `/money`, `/pay`, `/baltop`, `/eco` |
-| **Loja** 🆕 | Loja em menu para comprar e vender itens | `/loja`, `/vender`, `/vender tudo` |
+| **Loja** 🆕 | Todos os itens vanilla com preço de compra e venda, por seção, busca, preço embaixo do nome, preço dinâmico | `/loja`, `/loja buscar <nome>`, `/vender`, `/vender mao`, `/vender tudo`, `/preco` |
+| **Empregos** 🆕 | 13 empregos com níveis, ganhos na barra e anti-abuso | `/empregos`, `/empregos entrar\|sair\|info\|top\|stats` |
+| **Missões Diárias** 🆕 | Missões sorteadas todo dia que pagam dinheiro | `/missoes` |
+| **Mercado** 🆕 | Os jogadores vendem itens uns para os outros | `/mercado`, `/mercado vender <preço>`, `/mercado meus`, `/mercado coletar` |
+| **Procurados** 🆕 | Prêmio pela cabeça de um jogador | `/procurado <jogador> <valor>`, `/procurados` |
+| **Quiz no Chat** 🆕 | Pergunta no chat de tempos em tempos; quem acerta ganha | `/quiz` |
 | **Troca** 🆕 | Troca segura de itens e dinheiro com quem está perto | `/troca <jogador>`, `/troca aceitar`, `/troca recusar` |
 | Kits | Kits com cooldown ou uso único, kit inicial | `/kit`, `/createkit`, `/delkit` |
-| **Recompensas** 🆕 | Recompensa diária com bônus por dias seguidos, tempo de jogo | `/daily`, `/tempo` |
+| **Recompensas** 🆕 | Recompensa diária com bônus por dias seguidos, dinheiro por tempo online, tempo de jogo | `/daily`, `/tempo` |
 | Chat | Formato, anti-spam, anti-CAPS, filtro, **menções @nome** 🆕 | `/staffchat`, `/clearchat`, `/broadcast` |
 | Mensagens Privadas | Conversas privadas + socialspy; cada um pode desligar | `/msg`, `/r`, `/socialspy`, `/msgtoggle` |
 | **Menus dos Jogadores** 🆕 | Central do servidor, rankings e preferências | `/menu`, `/top`, `/preferencias` |
@@ -210,16 +233,49 @@ Fechar o menu, sair, morrer, se afastar ou clicar em **Cancelar** devolve tudo p
 
 ### Loja
 
-- `/loja` abre o menu. **Esquerdo** compra, **Shift+Esquerdo** compra 10x, **Direito** vende, **Shift+Direito** vende todos.
-- `/vender` vende o item da mão; `/vender tudo` vende tudo o que a loja aceita.
-- Só são aceitos itens "puros" (sem nome ou encantamento), para ninguém vender item especial por engano.
-- **Editor visual (admins)** 🆕: `/loja editar`, o botão **Editar loja** (bigorna) dentro da `/loja`, ou `/painel` → Loja → **Abrir editor**.
-  - **Adicionar:** com o editor aberto, clique em um item do **seu inventário**. Abre a tela do item com:
-    - **Preço de compra** e **preço de venda**: botões vermelhos/verdes de -100, -10, -1, +1, +10, +100, ou clique no lingote/esmeralda e digite o valor exato no chat (ex: `12.5`). `0` = desativado.
-    - **Tamanho do pacote**: -16, -4, -1, +1, +4, +16, ou digite.
-    - **SALVAR**, **Remover da loja** (clique duas vezes) ou **Voltar sem salvar**.
-  - **Editar:** clique no item na lista do editor.
-- **Pelo chat (admins):** segure um item e use `/loja add <preço de compra> <preço de venda>` (a quantidade na mão vira o tamanho do pacote; preço `0` desativa compra ou venda). `/loja remover` tira o item da mão da loja. Ou edite o `shop.yml`.
+- `/loja` abre as **seções** (Blocos, Madeiras, Cores, Minérios, Cobre, Natureza, Agricultura, Comida, Drops de Mobs, Redstone, Decoração, Utilidades, Ferramentas, Nether, End, Oceano, Raros). `/loja <seção>` abre direto (ex: `/loja minerios`).
+- Em cada item: **Esquerdo** abre a tela de **comprar**, **Direito** a de **vender** e **Shift+Direito** vende todos daquele item. Na tela de quantidade: -64, -10, -1, +1, +10, +64, atalhos (1, ¼ de pack, ½ pack, 1 pack, máximo) ou digite a quantidade.
+- **Busca**: `/loja buscar <nome>` ou a bússola na loja. Aceita português (`diamante`, `tocha`, `lã`, `picareta`, `carvalho`...) e o nome em inglês.
+- **Vender rápido**: `/vender` abre uma tela: coloque os itens e **feche**; a loja compra o que aceita e devolve o resto. `/vender mao` vende o item da mão, `/vender tudo` vende tudo o que a loja compra (ferramentas, itens com nome e encantados ficam com você).
+- `/preco` (ou `/preco <item>`) mostra quanto o item vale.
+- **Preço embaixo do nome**: os itens mostram "Vende por $X (64x: $Y)" no inventário, baús, fornalhas... Só na tela do jogador; o item continua igual. Liga/desliga em `/painel` → Economia → Loja.
+- **Como os preços são feitos**: os itens "naturais" (minérios, drops, plantas, blocos do mundo) têm um preço base; **todo o resto é calculado pelas receitas do servidor** (bancada, fornalha, cortador de pedras e ferraria). Por isso comprar os ingredientes, craftar e vender nunca dá lucro. A venda paga **40%** do preço de compra (muda no painel). Itens raros (discos, cabeças, estrela do Nether, totem...) só podem ser vendidos; itens de criativo (bedrock, ovos de spawn, blocos de comando...) ficam fora.
+- **Proteções**:
+  - ferramentas, armas e armaduras não são vendidas (dá para ligar no painel);
+  - **itens comprados de aldeões não vendem** (o item fica marcado, inclusive o que for craftado, assado ou colocado e quebrado com ele);
+  - **preço dinâmico**: quanto mais um item é vendido por todo mundo, mais o preço de venda cai (até 25%), voltando sozinho com o tempo. O quanto cai e o tempo de recuperação ficam no painel;
+  - VIP (`ultracore.loja.vip`) vende com bônus (10% por padrão).
+- **Editor (admins)**: `/loja editar` (ou `/painel` → Loja → editor). Escolha a seção e clique no item, ou clique num item do **seu inventário**. Dá para mudar o preço de compra e de venda (botões de -10 até +10 ou digitar), **voltar ao automático** ou **tirar da loja**. Pelo chat: `/loja add <compra> <venda>` (por unidade, segurando o item), `/loja remover`, `/loja automatico`. `/loja recalcular` refaz a tabela; `/loja zerar-dinamico` volta todos os preços de venda ao normal.
+- A loja antiga (até a 2.10) é convertida sozinha: os preços que você tinha mudado continuam (cópia em `shop-antigo.yml`).
+
+### Empregos
+
+- `/empregos` abre o menu: **Esquerdo** entra/sai do emprego, **Direito** mostra **o que cada emprego paga** no seu nível. Por padrão cada jogador pode estar em **3 empregos** (VIP em 4; `ultracore.empregos.max.<n>` libera mais).
+- Empregos: **Minerador** (pedras e minérios), **Lenhador** (troncos), **Fazendeiro** (colher plantação madura, reproduzir animais, tosquiar), **Caçador** (matar mobs, domar), **Pescador**, **Construtor** (colocar blocos), **Escavador** (terra, areia, cascalho, argila), **Artesão** (móveis, utilidades, redstone), **Ferreiro** (armas, ferramentas, armaduras, derreter minério, netherite), **Encantador** (por nível usado), **Alquimista** (por poção), **Explorador** (primeiro a entrar em chunks novos) e **Cozinheiro** (assar e fazer comidas).
+- Cada ação dá **dinheiro + XP**. O XP sobe o nível (até 100); cada nível paga **+1%** (nível 100 = o dobro). Nível 10, 25, 50, 75 e 100 mudam o título (Aprendiz, Profissional, Experiente, Mestre, Lendário).
+- **Anti-abuso**: bloco colocado por jogador não paga ao ser quebrado (fica salvo no mundo e anda com pistão); pedra de gerador não paga; plantação só paga madura; construtor só ganha se o bloco ficar 60 s no lugar; mob de spawner paga 20%, de ovo/comando não paga, e mob de farm (que quase morreu de queda/lava) paga 25%; AFK e criativo não ganham; explorador não ganha voando de élitro; limite de **$2.000 por hora** (o XP continua).
+- Outros comandos: `/empregos entrar|sair <emprego>`, `/empregos sairtodos`, `/empregos info <emprego>`, `/empregos stats [jogador]`, `/empregos top [emprego]`, `/empregos lista`.
+- Admins: `/empregos admin nivel|xp <jogador> <emprego> <valor>`, `/empregos admin resetar <jogador> [emprego]`, `/empregos admin recarregar`. No `/painel` → Economia → Empregos: máximo de empregos, multiplicadores, bônus por nível, nível máximo, limite por hora, spawner, farm, tempo do construtor, gerador, guardar nível ao sair, espera para trocar, barras e mundos sem empregos; o editor liga/desliga cada emprego e muda o multiplicador dele. Os valores de cada ação ficam em `empregos.yml`.
+
+### Missões diárias
+
+- `/missoes`: todo dia (meia-noite) cada jogador recebe **3 missões** sorteadas entre 21 tipos (quebrar pedra, minerar, cortar troncos, cavar, colher, matar monstros/zumbis/esqueletos/creepers/aranhas, caçar, pescar, craftar, fornalha, assar comida, encantar, reproduzir, explorar, construir, poções, tosquiar). O progresso conta sozinho e paga na hora; quem faz todas ganha **+50%** de bônus.
+- As mesmas proteções dos empregos valem (bloco colocado e mob de farm/spawner não contam).
+- Admins: `/missoes resetar <jogador>` e `/missoes trocar <jogador> <missão> [meta]`.
+
+### Mercado
+
+- Segure o item e use `/mercado vender <preço>` (aceita `2.5k`, `1m`). O item vai para o `/mercado`, onde qualquer um compra (com confirmação), **mesmo com você offline**: você recebe o dinheiro (menos a taxa de **5%**) e é avisado quando entrar.
+- `/mercado meus` mostra seus anúncios (clique para cancelar). Anúncios vencem em 48 h e voltam para a **caixa de coleta** (`/mercado coletar`), assim como compras feitas com o inventário cheio.
+- No painel: taxa, anúncios por jogador (`ultracore.mercado.limite.<n>` libera mais), duração, preço mínimo/máximo e aviso no chat. Admins removem anúncios com Shift+Direito.
+
+### Procurados
+
+- `/procurado <jogador> <valor>` coloca dinheiro na cabeça de alguém (sai do seu saldo). Quem matar o procurado leva o prêmio (menos 10% de taxa). `/procurados` mostra a lista.
+
+### Quiz no chat
+
+- A cada 15 minutos (com 2+ jogadores online) aparece uma pergunta: conta, palavra embaralhada ou um código para digitar. Quem responder certo primeiro ganha **$50**. Admins: `/quiz agora` e `/quiz parar`.
 
 ### Tags (chat e TAB)
 
@@ -323,18 +379,18 @@ O passo a passo está no [README da ponte](integracoes/whatsapp-bot/README.md).
 
 ### Placeholders (scoreboard, tab, anúncios, entrada/saída)
 
-`{player}` `{displayname}` `{tag}` `{money}` `{online}` `{max}` `{kills}` `{deaths}` `{ping}` `{world}` `{x}` `{y}` `{z}` — e, com o **PlaceholderAPI**, qualquer `%placeholder%` dele.
+`{player}` `{displayname}` `{tag}` `{money}` `{online}` `{max}` `{kills}` `{deaths}` `{ping}` `{world}` `{x}` `{y}` `{z}` `{empregos}` (empregos e níveis) `{missoes}` (missões feitas hoje, ex: 2/3) — e, com o **PlaceholderAPI**, qualquer `%placeholder%` dele.
 
 ## Permissões
 
 | Permissão | Quem tem por padrão | Inclui |
 |---|---|---|
-| `ultracore.player` | todos | spawn, home, warp, tpa, back, rtp, money, pay, baltop, kit, msg, ping, afk, regras, lixo, loja, vender, daily, tempo, report, tag, menu, top, preferencias |
-| `ultracore.vip` | ninguém (dê pelo LuckPerms) | craft, enderchest, hat, cores no chat, fly, nick com cores, tag [VIP] |
+| `ultracore.player` | todos | spawn, home, warp, tpa, back, rtp, money, pay, baltop, kit, msg, ping, afk, regras, lixo, loja, vender, preco, empregos, missoes, mercado, procurado, quiz, daily, tempo, report, tag, menu, top, preferencias |
+| `ultracore.vip` | ninguém (dê pelo LuckPerms) | craft, enderchest, hat, cores no chat, fly, nick com cores, tag [VIP], bônus de venda na loja, 4 empregos |
 | `ultracore.staff` | OP | kick, mute, ban, warn, histórico, ver denúncias, staffchat, vanish, invsee, gm, heal, feed, tphere... |
 | `ultracore.admin` | OP | tudo + `/painel`, setspawn, setwarp, eco, createkit, banip, editar a loja, gerenciar tags, god, speed... |
 
-Outras úteis: `ultracore.homes.unlimited`, `ultracore.bypass.delay`, `ultracore.bypass.cooldown`, `ultracore.kit.<nome>`, `ultracore.warp.<nome>`, `ultracore.tag.<id>` (cada tag), `ultracore.tags.admin` (/tag dar, tirar, criar, apagar), `ultracore.nick.others`, `ultracore.report.see`, `ultracore.silentjoin` e `ultracore.silentjoin.see` (staff), `ultracore.msg.bypass` (staff: manda mensagem privada mesmo para quem desligou).
+Outras úteis: `ultracore.homes.unlimited`, `ultracore.bypass.delay`, `ultracore.bypass.cooldown`, `ultracore.kit.<nome>`, `ultracore.warp.<nome>`, `ultracore.tag.<id>` (cada tag), `ultracore.tags.admin` (/tag dar, tirar, criar, apagar), `ultracore.nick.others`, `ultracore.report.see`, `ultracore.silentjoin` e `ultracore.silentjoin.see` (staff), `ultracore.msg.bypass` (staff: manda mensagem privada mesmo para quem desligou), `ultracore.loja.vip` (bônus de venda), `ultracore.empregos.max.<n>` (mais empregos), `ultracore.empregos.semlimite` (sem limite por hora), `ultracore.empregos.admin`, `ultracore.missoes.admin`, `ultracore.mercado.admin`, `ultracore.mercado.limite.<n>`, `ultracore.quiz.admin`.
 
 ## Para desenvolvedores
 
@@ -343,14 +399,17 @@ src/main/java/com/ultracore/
 ├── UltraCore.java          # classe principal, registra os módulos
 ├── module/                 # sistema de módulos (Module, Setting, ModuleManager)
 ├── gui/                    # menus do /painel
-├── core/                   # teleporte com delay, entrada pelo chat, /painel
+├── core/                   # teleporte com delay, entrada pelo chat, /painel, blocos colocados e trabalhos (empregos/missões)
+├── shop/                   # tabela de preços, seções, preço dinâmico e o preço embaixo do nome
 ├── data/                   # dados dos jogadores (plugins/UltraCore/players/)
 ├── hooks/                  # integração opcional com o Vault
 ├── util/                   # cores, mensagens (Lang), itens, tempo, arquivos
 └── modules/                # um arquivo por módulo
 src/main/resources/
 ├── plugin.yml              # comandos e permissões
-└── messages.yml            # mensagens padrão
+├── messages.yml            # mensagens padrão
+├── empregos.yml            # empregos padrão
+└── loja/                   # preços base (precos.txt), seções (secoes.txt) e busca em português (busca.txt)
 integracoes/whatsapp-bot/   # ponte para bots de WhatsApp (Node.js + Baileys)
 ```
 

@@ -122,7 +122,23 @@ public class MenusModule extends Module {
             row(1, travel);
 
             List<Button> economy = new ArrayList<>();
-            if (can(viewer, "loja")) economy.add(button(Material.EMERALD, "&a&lLoja", "loja", "&7Compre e venda itens."));
+            if (can(viewer, "loja")) economy.add(button(Material.EMERALD, "&a&lLoja", "loja", "&7Compre e venda todos os itens.", "&8Vender rápido: /vender"));
+            if (can(viewer, "mercado")) economy.add(button(Material.CHEST_MINECART, "&e&lMercado", "mercado", "&7Compre e venda itens", "&7com outros jogadores."));
+            if (can(viewer, "empregos")) {
+                JobsModule jobs = plugin.modules().get(JobsModule.class);
+                List<String> lore = new ArrayList<>(List.of("&7Ganhe dinheiro trabalhando:", "&7minerando, plantando, caçando..."));
+                List<JobsModule.Job> mine = jobs.joinedJobs(viewer);
+                if (!mine.isEmpty()) {
+                    StringBuilder sb = new StringBuilder("&7Seus: ");
+                    for (int i = 0; i < mine.size(); i++) sb.append(i > 0 ? "&7, " : "").append(mine.get(i).display());
+                    lore.add(sb.toString());
+                }
+                economy.add(button(Material.IRON_PICKAXE, "&6&lEmpregos", "empregos", lore.toArray(new String[0])));
+            }
+            if (can(viewer, "missoes")) {
+                QuestsModule quests = plugin.modules().get(QuestsModule.class);
+                economy.add(button(Material.WRITABLE_BOOK, "&b&lMissões", "missoes", "&7Missões do dia que pagam", "&7dinheiro. Feitas: &f" + quests.summary(viewer)));
+            }
             if (can(viewer, "kit")) economy.add(button(Material.CHEST, "&6&lKits", "kit", "&7Pegue seus kits."));
             if (can(viewer, "daily")) {
                 RewardsModule rewards = plugin.modules().get(RewardsModule.class);
@@ -137,6 +153,7 @@ public class MenusModule extends Module {
             List<Button> me = new ArrayList<>();
             if (can(viewer, "tag")) me.add(button(Material.NAME_TAG, "&e&lTags", "tag", "&7Escolha a tag que aparece", "&7no chat e na TAB."));
             if (can(viewer, "preferencias")) me.add(button(Material.COMPARATOR, "&f&lPreferências", "preferencias", "&7Pedidos de TPA, mensagens", "&7privadas e menções."));
+            if (can(viewer, "procurado")) me.add(button(Material.WITHER_SKELETON_SKULL, "&c&lProcurados", "procurado", "&7Quem tem prêmio pela cabeça.", "&7Mate e leve o dinheiro!"));
             if (can(viewer, "regras")) me.add(button(Material.BOOK, "&f&lRegras", "regras", "&7Leia as regras do servidor."));
             row(3, me);
 

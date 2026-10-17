@@ -90,9 +90,12 @@ public final class PriceLore implements Listener {
         try {
             String pkg = Bukkit.getServer().getClass().getPackage().getName();
             Class<?> craft = Class.forName(pkg + ".inventory.CraftItemStack");
-            asNmsCopy = craft.getMethod("asNMSCopy", ItemStack.class);
+            asNmsCopy = staticMethod(craft, "asNMSCopy", ItemStack.class, null);
             nmsItem = asNmsCopy.getReturnType();
-            asCraftMirror = craft.getMethod("asCraftMirror", nmsItem);
+            // "espelho" (sem copiar) quando existe; nas versões novas, uma cópia normal
+            asCraftMirror = staticMethod(craft, "asCraftMirror", nmsItem, ItemStack.class);
+            if (asCraftMirror == null) asCraftMirror = staticMethod(craft, "asBukkitCopy", nmsItem, ItemStack.class);
+            if (asCraftMirror == null) throw new NoSuchMethodException("CraftItemStack: conversão do item");
         } catch (Throwable t) {
             plugin.getLogger().warning("Preço embaixo do nome dos itens não é suportado nesta versão do servidor (" + t + "). Use /preco.");
             return false;
@@ -134,6 +137,28 @@ public final class PriceLore implements Listener {
         } catch (Throwable ignored) {
             // servidor desligando
         }
+    }
+
+    /**
+     * Método estático pelo nome; se não existir com esse nome, qualquer estático que receba "param" e devolva
+     * "returns" (ou um tipo do Minecraft, quando returns é null). Os nomes internos mudam entre versões.
+     */
+    private static Method staticMethod(Class<?> c, String name, Class<?> param, Class<?> returns) throws NoSuchMethodException {
+        try {
+            Method m = c.getMethod(name, param);
+            if (Modifier.isStatic(m.getModifiers())) return m;
+        } catch (NoSuchMethodException ignored) {
+            // procura pela assinatura
+        }
+        for (Method m : c.getMethods()) {
+            if (!Modifier.isStatic(m.getModifiers()) || m.getParameterCount() != 1 || m.getParameterTypes()[0] != param) continue;
+            Class<?> r = m.getReturnType();
+            boolean ok = returns != null ? returns.isAssignableFrom(r) && r != Object.class
+                    : r.getName().startsWith("net.minecraft") && r.getSimpleName().equals("ItemStack");
+            if (ok) return m;
+        }
+        if (returns == null) throw new NoSuchMethodException(c.getName() + "." + name);
+        return null;
     }
 
     // ---------- canal de rede do jogador ----------
@@ -408,7 +433,23 @@ public final class PriceLore implements Listener {
         }
         if (!changed) return pkt;
         if (s.record) return s.ctor.newInstance(values);
-        for (int i = 0; i < n; i++) if (s.kinds[i] == Kind.ITEM || s.kinds[i] == Kind.LIST) s.fields[i].set(pkt, values[i]);
+        for (int i = 0; i < n; i++) {
+            if (s.kinds[i] == Kind.ITEM) {
+                s.fields[i].set(pkt, values[i]);
+            } else if (s.kinds[i] == Kind.LIST) {
+                Object old = s.fields[i].get(pkt);
+                if (values[i] == old) continue;
+                if (s.fields[i].getType().isAssignableFrom(ArrayList.class)) {
+                    s.fields[i].set(pkt, values[i]);
+                } else if (old instanceof List<?> oldList && values[i] instanceof List<?> newList) {
+                    // tipo de lista especial (versões antigas): a lista é do próprio pacote, troca item por item
+                    @SuppressWarnings("unchecked") List<Object> target = (List<Object>) oldList;
+                    for (int j = 0; j < newList.size() && j < target.size(); j++) {
+                        if (target.get(j) != newList.get(j)) target.set(j, newList.get(j));
+                    }
+                }
+            }
+        }
         return pkt;
     }
 

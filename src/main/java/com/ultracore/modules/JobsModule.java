@@ -187,8 +187,8 @@ public class JobsModule extends Module implements Work.Listener {
                 boolean added = false;
                 if (defJobs != null) {
                     for (String id : defJobs.getKeys(false)) {
-                        if (file.get().contains("empregos." + id)) continue;
-                        file.get().set("empregos." + id, defJobs.getConfigurationSection(id));
+                        if (file.get().contains("empregos." + id) || defJobs.getConfigurationSection(id) == null) continue;
+                        file.get().createSection("empregos." + id, toMap(defJobs.getConfigurationSection(id)));
                         added = true;
                     }
                 }
@@ -235,6 +235,16 @@ public class JobsModule extends Module implements Work.Listener {
                     icon == null ? Material.PAPER : icon, j.getString("descricao", ""), j.getBoolean("ativo", true),
                     j.getDouble("multiplicador", 1.0), actions));
         }
+    }
+
+    /** Seção do YAML como mapas comuns (para copiar de um arquivo para outro). */
+    private static Map<String, Object> toMap(ConfigurationSection sec) {
+        Map<String, Object> out = new LinkedHashMap<>();
+        for (String k : sec.getKeys(false)) {
+            ConfigurationSection child = sec.getConfigurationSection(k);
+            out.put(k, child != null ? toMap(child) : sec.get(k));
+        }
+        return out;
     }
 
     private static int literal(String regex) {
