@@ -43,14 +43,20 @@ public class EconomyModule extends Module {
         });
     }
 
+    /** Símbolo guardado em memória: o format() também é usado fora da thread principal (preço nos itens). */
+    private volatile String symbol;
+
     public String format(double amount) {
-        return getString("symbol") + String.format(BR, "%,.2f", amount);
+        String sym = symbol;
+        if (sym == null) sym = symbol = getString("symbol");
+        return sym + String.format(BR, "%,.2f", amount);
     }
 
     // ---------- Vault (opcional) ----------
 
     @Override
     protected void onEnable() {
+        symbol = getString("symbol");
         if (Bukkit.getPluginManager().getPlugin("Vault") == null) return;
         try {
             VaultHook.register(plugin, this);
@@ -61,6 +67,7 @@ public class EconomyModule extends Module {
 
     @Override
     protected void onDisable() {
+        symbol = null;
         if (Bukkit.getPluginManager().getPlugin("Vault") == null) return;
         try {
             VaultHook.unregister();

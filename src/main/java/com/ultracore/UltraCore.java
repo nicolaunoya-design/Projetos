@@ -2,7 +2,9 @@ package com.ultracore;
 
 import com.ultracore.core.ChatInput;
 import com.ultracore.core.PanelCommand;
+import com.ultracore.core.PlacedBlocks;
 import com.ultracore.core.Teleporter;
+import com.ultracore.core.WorkTracker;
 import com.ultracore.data.PlayerData;
 import com.ultracore.data.PlayerDataManager;
 import com.ultracore.gui.MenuListener;
@@ -27,6 +29,8 @@ public final class UltraCore extends JavaPlugin {
     private ModuleManager moduleManager;
     private Teleporter teleporter;
     private ChatInput chatInput;
+    private PlacedBlocks placedBlocks;
+    private WorkTracker workTracker;
     private Method papiMethod;
 
     public static UltraCore get() {
@@ -42,6 +46,8 @@ public final class UltraCore extends JavaPlugin {
         dataManager = new PlayerDataManager(this);
         teleporter = new Teleporter(this);
         chatInput = new ChatInput(this);
+        placedBlocks = new PlacedBlocks(this);
+        workTracker = new WorkTracker(this);
 
         PluginManager pm = getServer().getPluginManager();
         pm.registerEvents(dataManager, this);
@@ -77,6 +83,7 @@ public final class UltraCore extends JavaPlugin {
         moduleManager.register(new DeathModule(this));
         moduleManager.register(new ClearLagModule(this));
         moduleManager.register(new ShopModule(this));
+        moduleManager.register(new JobsModule(this));
         moduleManager.register(new TradeModule(this));
         moduleManager.register(new RewardsModule(this));
         moduleManager.register(new NickModule(this));
@@ -107,6 +114,7 @@ public final class UltraCore extends JavaPlugin {
     @Override
     public void onDisable() {
         if (moduleManager != null) moduleManager.disableAll();
+        if (placedBlocks != null) placedBlocks.saveAll();
         if (dataManager != null) dataManager.saveAll();
     }
 
@@ -207,6 +215,10 @@ public final class UltraCore extends JavaPlugin {
     public ModuleManager modules() { return moduleManager; }
     public Teleporter teleporter() { return teleporter; }
     public ChatInput chatInput() { return chatInput; }
+    /** Blocos colocados por jogadores (não pagam emprego/missão ao quebrar). */
+    public PlacedBlocks placedBlocks() { return placedBlocks; }
+    /** Trabalhos feitos pelos jogadores (quebrar, matar, pescar...), já conferidos contra abusos. */
+    public WorkTracker work() { return workTracker; }
     public EconomyModule economy() { return moduleManager.get(EconomyModule.class); }
 
     /** Envia um aviso para o Discord e para o bot do WhatsApp (os que estiverem ligados com a categoria ativada). */

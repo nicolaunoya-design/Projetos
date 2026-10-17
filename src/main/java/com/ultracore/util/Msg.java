@@ -1,9 +1,15 @@
 package com.ultracore.util;
 
 import com.ultracore.UltraCore;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextReplacementConfig;
+import net.kyori.adventure.text.format.TextDecoration;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -68,6 +74,41 @@ public final class Msg {
         String colored = color(text);
         Bukkit.getOnlinePlayers().stream().filter(p -> p.hasPermission(permission)).forEach(p -> p.sendMessage(colored));
         Bukkit.getConsoleSender().sendMessage(colored);
+    }
+
+    /** Texto com cores (&a, &#RRGGBB) virando componente do Adventure. */
+    public static Component component(String text) {
+        return LegacyComponentSerializer.legacySection().deserialize(color(text));
+    }
+
+    /** Linha de lore (sem o itálico roxo que o jogo coloca por padrão). */
+    public static Component loreLine(String text) {
+        return component(text).decoration(TextDecoration.ITALIC, false);
+    }
+
+    /** Nome do item na língua de quem vê (o próprio Minecraft traduz). */
+    public static Component itemName(Material m) {
+        return Component.translatable(m.translationKey());
+    }
+
+    /** Troca {item} pelo nome traduzido do item, mantendo a cor do texto em volta. */
+    public static Component withItem(String text, Component item) {
+        return component(text).replaceText(TextReplacementConfig.builder().matchLiteral("{item}").replacement(item).build());
+    }
+
+    /** Como tell(), mas {item} aparece com o nome do item na língua do jogador. */
+    public static void tellItem(CommandSender to, String key, Material item, Object... placeholders) {
+        tellItem(to, key, itemName(item), placeholders);
+    }
+
+    public static void tellItem(CommandSender to, String key, Component item, Object... placeholders) {
+        String text = Lang.get(key, placeholders);
+        if (!text.isEmpty()) to.sendMessage(withItem(prefix() + text, item));
+    }
+
+    /** Mensagem na barra de ação (em cima da barra de itens). */
+    public static void actionBar(Player p, String text) {
+        p.sendActionBar(component(text));
     }
 
     /** Quebra um texto longo em várias linhas de lore. */

@@ -149,11 +149,17 @@ commands:
     aliases: [reportar, denunciar]
   # Loja
   loja:
-    description: Abre a loja do servidor.
-    aliases: [shop, mercado]
+    description: Loja do servidor com todos os itens vanilla (comprar e vender, por seção ou busca).
+    aliases: [shop, lojas, comprar]
   vender:
-    description: Vende o item da mão ou tudo.
+    description: Abre a tela de vender (ou /vender mao, /vender tudo).
     aliases: [sell]
+  preco:
+    description: Mostra quanto o item da mão (ou o item escrito) vale na loja.
+    aliases: [valor, price, precos, worth]
+  empregos:
+    description: Empregos (minerador, lenhador, fazendeiro, caçador, pescador...) para ganhar dinheiro e XP.
+    aliases: [jobs, emprego, trabalho, trabalhos, profissao, profissoes, job]
   # Recompensas
   daily:
     description: Pega a recompensa diária.
@@ -334,6 +340,18 @@ commands:
     aliases: [clearlag, lagg]
 
 permissions:
+  ultracore.loja.vip:
+    description: Ganha o bônus de venda VIP na loja (padrão +10%). Vem no grupo VIP.
+    default: false
+  ultracore.empregos.admin:
+    description: /empregos admin (nível, XP, resetar, recarregar). Só OP por padrão.
+    default: op
+  ultracore.empregos.semlimite:
+    description: Ignora o limite de dinheiro por hora dos empregos. Ninguém tem por padrão.
+    default: false
+  ultracore.empregos.max.4:
+    description: Pode estar em 4 empregos ao mesmo tempo (ultracore.empregos.max.N até 13). Vem no grupo VIP.
+    default: false
   ultracore.tabhide:
     description: /esconder (sair da TAB). Só OP por padrão.
     default: op
@@ -392,6 +410,8 @@ permissions:
       ultracore.luz: true
       ultracore.loja: true
       ultracore.vender: true
+      ultracore.preco: true
+      ultracore.empregos: true
       ultracore.daily: true
       ultracore.tempo: true
       ultracore.report: true
@@ -412,6 +432,8 @@ permissions:
       ultracore.tag.personalizada: true
       ultracore.nick: true
       ultracore.nick.color: true
+      ultracore.loja.vip: true
+      ultracore.empregos.max.4: true
   ultracore.staff:
     description: Ferramentas de moderação (dê via LuckPerms).
     default: op
@@ -468,4 +490,5 @@ permissions:
       ultracore.bypass.dimension: true
       ultracore.banip: true
       ultracore.loja.admin: true
+      ultracore.empregos.admin: true
       ultracore.nick.others: true

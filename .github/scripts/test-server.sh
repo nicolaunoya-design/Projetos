@@ -95,7 +95,15 @@ fi
 # Qualquer stack trace que passe pelo nosso pacote, ou erro citando o plugin
 if grep -nE "at com\.ultracore\.|Error occurred while enabling UltraCore|Could not load 'plugins/UltraCore|Erro ao ativar o módulo|Erro ao desativar o módulo|Erro no comando" server.log; then
   echo "::error::[$VERSION] erros do UltraCore encontrados no log (veja acima)"
+  # as primeiras linhas do erro viram anotação (dá para ler sem baixar o log)
+  grep -nE -B2 -A3 "Erro ao ativar o módulo|Erro no comando|Error occurred while enabling UltraCore" server.log | head -12 | while read -r L; do echo "::error::[$VERSION] ${L:0:300}"; done
+  grep -nE "Exception|Error:|at com\.ultracore\." server.log | grep -v "No key layers" | head -6 | while read -r L; do echo "::error::[$VERSION] ${L:0:300}"; done
   FAIL=1
+fi
+# quantos itens a loja calculou e se o preço embaixo do nome ficou ligado
+grep -m1 "Loja: " server.log | while read -r L; do echo "::notice::[$VERSION] ${L:0:300}"; done
+if grep -q "Preço embaixo do nome dos itens" server.log; then
+  grep -m1 "Preço embaixo do nome dos itens" server.log | while read -r L; do echo "::warning::[$VERSION] ${L:0:300}"; done
 fi
 if [ ! -f plugins/UltraCore/messages.yml ] || ! grep -q "moderation:" plugins/UltraCore/messages.yml; then
   echo "::error::[$VERSION] messages.yml não foi criado"

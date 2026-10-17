@@ -55,10 +55,26 @@ public final class PlayerData {
     private boolean mentionsDisabled;
     /** Tempo de jogo em ticks (atualizado ao entrar/sair; usado no ranking). */
     private long playTicks;
+    /** Empregos (/empregos): id -> progresso. */
+    private final Map<String, JobData> jobs = new LinkedHashMap<>();
+    /** Última vez que entrou/saiu de um emprego (para a espera de troca). */
+    private long jobsChanged;
+    /** Missões do dia (/missoes): o dia (aaaa-mm-dd) e a lista (id, alvo, meta, progresso, prêmio, feita). */
+    private String questDay = "";
+    private final List<Map<String, Object>> quests = new ArrayList<>();
+    private boolean questBonus;
     /** Tags dadas por um admin (além das liberadas por permissão). */
     private final List<String> ownedTags = new ArrayList<>();
     /** Histórico de punições: type, reason, by, time, duration. */
     private final List<Map<String, Object>> history = new ArrayList<>();
+
+    /** Progresso em um emprego. */
+    public static final class JobData {
+        public int level = 1;
+        public double xp;
+        public boolean joined;
+        public double earned;
+    }
 
     public PlayerData(UUID uuid, String name) {
         this.uuid = uuid;
@@ -99,6 +115,25 @@ public final class PlayerData {
         d.mentionsDisabled = c.getBoolean("prefs.mentions-off");
         d.playTicks = c.getLong("stats.play-ticks");
         d.ownedTags.addAll(c.getStringList("tag.owned"));
+        ConfigurationSection js = c.getConfigurationSection("jobs");
+        if (js != null) {
+            for (String id : js.getKeys(false)) {
+                JobData j = new JobData();
+                j.level = Math.max(1, js.getInt(id + ".level", 1));
+                j.xp = Math.max(0, js.getDouble(id + ".xp"));
+                j.joined = js.getBoolean(id + ".joined");
+                j.earned = js.getDouble(id + ".earned");
+                d.jobs.put(id, j);
+            }
+        }
+        d.jobsChanged = c.getLong("jobs-changed");
+        d.questDay = c.getString("quests.day", "");
+        for (Map<?, ?> m : c.getMapList("quests.list")) {
+            Map<String, Object> q = new LinkedHashMap<>();
+            m.forEach((key, val) -> q.put(String.valueOf(key), val));
+            d.quests.add(q);
+        }
+        d.questBonus = c.getBoolean("quests.bonus");
         for (Map<?, ?> m : c.getMapList("history")) {
             Map<String, Object> entry = new LinkedHashMap<>();
             m.forEach((key, val) -> entry.put(String.valueOf(key), val));
@@ -140,6 +175,16 @@ public final class PlayerData {
         c.set("prefs.mentions-off", mentionsDisabled);
         c.set("stats.play-ticks", playTicks);
         c.set("tag.owned", ownedTags);
+        jobs.forEach((id, j) -> {
+            c.set("jobs." + id + ".level", j.level);
+            c.set("jobs." + id + ".xp", Math.round(j.xp * 100.0) / 100.0);
+            c.set("jobs." + id + ".joined", j.joined);
+            c.set("jobs." + id + ".earned", Math.round(j.earned * 100.0) / 100.0);
+        });
+        c.set("jobs-changed", jobsChanged);
+        c.set("quests.day", questDay);
+        c.set("quests.list", quests);
+        c.set("quests.bonus", questBonus);
         c.set("history", history);
         return c;
     }
@@ -210,6 +255,16 @@ public final class PlayerData {
     public void setPlayTicks(long playTicks) { this.playTicks = Math.max(0, playTicks); }
     public void setTag(String tag) { this.tag = tag == null ? "" : tag; }
     public List<String> getOwnedTags() { return ownedTags; }
+    public Map<String, JobData> getJobs() { return jobs; }
+    /** Progresso no emprego (cria vazio se ainda não tiver). */
+    public JobData job(String id) { return jobs.computeIfAbsent(id, k -> new JobData()); }
+    public long getJobsChanged() { return jobsChanged; }
+    public void setJobsChanged(long t) { this.jobsChanged = t; }
+    public String getQuestDay() { return questDay; }
+    public void setQuestDay(String day) { this.questDay = day == null ? "" : day; }
+    public List<Map<String, Object>> getQuests() { return quests; }
+    public boolean isQuestBonus() { return questBonus; }
+    public void setQuestBonus(boolean v) { this.questBonus = v; }
 
     /** Registra uma punição no histórico. duration em ms (-1 = permanente, 0 = não se aplica). */
     public void addHistory(String type, String reason, String by, long duration) {

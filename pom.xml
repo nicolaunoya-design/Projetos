@@ -34,6 +34,13 @@
             <version>${paper.version}</version>
             <scope>provided</scope>
         </dependency>
+        <!-- O Netty já vem dentro do servidor; só é usado para mostrar o preço embaixo do nome dos itens. -->
+        <dependency>
+            <groupId>io.netty</groupId>
+            <artifactId>netty-transport</artifactId>
+            <version>4.1.97.Final</version>
+            <scope>provided</scope>
+        </dependency>
         <!-- Opcional em tempo de execução: só é usado se o Vault estiver instalado no servidor. -->
         <dependency>
             <groupId>com.github.MilkBowl</groupId>

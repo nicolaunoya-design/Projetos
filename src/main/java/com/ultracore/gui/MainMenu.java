@@ -21,7 +21,7 @@ public final class MainMenu extends Menu {
     /** Categorias do painel; módulos que não estão em nenhuma caem em "Outros". */
     enum Category {
         TELEPORT("&b&lTeleporte", Material.ENDER_PEARL, Material.LIGHT_BLUE_STAINED_GLASS_PANE, "spawn", "homes", "warps", "tpa", "back", "rtp"),
-        ECONOMY("&6&lEconomia", Material.GOLD_INGOT, Material.YELLOW_STAINED_GLASS_PANE, "economy", "shop", "trade", "kits", "rewards"),
+        ECONOMY("&6&lEconomia", Material.GOLD_INGOT, Material.YELLOW_STAINED_GLASS_PANE, "economy", "shop", "jobs", "quests", "market", "bounty", "quiz", "trade", "kits", "rewards"),
         CHAT("&e&lChat e Social", Material.OAK_SIGN, Material.ORANGE_STAINED_GLASS_PANE, "chat", "privatemsg", "nick", "tags", "joinquit", "announcer", "menus"),
         VISUAL("&d&lVisual", Material.PAINTING, Material.MAGENTA_STAINED_GLASS_PANE, "scoreboard", "tablist", "motd"),
         STAFF("&c&lStaff e Moderação", Material.DIAMOND_SWORD, Material.RED_STAINED_GLASS_PANE, "moderation", "staff", "afk"),
