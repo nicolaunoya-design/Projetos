@@ -104,6 +104,8 @@ public class ShopModule extends Module {
     private final Map<String, List<String>> searchWords = new LinkedHashMap<>();
     private final Map<Material, double[]> overrides = new EnumMap<>(Material.class);
     private final Set<Material> disabled = EnumSet.noneOf(Material.class);
+    /** Seções apagadas pelo editor: somem da loja e os itens voltam para as regras seguintes ou para "diversos". */
+    private final Set<String> hiddenSections = new LinkedHashSet<>();
     private volatile PriceTable table;
     private volatile Map<Material, Price> prices = Map.of();
     private volatile ShopSections sections;
@@ -283,6 +285,8 @@ public class ShopModule extends Module {
     private void loadOverrides() {
         overrides.clear();
         disabled.clear();
+        hiddenSections.clear();
+        hiddenSections.addAll(file.get().getStringList("secoes-apagadas"));
         ConfigurationSection sec = file.get().getConfigurationSection("precos");
         if (sec != null) {
             for (String k : sec.getKeys(false)) {
@@ -313,6 +317,7 @@ public class ShopModule extends Module {
         List<String> off = new ArrayList<>();
         for (Material m : disabled) off.add(m.name());
         c.set("desativados", off);
+        c.set("secoes-apagadas", new ArrayList<>(hiddenSections));
         c.set("versao", 3);
         saveFile();
     }
@@ -369,7 +374,7 @@ public class ShopModule extends Module {
             map.put(m, new Price(m, buy, sell, o != null));
         }
         prices = Collections.unmodifiableMap(map);
-        sections = ShopSections.build(plugin, map.keySet());
+        sections = ShopSections.build(plugin, map.keySet(), hiddenSections);
     }
 
     /** Preço de um item na loja (null = fora da loja). */
@@ -750,6 +755,53 @@ public class ShopModule extends Module {
                 () -> new MainShopMenu(p, admin)).open(p);
     }
 
+    /** Apaga uma seção da loja (persistente). Os itens dela passam para as regras seguintes ou para "diversos". */
+    private void removeSection(Player p, ShopSections.Section sec) {
+        if (sec.id().equals("diversos")) {
+            msg(p, "shop.section-protected");
+            return;
+        }
+        hiddenSections.add(sec.id());
+        saveOverrides();
+        rebuild();
+        msg(p, "shop.section-removed", "section", sec.title());
+        Bukkit.getScheduler().runTask(plugin, () -> new MainShopMenu(p, true).open(p));
+    }
+
+    private final class HiddenSectionsMenu extends Menu {
+        private final Player viewer;
+
+        HiddenSectionsMenu(Player viewer) {
+            super(27, "&8Seções apagadas");
+            this.viewer = viewer;
+        }
+
+        @Override
+        public void build() {
+            clear();
+            for (int i = 0; i < 27; i++) set(i, ItemBuilder.filler(), null);
+            Map<String, ShopSections.Section> defs = ShopSections.definitions(plugin);
+            int slot = 10;
+            for (String id : hiddenSections) {
+                ShopSections.Section sec = defs.get(id);
+                if (sec == null) continue;
+                set(slot++, new ItemBuilder(sec.icon()).name(sec.title()).lore("&a▸ Clique para restaurar").build(), e -> {
+                    click(viewer);
+                    hiddenSections.remove(id);
+                    saveOverrides();
+                    rebuild();
+                    msg(viewer, "shop.section-restored", "section", sec.title());
+                    openLater(viewer, new MainShopMenu(viewer, true));
+                });
+            }
+            if (hiddenSections.isEmpty()) set(13, new ItemBuilder(Material.PAPER).name("&7Nenhuma seção apagada").build(), null);
+            set(22, new ItemBuilder(Material.SPECTRAL_ARROW).name("&7« Voltar ao editor").build(), e -> {
+                click(viewer);
+                openLater(viewer, new MainShopMenu(viewer, true));
+            });
+        }
+    }
+
     private void openSection(Player p, ShopSections.Section sec, boolean admin, Supplier<Menu> back) {
         String id = sec.id();
         new ListMenu(p, "&8Loja &7» " + sec.title(), () -> {
@@ -866,8 +918,13 @@ public class ShopModule extends Module {
             for (int i = 0; i < list.size() && i < SECTION_SLOTS.length; i++) {
                 ShopSections.Section sec = list.get(i);
                 set(SECTION_SLOTS[i], new ItemBuilder(sec.icon()).name(sec.title())
-                        .lore("&7Itens: &f" + sec.items().size(), "", "&e▸ Clique para abrir").build(), e -> {
+                        .lore("&7Itens: &f" + sec.items().size(), "", "&e▸ Clique para abrir")
+                        .lore(admin ? new String[]{"&c▸ Botão direito: apagar seção"} : new String[0]).build(), e -> {
                     click(viewer);
+                    if (admin && e.isRightClick()) {
+                        removeSection(viewer, sec);
+                        return;
+                    }
                     Bukkit.getScheduler().runTask(plugin, () -> openSection(viewer, sec, admin, () -> new MainShopMenu(viewer, admin)));
                 });
             }
@@ -888,6 +945,11 @@ public class ShopModule extends Module {
                     }, 2L);
                 });
             } else {
+                set(46, new ItemBuilder(Material.BOOK).name("&e&lSeções apagadas").lore("&7Apagadas: &f" + hiddenSections.size(), "",
+                        "&e▸ Clique para restaurar").build(), e -> {
+                    click(viewer);
+                    openLater(viewer, new HiddenSectionsMenu(viewer));
+                });
                 set(48, new ItemBuilder(Material.BARRIER).name("&cItens tirados da loja").lore("&7Ver e colocar de volta.", "",
                         "&7Tirados: &f" + disabled.size()).build(), e -> {
                     click(viewer);
