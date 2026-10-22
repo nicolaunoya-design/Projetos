@@ -1,0 +1,73 @@
+# Seções da loja do UltraCore e quais itens vão em cada uma.
+# "secao <id> <ícone> <título>" define a seção (a ordem aqui é a ordem no menu).
+# "<id>: padrões..." coloca os itens na seção. A PRIMEIRA regra que combinar ganha.
+# "*" é curinga; "#comida" = qualquer item que dá para comer. O que não combinar vai para "diversos".
+
+secao blocos STONE_BRICKS &7&lBlocos
+secao madeiras OAK_LOG &6&lMadeiras
+secao cores RED_WOOL &d&lCores
+secao minerios DIAMOND &b&lMinérios
+secao cobre COPPER_BLOCK &6&lCobre
+secao natureza OAK_SAPLING &2&lNatureza
+secao agricultura WHEAT &e&lAgricultura
+secao comida COOKED_BEEF &c&lComida
+secao mobs BONE &f&lDrops de Mobs
+secao redstone REDSTONE &4&lRedstone
+secao decoracao LANTERN &d&lDecoração
+secao utilidades CRAFTING_TABLE &7&lUtilidades
+secao ferramentas IRON_PICKAXE &9&lFerramentas e Combate
+secao nether NETHERRACK &c&lNether
+secao end END_STONE &5&lThe End
+secao oceano PRISMARINE &3&lOceano
+secao raros NETHER_STAR &e&lRaros
+secao diversos CHEST &f&lDiversos
+
+ferramentas: leather_horse_armor
+raros: music_disc_* disc_fragment_5 *_pottery_sherd *_smithing_template *_banner_pattern *_head *_skull nether_star
+raros: totem_of_undying enchanted_golden_apple echo_shard heart_of_the_sea heavy_core trial_key ominous_trial_key ominous_bottle
+raros: sniffer_egg dragon_breath experience_bottle beacon conduit end_crystal recovery_compass dried_ghast *_horse_armor
+ferramentas: *_sword *_pickaxe *_axe *_shovel *_hoe *_spear *_helmet *_chestplate *_leggings *_boots bow crossbow shield
+ferramentas: fishing_rod carrot_on_a_stick warped_fungus_on_a_stick shears flint_and_steel brush mace wolf_armor arrow spectral_arrow
+minerios: *_ore raw_* *_ingot *_nugget diamond emerald coal charcoal lapis_lazuli redstone quartz amethyst_shard amethyst_block
+minerios: amethyst_cluster *_amethyst_bud netherite_scrap ancient_debris iron_block gold_block diamond_block emerald_block
+minerios: coal_block lapis_block redstone_block netherite_block
+cobre: *copper* *lightning_rod
+natureza: moss_carpet pale_moss_carpet
+cores: *_wool *_carpet *_concrete *_concrete_powder *terracotta* *stained_glass* *_bed *_banner *_candle candle *_dye
+cores: *_shulker_box *_bundle *_harness
+nether: crimson_fungus warped_fungus crimson_roots warped_roots crimson_nylium warped_nylium warped_wart_block nether_wart_block
+nether: weeping_vines twisting_vines
+natureza: *_leaves *_sapling mangrove_propagule mangrove_roots azalea flowering_azalea moss_block pale_moss_block pale_hanging_moss
+natureza: vine glow_lichen hanging_roots spore_blossom big_dripleaf small_dripleaf brown_mushroom red_mushroom *_mushroom_block
+natureza: mushroom_stem dandelion golden_dandelion poppy blue_orchid allium azure_bluet *_tulip oxeye_daisy cornflower
+natureza: lily_of_the_valley wither_rose torchflower pitcher_plant sunflower lilac rose_bush peony pink_petals wildflowers
+natureza: *_eyeblossom cactus_flower short_grass grass tall_grass fern large_fern dead_bush bush firefly_bush short_dry_grass
+natureza: tall_dry_grass leaf_litter cobweb lily_pad creaking_heart
+agricultura: wheat wheat_seeds hay_block carrot potato beetroot beetroot_seeds melon melon_slice melon_seeds pumpkin
+agricultura: pumpkin_seeds carved_pumpkin jack_o_lantern sugar_cane sugar cactus bamboo cocoa_beans sweet_berries glow_berries
+agricultura: glistering_melon_slice torchflower_seeds pitcher_pod honeycomb honey_block honeycomb_block bee_nest beehive composter bone_meal
+madeiras: oak_* spruce_* birch_* jungle_* acacia_* dark_oak_* mangrove_* cherry_* pale_oak_* crimson_* warped_* bamboo_*
+madeiras: *_log *_wood *_planks *_stem *_hyphae stripped_* stick *_shelf
+mobs: rotten_flesh spider_eye fermented_spider_eye
+comida: #comida cake
+nether: netherrack nether_* *nether_brick* soul_* basalt polished_basalt smooth_basalt *blackstone* glowstone glowstone_dust
+nether: magma_block shroomlight crying_obsidian respawn_anchor quartz_* chiseled_quartz_block smooth_quartz* lodestone
+end: end_* purpur_* chorus_* popped_chorus_fruit shulker_shell
+oceano: *prismarine* sea_lantern sea_pickle seagrass kelp dried_kelp_block *coral* sponge wet_sponge nautilus_shell turtle_egg
+oceano: turtle_scute scute
+redstone: redstone_* repeater comparator piston sticky_piston observer hopper dropper dispenser lever *_button *pressure_plate
+redstone: tripwire_hook daylight_detector target note_block jukebox *rail* minecart *_minecart tnt slime_block
+redstone: *sculk_sensor crafter trapped_chest iron_door iron_trapdoor
+utilidades: crafting_table furnace smoker blast_furnace chest barrel ender_chest anvil grindstone stonecutter smithing_table
+utilidades: loom cartography_table fletching_table enchanting_table brewing_stand cauldron bucket *_bucket compass clock
+utilidades: spyglass lead name_tag saddle map book writable_book paper glass_bottle bowl ender_eye fire_charge
+utilidades: firework_rocket bundle shulker_box lectern
+decoracao: *lantern *torch* *campfire flower_pot *item_frame painting armor_stand *chain iron_bars *_bars ladder scaffolding
+decoracao: bookshelf chiseled_bookshelf decorated_pot glass glass_pane tinted_glass *_froglight bell
+mobs: bone bone_block string gunpowder ender_pearl blaze_rod blaze_powder breeze_rod wind_charge ghast_tear slime_ball
+mobs: magma_cream phantom_membrane leather feather rabbit_hide rabbit_foot ink_sac glow_ink_sac armadillo_scute egg
+mobs: blue_egg brown_egg
+blocos: stone* cobble* mossy_* deepslate* *granite* *diorite* *andesite* *tuff* calcite dripstone_block pointed_dripstone
+blocos: *brick* mud* packed_mud *sandstone* sand red_sand gravel dirt coarse_dirt grass_block podzol rooted_dirt mycelium
+blocos: clay ice packed_ice blue_ice snow snow_block snowball obsidian smooth_stone* polished_* chiseled_* cracked_* resin_*
+blocos: sculk* end_stone* flint clay_ball

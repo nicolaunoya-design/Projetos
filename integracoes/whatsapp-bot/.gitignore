@@ -1,0 +1,4 @@
+auth_info/
+minecraft-bridge.config.json
+node_modules/
+package-lock.json

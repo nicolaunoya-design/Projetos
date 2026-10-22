@@ -1,0 +1,522 @@
+name: UltraCore
+version: '${project.version}'
+main: com.ultracore.UltraCore
+api-version: '1.21'
+description: Plugin tudo-em-um com módulos que podem ser ligados/desligados pelo /painel.
+authors: [UltraCore]
+softdepend: [Vault, PlaceholderAPI]
+
+commands:
+  painel:
+    description: Abre o painel de configuração do UltraCore.
+    aliases: [ultracore, uc, config]
+  # Spawn
+  spawn:
+    description: Vai para o spawn.
+  setspawn:
+    description: Define o spawn.
+  # Homes
+  sethome:
+    description: Define uma home.
+    aliases: [definircasa]
+  home:
+    description: Vai para uma home.
+    aliases: [casa]
+  delhome:
+    description: Remove uma home.
+    aliases: [delcasa]
+  homes:
+    description: Lista suas homes.
+    aliases: [casas]
+  # Warps
+  warp:
+    description: Vai para uma warp.
+  warps:
+    description: Menu de warps.
+  setwarp:
+    description: Cria uma warp.
+  delwarp:
+    description: Remove uma warp.
+  # TPA
+  tpa:
+    description: Pede para teleportar até um jogador.
+  tpahere:
+    description: Pede para um jogador vir até você.
+    aliases: [tpaqui]
+  tpaccept:
+    description: Aceita um pedido de teleporte.
+    aliases: [tpaceitar, tpyes]
+  tpdeny:
+    description: Nega um pedido de teleporte.
+    aliases: [tpnegar, tpno]
+  tptoggle:
+    description: Liga/desliga o recebimento de pedidos.
+  back:
+    description: Volta para o local anterior.
+    aliases: [voltar]
+  pvp:
+    description: Mostra se o PvP está ligado; admins ligam/desligam com /pvp ligar|desligar.
+    aliases: [combate]
+  mortes:
+    description: Registro de mortes (onde, quando, causa e itens perdidos, com botão para devolver).
+    aliases: [deaths, registromortes]
+  troca:
+    description: Troca segura de itens e dinheiro com um jogador perto de você.
+    aliases: [trocar, trade]
+  ultimamorte:
+    description: Mostra onde você (ou outro jogador) morreu pela última vez.
+    aliases: [mortecoords, deathcoords, ondemorri, ultmorte]
+  rtp:
+    description: Teleporte aleatório.
+    aliases: [wild, aleatorio]
+  # Economia
+  money:
+    description: Mostra o saldo.
+    aliases: [bal, balance, dinheiro, saldo, coins]
+  pay:
+    description: Paga um jogador.
+    aliases: [pagar]
+  baltop:
+    description: Ranking dos mais ricos.
+    aliases: [moneytop, topmoney, ricos]
+  eco:
+    description: Administra a economia.
+    aliases: [economia]
+  # Kits
+  kit:
+    description: Pega um kit.
+    aliases: [kits]
+  createkit:
+    description: Cria um kit com seu inventário.
+    aliases: [criarkit]
+  delkit:
+    description: Remove um kit.
+  # Chat
+  clearchat:
+    description: Limpa o chat.
+    aliases: [limparchat, cc]
+  broadcast:
+    description: Envia um anúncio.
+    aliases: [bc, anunciar]
+  staffchat:
+    description: Chat da staff.
+    aliases: [sc]
+  msg:
+    description: Mensagem privada.
+    aliases: [tell, w, m, whisper, pm]
+  r:
+    description: Responde a última mensagem privada.
+    aliases: [reply, responder]
+  socialspy:
+    description: Espia mensagens privadas.
+    aliases: [spy]
+  # Moderação
+  ban:
+    description: Bane um jogador.
+    aliases: [banir]
+  tempban:
+    description: Bane temporariamente.
+    aliases: [tempbanir]
+  unban:
+    description: Desbane um jogador.
+    aliases: [desbanir, pardon]
+  kick:
+    description: Expulsa um jogador.
+    aliases: [expulsar]
+  mute:
+    description: Silencia um jogador.
+    aliases: [mutar, tempmute]
+  unmute:
+    description: Remove o silêncio.
+    aliases: [desmutar]
+  warn:
+    description: Dá um aviso a um jogador.
+    aliases: [avisar, advertir]
+  limparavisos:
+    description: Zera os avisos de um jogador.
+    aliases: [clearwarns]
+  historico:
+    description: Mostra o histórico de punições.
+    aliases: [history, hist]
+  banip:
+    description: Bane o IP de um jogador.
+    aliases: [ipban]
+  unbanip:
+    description: Remove um ban de IP.
+    aliases: [desbanirip]
+  report:
+    description: Denuncia um jogador para a staff.
+    aliases: [reportar, denunciar]
+  # Loja
+  loja:
+    description: Loja do servidor com todos os itens vanilla (comprar e vender, por seção ou busca).
+    aliases: [shop, lojas, comprar]
+  vender:
+    description: Abre a tela de vender (ou /vender mao, /vender tudo).
+    aliases: [sell]
+  preco:
+    description: Mostra quanto o item da mão (ou o item escrito) vale na loja.
+    aliases: [valor, price, precos, worth]
+  empregos:
+    description: Empregos (minerador, lenhador, fazendeiro, caçador, pescador...) para ganhar dinheiro e XP.
+    aliases: [jobs, emprego, trabalho, trabalhos, profissao, profissoes, job]
+  missoes:
+    description: Missões diárias que pagam dinheiro (mudam todo dia).
+    aliases: [missao, quests, quest, desafios, diarias]
+  mercado:
+    description: Mercado dos jogadores (vender itens para outros jogadores pelo preço que quiser).
+    aliases: [market, leilao, ah, auction, mercadodosjogadores]
+  procurado:
+    description: Coloca dinheiro na cabeça de um jogador (quem matar leva) ou mostra os procurados.
+    aliases: [procurados, bounty, cabeca, premio, wanted]
+  quiz:
+    description: Mostra a pergunta do quiz do chat (admins podem começar uma agora).
+    aliases: [pergunta, chatgame]
+  # Recompensas
+  daily:
+    description: Pega a recompensa diária.
+    aliases: [diario, recompensa]
+  tempo:
+    description: Mostra o tempo de jogo.
+    aliases: [playtime, tempojogado]
+  # Apelidos
+  nick:
+    description: Define um apelido.
+    aliases: [apelido, nickname]
+  # Menus dos jogadores
+  menu:
+    description: Abre a central do servidor (spawn, homes, warps, loja, kits...).
+    aliases: [servidor, central]
+  top:
+    description: Rankings do servidor (dinheiro, abates, tempo de jogo).
+    aliases: [ranking, rank, tops]
+  preferencias:
+    description: Suas preferências (pedidos de TPA, mensagens privadas, menções).
+    aliases: [prefs, opcoes]
+  msgtoggle:
+    description: Liga/desliga receber mensagens privadas.
+    aliases: [togglemsg, msgoff]
+  # Diversão (só OP)
+  trovao:
+    description: Cai um raio em alguém (ou em você).
+    aliases: [raio, smite, lightning]
+  explodir:
+    description: Explosão em alguém (por padrão não quebra blocos).
+    aliases: [explode, boom]
+  foguete:
+    description: Lança alguém para o alto (sem dano de queda).
+    aliases: [rocket]
+  fogos:
+    description: Solta fogos de artifício em volta de alguém.
+    aliases: [fireworks, firework]
+  queimar:
+    description: Põe fogo em alguém.
+    aliases: [burn]
+  congelar:
+    description: Congela/descongela alguém no lugar.
+    aliases: [freeze]
+  assustar:
+    description: Dá um susto (som e tela do guardião).
+    aliases: [scare]
+  arremessar:
+    description: Arremessa alguém para longe.
+    aliases: [fling, lancar]
+  falsoop:
+    description: Mostra uma mensagem falsa de que a pessoa virou OP.
+    aliases: [fakeop]
+  fazerfalar:
+    description: Faz alguém falar no chat.
+    aliases: [sudo]
+  chuvadeitens:
+    description: Chuva de itens (só enfeite) em volta de alguém.
+    aliases: [itemrain, chuva]
+  girar:
+    description: Faz alguém girar.
+  bigorna:
+    description: Uma bigorna cai na cabeça de alguém (não fica no mapa).
+  chuvadegalinhas:
+    description: Chuva de galinhas em cima de alguém.
+    aliases: [galinhas]
+  bebado:
+    description: Deixa alguém bêbado (tela girando e andando torto).
+    aliases: [bebada]
+  cegar:
+    description: Deixa tudo escuro para alguém por 10 segundos.
+    aliases: [escuridao]
+  levitar:
+    description: Faz alguém flutuar.
+  terremoto:
+    description: Terremoto em volta de alguém.
+  tornado:
+    description: Tornado que gira e levanta alguém.
+  gigante:
+    description: Deixa alguém gigante (de novo = normal).
+  anao:
+    description: Deixa alguém pequeno (de novo = normal).
+    aliases: [pequeno, mini]
+  tamanho:
+    description: Muda o tamanho de alguém (0.1 a 10 ou normal).
+  explosaofalsa:
+    description: Barulho e fumaça de explosão, sem dano.
+    aliases: [boom]
+  amor:
+    description: Corações em volta de alguém.
+    aliases: [coracoes]
+  chuvadetnt:
+    description: TNT caindo do céu em alguém (não quebra o mapa).
+  meteoro:
+    description: Uma bola de fogo cai do céu em alguém (não quebra o mapa).
+  inverter:
+    description: Vira alguém de costas.
+  pipoca:
+    description: Faz alguém pular sem parar.
+  abduzir:
+    description: Um disco voador leva alguém para cima.
+    aliases: [et, ovni]
+  diversao:
+    description: Menu de diversão (escolhe o alvo e a brincadeira).
+    aliases: [zoar, brincadeiras]
+    aliases: [spin]
+  # Entrada silenciosa
+  silentjoin:
+    description: Entra e sai do servidor sem avisar ninguém.
+    aliases: [entradasilenciosa, silencioso, sj]
+  # Tags
+  tag:
+    description: Escolhe a tag que aparece no chat e na TAB.
+    aliases: [tags, prefixo]
+  # Staff
+  fly:
+    description: Liga/desliga o voo.
+    aliases: [voar]
+  heal:
+    description: Cura.
+    aliases: [curar]
+  feed:
+    description: Sacia a fome.
+    aliases: [comer, alimentar]
+  gm:
+    description: Muda o modo de jogo.
+    aliases: [gamemode, modo]
+  god:
+    description: Modo deus.
+    aliases: [deus]
+  vanish:
+    description: Modo fantasma (invisível no mundo, na TAB, no chat e nas mortes).
+    aliases: [v, invisivel, fantasma, ghost]
+  esconder:
+    description: Modo oculto - o personagem continua no mundo, mas some da TAB, do chat (entrada, saída, mortes) e da contagem de online.
+    aliases: [tabhide, hidetab, escondertab]
+  escondernick:
+    description: Esconde (ou mostra) o nome que aparece em cima da sua cabeça.
+    aliases: [hidenick, escondernome, semnome, nomeinvisivel]
+  invsee:
+    description: Vê o inventário de um jogador.
+  ecsee:
+    description: Vê o baú do fim de um jogador.
+  clearinv:
+    description: Limpa o inventário.
+    aliases: [ci, limparinv]
+  speed:
+    description: Muda sua velocidade.
+    aliases: [velocidade]
+  tphere:
+    description: Puxa um jogador até você.
+    aliases: [s, puxar]
+  # Utilidades
+  craft:
+    description: Abre uma mesa de trabalho.
+    aliases: [bancada, workbench, wb]
+  enderchest:
+    description: Abre seu baú do fim.
+    aliases: [ec, echest]
+  hat:
+    description: Coloca o item da mão na cabeça.
+    aliases: [chapeu]
+  ping:
+    description: Mostra o ping.
+  lixo:
+    description: Abre a lixeira.
+    aliases: [lixeira, trash, disposal]
+  regras:
+    description: Mostra as regras.
+    aliases: [rules]
+  luz:
+    description: Liga/desliga a visão noturna (fullbright).
+    aliases: [fullbright, fb, visaonoturna, nightvision, nv]
+  afk:
+    description: Fica AFK.
+    aliases: [ausente]
+  limparitens:
+    description: Remove itens do chão agora.
+    aliases: [clearlag, lagg]
+
+permissions:
+  ultracore.loja.vip:
+    description: Ganha o bônus de venda VIP na loja (padrão +10%). Vem no grupo VIP.
+    default: false
+  ultracore.empregos.admin:
+    description: /empregos admin (nível, XP, resetar, recarregar). Só OP por padrão.
+    default: op
+  ultracore.empregos.semlimite:
+    description: Ignora o limite de dinheiro por hora dos empregos. Ninguém tem por padrão.
+    default: false
+  ultracore.missoes.admin:
+    description: /missoes resetar|trocar (sortear de novo ou trocar a missão de alguém). Só OP por padrão.
+    default: op
+  ultracore.mercado.admin:
+    description: Remove anúncios de outros jogadores no /mercado (Shift+Direito). Só OP por padrão.
+    default: op
+  ultracore.quiz.admin:
+    description: /quiz agora e /quiz parar. Só OP por padrão.
+    default: op
+  ultracore.empregos.max.4:
+    description: Pode estar em 4 empregos ao mesmo tempo (ultracore.empregos.max.N até 13). Vem no grupo VIP.
+    default: false
+  ultracore.tabhide:
+    description: /esconder (sair da TAB). Só OP por padrão.
+    default: op
+  ultracore.tabhide.others:
+    description: /esconder outros jogadores. Só OP por padrão.
+    default: op
+  ultracore.tabhide.see:
+    description: Continua vendo na TAB quem usou /esconder. Ninguém tem por padrão (nem OP); dê pelo LuckPerms.
+    default: false
+  ultracore.tag.personalizada:
+    description: Criar a própria tag no criador de tags (/tag criador). Vem no grupo VIP; OP também tem.
+    default: op
+  ultracore.pvp.admin:
+    description: /pvp ligar|desligar (PvP do servidor todo). Só OP por padrão.
+    default: op
+  ultracore.mortes:
+    description: /mortes e o botão Mortes do /painel (ver e devolver itens de mortes). Só OP por padrão.
+    default: op
+  ultracore.ultimamorte.others:
+    description: /ultimamorte de outros jogadores (mesmo offline). Só OP por padrão.
+    default: op
+  ultracore.luz.others:
+    description: /luz em outros jogadores. Só OP por padrão.
+    default: op
+  ultracore.hidenick:
+    description: /escondernick (some o nome em cima da cabeça). Só OP por padrão.
+    default: op
+  ultracore.hidenick.others:
+    description: /escondernick em outros jogadores. Só OP por padrão.
+    default: op
+  ultracore.diversao:
+    description: Comandos de diversão (/trovao, /explodir, /foguete...). Só OP por padrão.
+    default: op
+  ultracore.player:
+    description: Comandos básicos de jogador.
+    default: true
+    children:
+      ultracore.spawn: true
+      ultracore.home: true
+      ultracore.warp: true
+      ultracore.tpa: true
+      ultracore.back: true
+      ultracore.ultimamorte: true
+      ultracore.troca: true
+      ultracore.pvp: true
+      ultracore.rtp: true
+      ultracore.money: true
+      ultracore.pay: true
+      ultracore.baltop: true
+      ultracore.kit: true
+      ultracore.msg: true
+      ultracore.ping: true
+      ultracore.afk: true
+      ultracore.regras: true
+      ultracore.lixo: true
+      ultracore.luz: true
+      ultracore.loja: true
+      ultracore.vender: true
+      ultracore.preco: true
+      ultracore.empregos: true
+      ultracore.missoes: true
+      ultracore.mercado: true
+      ultracore.procurado: true
+      ultracore.quiz: true
+      ultracore.daily: true
+      ultracore.tempo: true
+      ultracore.report: true
+      ultracore.tag: true
+      ultracore.menu: true
+      ultracore.top: true
+      ultracore.preferencias: true
+  ultracore.vip:
+    description: Vantagens de VIP (dê via LuckPerms).
+    default: false
+    children:
+      ultracore.craft: true
+      ultracore.enderchest: true
+      ultracore.hat: true
+      ultracore.chat.color: true
+      ultracore.fly: true
+      ultracore.tag.vip: true
+      ultracore.tag.personalizada: true
+      ultracore.nick: true
+      ultracore.nick.color: true
+      ultracore.loja.vip: true
+      ultracore.empregos.max.4: true
+  ultracore.staff:
+    description: Ferramentas de moderação (dê via LuckPerms).
+    default: op
+    children:
+      ultracore.player: true
+      ultracore.vip: true
+      ultracore.kick: true
+      ultracore.mute: true
+      ultracore.ban: true
+      ultracore.staffchat: true
+      ultracore.clearchat: true
+      ultracore.socialspy: true
+      ultracore.vanish: true
+      ultracore.vanish.see: true
+      ultracore.invsee: true
+      ultracore.tphere: true
+      ultracore.gamemode: true
+      ultracore.heal: true
+      ultracore.feed: true
+      ultracore.chat.bypass: true
+      ultracore.bypass.delay: true
+      ultracore.afk.bypass: true
+      ultracore.tag.mod: true
+      ultracore.warn: true
+      ultracore.historico: true
+      ultracore.report.see: true
+      ultracore.silentjoin: true
+      ultracore.silentjoin.see: true
+      ultracore.msg.bypass: true
+  ultracore.admin:
+    description: Acesso total, incluindo o /painel.
+    default: op
+    children:
+      ultracore.staff: true
+      ultracore.setspawn: true
+      ultracore.setwarp: true
+      ultracore.eco: true
+      ultracore.createkit: true
+      ultracore.broadcast: true
+      ultracore.clearlag: true
+      ultracore.god: true
+      ultracore.god.others: true
+      ultracore.fly.others: true
+      ultracore.heal.others: true
+      ultracore.feed.others: true
+      ultracore.gamemode.others: true
+      ultracore.clearinv: true
+      ultracore.clearinv.others: true
+      ultracore.speed: true
+      ultracore.homes.unlimited: true
+      ultracore.bypass.cooldown: true
+      ultracore.tag.admin: true
+      ultracore.tags.admin: true
+      ultracore.bypass.dimension: true
+      ultracore.banip: true
+      ultracore.loja.admin: true
+      ultracore.empregos.admin: true
+      ultracore.missoes.admin: true
+      ultracore.mercado.admin: true
+      ultracore.quiz.admin: true
+      ultracore.nick.others: true

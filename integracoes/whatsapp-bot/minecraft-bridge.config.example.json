@@ -1,0 +1,24 @@
+{
+  "http": {
+    "host": "0.0.0.0",
+    "porta": 3000,
+    "caminho": "/ultracore",
+    "token": "troque-esta-senha"
+  },
+  "rcon": {
+    "host": "IP-DO-SERVIDOR-MINECRAFT",
+    "porta": 25575,
+    "senha": "SENHA-DO-RCON"
+  },
+  "grupoAvisos": "",
+  "grupoChat": "",
+  "admins": [
+    "5511999999999"
+  ],
+  "comandosPublicos": [
+    "online",
+    "ajuda"
+  ],
+  "prefixo": "!",
+  "aceitarDeMim": true
+}
