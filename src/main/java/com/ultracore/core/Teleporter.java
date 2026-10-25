@@ -2,6 +2,7 @@ package com.ultracore.core;
 
 import com.ultracore.UltraCore;
 import com.ultracore.util.Msg;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
@@ -76,10 +77,17 @@ public final class Teleporter implements Listener {
     private void doTeleport(Player p, Location dest, Runnable onDone) {
         // montado (cavalo, barco, minecart) o teleporte falha: desce antes
         if (p.isInsideVehicle()) p.leaveVehicle();
-        if (!p.teleport(dest)) return;
-        p.playSound(p.getLocation(), Sound.ENTITY_ENDERMAN_TELEPORT, 0.7f, 1.2f);
-        Msg.tell(p, "teleport.done");
-        if (onDone != null) onDone.run();
+        // o destino carrega em segundo plano: com p.teleport() o servidor inteiro para até o chunk carregar
+        p.teleportAsync(dest).whenComplete((ok, error) -> {
+            Runnable finish = () -> {
+                if (!Boolean.TRUE.equals(ok) || !p.isOnline()) return;
+                p.playSound(p.getLocation(), Sound.ENTITY_ENDERMAN_TELEPORT, 0.7f, 1.2f);
+                Msg.tell(p, "teleport.done");
+                if (onDone != null) onDone.run();
+            };
+            if (Bukkit.isPrimaryThread()) finish.run();
+            else if (plugin.isEnabled()) Bukkit.getScheduler().runTask(plugin, finish);
+        });
     }
 
     public void cancel(Player p) {

@@ -17,6 +17,7 @@ Cada recurso é um **módulo** que pode ser **ligado, desligado e configurado de
   - **Quiz no chat**: de tempos em tempos aparece uma pergunta; quem acertar primeiro ganha.
   - **Dinheiro por tempo online** (sem contar AFK), além da recompensa diária que já existia.
 - `/menu` com os botões novos (Mercado, Empregos, Missões, Procurados) e placeholders `{empregos}` e `{missoes}`.
+- **3.0.2**: corrige o item que parecia **duplicar na tela** ao clicar no inventário (com o preço embaixo do nome ligado, o servidor reenviava o inventário a cada clique). `/home`, `/spawn`, `/warp`, `/tpa`, `/back` e `/rtp` agora **carregam o destino em segundo plano**, sem travar o servidor.
 
 ## ✨ Novidades da 2.6 a 2.10
 

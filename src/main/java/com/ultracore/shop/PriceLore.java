@@ -62,6 +62,7 @@ public final class PriceLore implements Listener {
     private static final Set<String> OUTGOING = Set.of("ClientboundContainerSetContentPacket", "ClientboundContainerSetSlotPacket",
             "ClientboundSetCursorItemPacket", "ClientboundSetPlayerInventoryPacket");
     private static final String CREATIVE = "ServerboundSetCreativeModeSlotPacket";
+    private static final String CLICK = "ServerboundContainerClickPacket";
 
     private final Plugin plugin;
     private final Source source;
@@ -74,6 +75,10 @@ public final class PriceLore implements Listener {
     private Method asCraftMirror;
     private Class<?> nmsItem;
     private List<Field> channelPath;
+    /** Partes do item "lore" e "custom_data" (da 1.21.5 em diante o clique traz um resumo de cada parte). */
+    private Object loreType;
+    private Object customDataType;
+    private Constructor<?> intMap;
     private volatile boolean broken;
     private boolean registered;
 
@@ -96,6 +101,13 @@ public final class PriceLore implements Listener {
             asCraftMirror = staticMethod(craft, "asCraftMirror", nmsItem, ItemStack.class);
             if (asCraftMirror == null) asCraftMirror = staticMethod(craft, "asBukkitCopy", nmsItem, ItemStack.class);
             if (asCraftMirror == null) throw new NoSuchMethodException("CraftItemStack: conversão do item");
+            try {
+                Class<?> dc = Class.forName("net.minecraft.core.component.DataComponents", true, nmsItem.getClassLoader());
+                loreType = dc.getField("LORE").get(null);
+                customDataType = dc.getField("CUSTOM_DATA").get(null);
+            } catch (Throwable ignored) {
+                // só faz falta da 1.21.5 em diante; se faltar lá, o clique desliga o preço (ver stripHash)
+            }
         } catch (Throwable t) {
             plugin.getLogger().warning("Preço embaixo do nome dos itens não é suportado nesta versão do servidor (" + t + "). Use /preco.");
             return false;
@@ -488,24 +500,128 @@ public final class PriceLore implements Listener {
         for (int i = 0; i < n; i++) {
             values[i] = s.get(pkt, i);
             if (s.kinds[i] != Kind.ITEM || values[i] == null) continue;
-            ItemStack mirror = (ItemStack) asCraftMirror.invoke(null, values[i]);
-            if (mirror == null || mirror.getType().isAir() || !mirror.hasItemMeta()) continue;
-            ItemMeta meta = mirror.getItemMeta();
-            List<Component> lore = meta.lore();
-            if (lore == null || lore.isEmpty()) continue;
-            List<Component> kept = new ArrayList<>();
-            for (Component c : lore) if (!MARKER.equals(c.insertion())) kept.add(c);
-            if (kept.size() == lore.size()) continue;
-            ItemStack copy = mirror.clone();
-            meta.lore(kept.isEmpty() ? null : kept);
-            copy.setItemMeta(meta);
-            values[i] = asNmsCopy.invoke(null, copy);
-            changed = true;
+            Object nv = stripItem(values[i]);
+            if (nv != values[i]) {
+                values[i] = nv;
+                changed = true;
+            }
         }
         if (!changed) return pkt;
         if (s.record) return s.ctor.newInstance(values);
         for (int i = 0; i < n; i++) if (s.kinds[i] == Kind.ITEM) s.fields[i].set(pkt, values[i]);
         return pkt;
+    }
+
+    /** O item sem as nossas linhas (o mesmo objeto se não tinha nenhuma). */
+    private Object stripItem(Object nms) throws ReflectiveOperationException {
+        ItemStack mirror = (ItemStack) asCraftMirror.invoke(null, nms);
+        if (mirror == null || mirror.getType().isAir() || !mirror.hasItemMeta()) return nms;
+        ItemMeta meta = mirror.getItemMeta();
+        List<Component> lore = meta.lore();
+        if (lore == null || lore.isEmpty()) return nms;
+        List<Component> kept = new ArrayList<>();
+        for (Component c : lore) if (!MARKER.equals(c.insertion())) kept.add(c);
+        if (kept.size() == lore.size()) return nms;
+        ItemStack copy = mirror.clone();
+        meta.lore(kept.isEmpty() ? null : kept);
+        copy.setItemMeta(meta);
+        return asNmsCopy.invoke(null, copy);
+    }
+
+    /**
+     * Clique no inventário: o cliente conta ao servidor como ficaram os itens na tela DELE, com o preço.
+     * Sem tirar o preço, o servidor acha que a tela do jogador está errada e reenvia os itens a cada clique;
+     * com lag, o item "duplica" na tela. Até 1.21.4 vêm os itens inteiros; da 1.21.5 em diante, um resumo.
+     */
+    private Object stripClick(Object pkt) throws ReflectiveOperationException {
+        Shape s = shape(pkt.getClass());
+        if (s == null) return pkt;
+        int n = s.kinds.length;
+        Object[] values = new Object[n];
+        boolean changed = false;
+        for (int i = 0; i < n; i++) {
+            Object v = s.get(pkt, i);
+            values[i] = clicked(v);
+            if (values[i] != v) changed = true;
+        }
+        if (!changed) return pkt;
+        if (s.record) return s.ctor.newInstance(values);
+        for (int i = 0; i < n; i++) if (values[i] != s.get(pkt, i)) s.fields[i].set(pkt, values[i]);
+        return pkt;
+    }
+
+    /** Uma parte do pacote de clique: item, resumo de item ou o mapa slot -> item. */
+    private Object clicked(Object v) throws ReflectiveOperationException {
+        if (v == null) return null;
+        if (nmsItem.isInstance(v)) return stripItem(v);
+        if (v instanceof Map<?, ?> map) {
+            Map<Object, Object> copy = null;
+            for (Map.Entry<?, ?> e : map.entrySet()) {
+                Object old = e.getValue();
+                Object nv = old instanceof Map ? old : clicked(old);
+                if (nv == old) continue;
+                if (copy == null) copy = intMap(map);
+                copy.put(e.getKey(), nv);
+            }
+            return copy == null ? map : copy;
+        }
+        if (v.getClass().isRecord()) return stripHash(v);
+        return v;
+    }
+
+    /** Cópia do mapa slot -> item no tipo que o pacote usa (o original não deixa mudar). */
+    @SuppressWarnings("unchecked")
+    private Map<Object, Object> intMap(Map<?, ?> src) throws ReflectiveOperationException {
+        if (intMap == null) {
+            intMap = Class.forName("it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap", true, nmsItem.getClassLoader()).getConstructor();
+        }
+        Map<Object, Object> m = (Map<Object, Object>) intMap.newInstance();
+        m.putAll(src);
+        return m;
+    }
+
+    /** 1.21.5+: resumo de um item (tipo, quantidade e as partes). Mexe só nas partes. */
+    private Object stripHash(Object hashed) throws ReflectiveOperationException {
+        if (loreType == null) throw new NoSuchFieldException("DataComponents.LORE");
+        Shape s = shape(hashed.getClass());
+        if (s == null) return hashed;
+        Object[] values = new Object[s.kinds.length];
+        boolean changed = false;
+        for (int i = 0; i < values.length; i++) {
+            values[i] = s.get(hashed, i);
+            if (values[i] == null || !values[i].getClass().isRecord()) continue;
+            Object parts = stripLorePart(values[i]);
+            if (parts != values[i]) {
+                values[i] = parts;
+                changed = true;
+            }
+        }
+        return changed ? s.ctor.newInstance(values) : hashed;
+    }
+
+    /**
+     * Partes do item: tira a "lore" quando ela só pode ser a nossa. O preço só vai em item sem nada além do
+     * tipo, e a marca de aldeão em item que só tem a marca (custom_data); item com outras partes fica igual.
+     */
+    private Object stripLorePart(Object parts) throws ReflectiveOperationException {
+        Shape s = shape(parts.getClass());
+        if (s == null) return parts;
+        Object[] values = new Object[s.kinds.length];
+        int added = -1;
+        boolean removedNone = true;
+        for (int i = 0; i < values.length; i++) {
+            values[i] = s.get(parts, i);
+            if (values[i] instanceof Map<?, ?> m && m.containsKey(loreType)) added = i;
+            else if (values[i] instanceof Set<?> set && !set.isEmpty()) removedNone = false;
+        }
+        if (added < 0 || !removedNone) return parts;
+        Map<?, ?> m = (Map<?, ?>) values[added];
+        boolean ours = m.size() == 1 || (m.size() == 2 && customDataType != null && m.containsKey(customDataType));
+        if (!ours) return parts;
+        Map<Object, Object> copy = new HashMap<>(m);
+        copy.remove(loreType);
+        values[added] = copy;
+        return s.ctor.newInstance(values);
     }
 
     private final class Handler extends ChannelDuplexHandler {
@@ -532,11 +648,20 @@ public final class PriceLore implements Listener {
         @Override
         public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
             Object in = msg;
-            if (!broken && msg != null && msg.getClass().getSimpleName().equals(CREATIVE)) {
+            String name = broken || msg == null ? "" : msg.getClass().getSimpleName();
+            if (name.equals(CREATIVE)) {
                 try {
                     in = stripIn(msg);
                 } catch (Throwable t) {
                     in = msg;
+                }
+            } else if (name.equals(CLICK) && player.getGameMode() != GameMode.CREATIVE) {
+                try {
+                    in = stripClick(msg);
+                } catch (Throwable t) {
+                    // sem conseguir tirar o preço do clique, o inventário fica dessincronizado: melhor desligar
+                    in = msg;
+                    fail("erro ao ler o clique no inventário", t);
                 }
             }
             super.channelRead(ctx, in);

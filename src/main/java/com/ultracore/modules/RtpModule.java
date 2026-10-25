@@ -3,6 +3,7 @@ package com.ultracore.modules;
 import com.ultracore.UltraCore;
 import com.ultracore.module.Module;
 import com.ultracore.util.TimeUtil;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -10,10 +11,12 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.function.Consumer;
 
 public class RtpModule extends Module {
 
@@ -21,6 +24,8 @@ public class RtpModule extends Module {
             Material.MAGMA_BLOCK, Material.FIRE, Material.POWDER_SNOW, Material.SWEET_BERRY_BUSH, Material.CAMPFIRE);
 
     private final Map<UUID, Long> cooldowns = new HashMap<>();
+    /** Quem já está esperando o /rtp achar um lugar (não deixa pedir de novo no meio). */
+    private final Set<UUID> searching = new HashSet<>();
 
     public RtpModule(UltraCore plugin) {
         super(plugin, "rtp", "Teleporte Aleatório", Material.GRASS_BLOCK, true,
@@ -45,33 +50,58 @@ public class RtpModule extends Module {
                 msg(p, "rtp.cooldown", "time", TimeUtil.format(cd - (now - lastUse)));
                 return;
             }
-            Location loc = findSafe(w);
-            if (loc == null) {
-                msg(p, "rtp.not-found");
-                return;
-            }
-            cooldowns.put(p.getUniqueId(), now);
-            msg(p, "rtp.found", "x", loc.getBlockX(), "z", loc.getBlockZ());
-            plugin.teleporter().teleport(p, loc, getInt("delay"));
+            boolean first = searching.add(p.getUniqueId());
+            msg(p, "rtp.searching");
+            if (!first) return; // já está procurando
+            findSafe(w, 0, loc -> {
+                searching.remove(p.getUniqueId());
+                if (!p.isOnline()) return;
+                if (loc == null) {
+                    msg(p, "rtp.not-found");
+                    return;
+                }
+                cooldowns.put(p.getUniqueId(), System.currentTimeMillis());
+                msg(p, "rtp.found", "x", loc.getBlockX(), "z", loc.getBlockZ());
+                plugin.teleporter().teleport(p, loc, getInt("delay"));
+            });
         }).playerOnly();
     }
 
-    private Location findSafe(World w) {
+    /**
+     * Sorteia um lugar e carrega o chunk em segundo plano (getHighestBlockAt num chunk que não existe gera o
+     * terreno na thread principal e trava o servidor). Tenta até 20 lugares, um de cada vez.
+     */
+    private void findSafe(World w, int tries, Consumer<Location> done) {
+        if (tries >= 20 || !isEnabled()) {
+            done.accept(null);
+            return;
+        }
         ThreadLocalRandom r = ThreadLocalRandom.current();
         int max = getInt("radius");
         int min = Math.min(getInt("min-radius"), max - 1);
         Location center = w.getSpawnLocation();
-        for (int i = 0; i < 20; i++) {
-            double angle = r.nextDouble(Math.PI * 2);
-            int dist = r.nextInt(min, max + 1);
-            int x = center.getBlockX() + (int) (Math.cos(angle) * dist);
-            int z = center.getBlockZ() + (int) (Math.sin(angle) * dist);
-            Block b = w.getHighestBlockAt(x, z);
-            if (b.isLiquid() || UNSAFE.contains(b.getType()) || b.getType().isAir()) continue;
-            Location loc = b.getLocation().add(0.5, 1, 0.5);
-            if (!w.getWorldBorder().isInside(loc)) continue;
-            return loc;
+        double angle = r.nextDouble(Math.PI * 2);
+        int dist = r.nextInt(min, max + 1);
+        int x = center.getBlockX() + (int) (Math.cos(angle) * dist);
+        int z = center.getBlockZ() + (int) (Math.sin(angle) * dist);
+        if (!w.getWorldBorder().isInside(new Location(w, x + 0.5, center.getY(), z + 0.5))) {
+            findSafe(w, tries + 1, done);
+            return;
         }
-        return null;
+        w.getChunkAtAsync(x >> 4, z >> 4).whenComplete((chunk, error) -> {
+            if (!plugin.isEnabled()) return; // desligando o servidor
+            Bukkit.getScheduler().runTask(plugin, () -> {
+                if (error != null || chunk == null) {
+                    findSafe(w, tries + 1, done);
+                    return;
+                }
+                Block b = w.getHighestBlockAt(x, z);
+                if (b.isLiquid() || UNSAFE.contains(b.getType()) || b.getType().isAir()) {
+                    findSafe(w, tries + 1, done);
+                    return;
+                }
+                done.accept(b.getLocation().add(0.5, 1, 0.5));
+            });
+        });
     }
 }

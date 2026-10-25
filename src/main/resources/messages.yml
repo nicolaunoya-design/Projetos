@@ -77,6 +77,7 @@ rtp:
   wrong-world: '&cO /rtp só funciona no mundo normal.'
   cooldown: '&cAguarde &f{time} &cpara usar de novo.'
   not-found: '&cNão encontrei um local seguro, tente novamente.'
+  searching: '&7Procurando um local seguro...'
   found: '&7Local encontrado: &f{x}, {z}'
 economy:
   balance: '&fSeu saldo: &a{money}'
