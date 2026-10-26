@@ -4,6 +4,10 @@ Plugin para **Paper 1.21 até 26.x** (e forks como Purpur) que junta num só lug
 
 Cada recurso é um **módulo** que pode ser **ligado, desligado e configurado dentro do jogo** pelo comando `/painel`, sem mexer em arquivos nem reiniciar o servidor. Todas as mensagens podem ser editadas no `messages.yml`.
 
+## ✨ Novidades da 3.1
+
+- **Lojas da Comunidade** (`/lojinha`): cada jogador paga uma taxa (padrão $2.500) e abre a própria loja, com nome, ícone e descrição. Clique num item do seu inventário para colocar à venda, escolha quantos vão em cada compra e o preço: **em dinheiro ou em qualquer item** (diamante, esmeralda, ferro, netherite... ou qualquer outro). Os outros compram pelo menu, mesmo com você offline. Veja [Lojas da Comunidade](#lojas-da-comunidade).
+
 ## ✨ Novidades da 3.0 (economia)
 
 - **Empregos** (estilo Jobs Reborn): `/empregos` com **13 empregos**: Minerador, Lenhador, Fazendeiro, Caçador, Pescador, Construtor, Escavador, Artesão, Ferreiro, Encantador, Alquimista, Explorador e Cozinheiro. Cada um tem níveis (até 100); quanto maior o nível, mais paga. O ganho aparece na barra de ação e o nível numa barra no topo da tela. Tem **proteções contra abuso**: bloco colocado não paga ao quebrar, gerador de pedra não paga, mob de spawner, ovo ou comando não paga (ou paga pouco), farm de mob paga 25%, AFK/criativo não contam, construtor só ganha se o bloco ficar no lugar, e há limite de ganho por hora. Veja [Empregos](#empregos).
@@ -163,6 +167,7 @@ Textos aceitam cores `&a`, `&l`... e hex `&#FF8800`.
 | **Empregos** 🆕 | 13 empregos com níveis, ganhos na barra e anti-abuso | `/empregos`, `/empregos entrar\|sair\|info\|top\|stats` |
 | **Missões Diárias** 🆕 | Missões sorteadas todo dia que pagam dinheiro | `/missoes` |
 | **Mercado** 🆕 | Os jogadores vendem itens uns para os outros | `/mercado`, `/mercado vender <preço>`, `/mercado meus`, `/mercado coletar` |
+| **Lojas da Comunidade** 🆕 | Cada jogador abre a sua loja e vende por dinheiro ou por itens | `/lojinha`, `/lojinha criar`, `/lojinha <jogador>`, `/lojinha cofre`, `/lojinha coletar` |
 | **Procurados** 🆕 | Prêmio pela cabeça de um jogador | `/procurado <jogador> <valor>`, `/procurados` |
 | **Quiz no Chat** 🆕 | Pergunta no chat de tempos em tempos; quem acerta ganha | `/quiz` |
 | **Troca** 🆕 | Troca segura de itens e dinheiro com quem está perto | `/troca <jogador>`, `/troca aceitar`, `/troca recusar` |
@@ -269,6 +274,18 @@ Fechar o menu, sair, morrer, se afastar ou clicar em **Cancelar** devolve tudo p
 - Segure o item e use `/mercado vender <preço>` (aceita `2.5k`, `1m`). O item vai para o `/mercado`, onde qualquer um compra (com confirmação), **mesmo com você offline**: você recebe o dinheiro (menos a taxa de **5%**) e é avisado quando entrar.
 - `/mercado meus` mostra seus anúncios (clique para cancelar). Anúncios vencem em 48 h e voltam para a **caixa de coleta** (`/mercado coletar`), assim como compras feitas com o inventário cheio.
 - No painel: taxa, anúncios por jogador (`ultracore.mercado.limite.<n>` libera mais), duração, preço mínimo/máximo e aviso no chat. Admins removem anúncios com Shift+Direito.
+
+### Lojas da Comunidade
+
+- `/lojinha` mostra as lojas abertas (ordem: mais vendas, mais novas ou nome). `/lojinha <jogador>` abre a loja de alguém direto.
+- **Criar:** `/lojinha criar` (ou o botão "Criar minha loja") cobra a taxa uma vez só e abre o menu de **Gerenciar**. Lá você muda o nome, a descrição (pelo chat, aceita cores) e o ícone (clique no botão e depois num item do inventário), abre/fecha a loja e pode apagar (o estoque e o cofre voltam para você; a taxa não).
+- **Colocar à venda:** com o Gerenciar aberto, clique num item do **seu inventário**: ele vai para o estoque e abre o editor. No editor você escolhe:
+  - quantos itens vão em **cada compra** (1 a 64);
+  - o **preço**: em **dinheiro** (digite no chat, aceita `2.5k`) ou em **item** (atalhos para diamante, esmeralda, ouro, ferro, netherite, lápis-lazúli e cobre, ou clique em qualquer item do inventário) e quantos;
+  - o **estoque**: clique em itens iguais no inventário, "Colocar no estoque" (põe todos) ou tire o que quiser.
+- **Comprar:** clique no item, escolha quantas vezes (+1, +5, +10, máximo) e confirme. Pagamento em dinheiro cai no saldo do dono (menos a taxa de **5%**); pagamento em item vai para o **cofre** da loja (`/lojinha cofre`). O dono é avisado na hora ou quando entrar.
+- O que não couber no inventário (estoque retirado, loja apagada) vai para a **caixa de coleta** (`/lojinha coletar`).
+- No painel (Economia → Lojas da Comunidade): taxa para abrir, taxa por venda, itens por loja (até 28), estoque por item, preço mínimo/máximo e aviso no chat. Admins (`ultracore.lojinha.admin`) apagam lojas com `/lojinha apagar <jogador>` ou pelo botão dentro da loja.
 
 ### Procurados
 
@@ -386,12 +403,12 @@ O passo a passo está no [README da ponte](integracoes/whatsapp-bot/README.md).
 
 | Permissão | Quem tem por padrão | Inclui |
 |---|---|---|
-| `ultracore.player` | todos | spawn, home, warp, tpa, back, rtp, money, pay, baltop, kit, msg, ping, afk, regras, lixo, loja, vender, preco, empregos, missoes, mercado, procurado, quiz, daily, tempo, report, tag, menu, top, preferencias |
+| `ultracore.player` | todos | spawn, home, warp, tpa, back, rtp, money, pay, baltop, kit, msg, ping, afk, regras, lixo, loja, vender, preco, empregos, missoes, mercado, lojinha, procurado, quiz, daily, tempo, report, tag, menu, top, preferencias |
 | `ultracore.vip` | ninguém (dê pelo LuckPerms) | craft, enderchest, hat, cores no chat, fly, nick com cores, tag [VIP], bônus de venda na loja, 4 empregos |
 | `ultracore.staff` | OP | kick, mute, ban, warn, histórico, ver denúncias, staffchat, vanish, invsee, gm, heal, feed, tphere... |
 | `ultracore.admin` | OP | tudo + `/painel`, setspawn, setwarp, eco, createkit, banip, editar a loja, gerenciar tags, god, speed... |
 
-Outras úteis: `ultracore.homes.unlimited`, `ultracore.bypass.delay`, `ultracore.bypass.cooldown`, `ultracore.kit.<nome>`, `ultracore.warp.<nome>`, `ultracore.tag.<id>` (cada tag), `ultracore.tags.admin` (/tag dar, tirar, criar, apagar), `ultracore.nick.others`, `ultracore.report.see`, `ultracore.silentjoin` e `ultracore.silentjoin.see` (staff), `ultracore.msg.bypass` (staff: manda mensagem privada mesmo para quem desligou), `ultracore.loja.vip` (bônus de venda), `ultracore.empregos.max.<n>` (mais empregos), `ultracore.empregos.semlimite` (sem limite por hora), `ultracore.empregos.admin`, `ultracore.missoes.admin`, `ultracore.mercado.admin`, `ultracore.mercado.limite.<n>`, `ultracore.quiz.admin`.
+Outras úteis: `ultracore.homes.unlimited`, `ultracore.bypass.delay`, `ultracore.bypass.cooldown`, `ultracore.kit.<nome>`, `ultracore.warp.<nome>`, `ultracore.tag.<id>` (cada tag), `ultracore.tags.admin` (/tag dar, tirar, criar, apagar), `ultracore.nick.others`, `ultracore.report.see`, `ultracore.silentjoin` e `ultracore.silentjoin.see` (staff), `ultracore.msg.bypass` (staff: manda mensagem privada mesmo para quem desligou), `ultracore.loja.vip` (bônus de venda), `ultracore.empregos.max.<n>` (mais empregos), `ultracore.empregos.semlimite` (sem limite por hora), `ultracore.empregos.admin`, `ultracore.missoes.admin`, `ultracore.mercado.admin`, `ultracore.mercado.limite.<n>`, `ultracore.lojinha.admin`, `ultracore.quiz.admin`.
 
 ## Para desenvolvedores
 

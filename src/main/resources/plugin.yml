@@ -166,6 +166,9 @@ commands:
   mercado:
     description: Mercado dos jogadores (vender itens para outros jogadores pelo preço que quiser).
     aliases: [market, leilao, ah, auction, mercadodosjogadores]
+  lojinha:
+    description: Lojas da comunidade (cada jogador abre a sua e vende por dinheiro ou por itens).
+    aliases: [lojinhas, lojacomunidade, lojascomunidade, comunidade, feira, pshop, playershop, playershops]
   procurado:
     description: Coloca dinheiro na cabeça de um jogador (quem matar leva) ou mostra os procurados.
     aliases: [procurados, bounty, cabeca, premio, wanted]
@@ -367,6 +370,9 @@ permissions:
   ultracore.mercado.admin:
     description: Remove anúncios de outros jogadores no /mercado (Shift+Direito). Só OP por padrão.
     default: op
+  ultracore.lojinha.admin:
+    description: Apaga a loja de outros jogadores (/lojinha apagar <jogador> ou pelo menu da loja). Só OP por padrão.
+    default: op
   ultracore.quiz.admin:
     description: /quiz agora e /quiz parar. Só OP por padrão.
     default: op
@@ -435,6 +441,7 @@ permissions:
       ultracore.empregos: true
       ultracore.missoes: true
       ultracore.mercado: true
+      ultracore.lojinha: true
       ultracore.procurado: true
       ultracore.quiz: true
       ultracore.daily: true
@@ -518,5 +525,6 @@ permissions:
       ultracore.empregos.admin: true
       ultracore.missoes.admin: true
       ultracore.mercado.admin: true
+      ultracore.lojinha.admin: true
       ultracore.quiz.admin: true
       ultracore.nick.others: true

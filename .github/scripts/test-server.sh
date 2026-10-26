@@ -62,6 +62,7 @@ if grep -q "Done (" server.log; then
              "loja recalcular" "preco diamond" "preco cobblestone" "loja zerar-dinamico" "empregos lista" "empregos top" "empregos stats Ninguem" \
              "empregos admin recarregar" "painel desativar jobs" "painel ativar jobs" "missoes" "procurado" "quiz agora" "quiz parar" \
              "painel desativar market" "painel ativar market" "painel desativar quests" "painel ativar quests" "painel desativar bounty" "painel ativar bounty" \
+             "lojinha" "painel desativar playershops" "painel ativar playershops" \
              "painel lista"; do
     echo "$cmd" >&3
     sleep 2

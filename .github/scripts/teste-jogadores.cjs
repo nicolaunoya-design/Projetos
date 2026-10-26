@@ -616,6 +616,88 @@ async function main () {
   }
   if (bots.Robo.currentWindow) bots.Robo.closeWindow(bots.Robo.currentWindow)
 
+  // ---------- lojas da comunidade (/lojinha) ----------
+  await rcon.comando('eco set Alvo 5000')
+  await rcon.comando('eco set Robo 5000')
+  await rcon.comando('clear Alvo')
+  await rcon.comando('clear Robo')
+  await rcon.comando('give Alvo minecraft:cobblestone 10')
+  await espera(800)
+  const naJanela = (w, nome, embaixo) => w ? w.slots.findIndex((it, i) => (embaixo ? i >= w.inventoryStart : i < w.inventoryStart) && it && it.name === nome) : -1
+  const fechar = (bot) => { if (bot.currentWindow) bot.closeWindow(bot.currentWindow) }
+  let wlj = await janela(bots.Alvo, () => bots.Alvo.chat('/lojinha criar'))
+  checar(/Criar minha loja/.test(tituloDe(wlj)), '/lojinha criar mostra a taxa e pede confirmação')
+  wlj = wlj ? await janela(bots.Alvo, () => clicar(bots.Alvo, 11)) : null
+  checar(/Gerenciar/.test(tituloDe(wlj)), 'criar a loja abre o menu de gerenciar')
+  checar(Math.abs(await saldo('Alvo') - 2500) < 2, 'criar a loja cobra a taxa de $2.500')
+  const pedraInv = naJanela(wlj, 'cobblestone', true)
+  let wof = pedraInv >= 0 ? await janela(bots.Alvo, () => clicar(bots.Alvo, pedraInv)) : null
+  checar(/Editar item/.test(tituloDe(wof)), 'clicar num item do inventário põe à venda e abre o editor')
+  await espera(800)
+  checar(conta(bots.Alvo, 'cobblestone') === 0, 'o item sai do inventário e vai para o estoque da loja')
+  desde = marca('Alvo')
+  if (wof) await clicar(bots.Alvo, 31) // preço em dinheiro (pelo chat)
+  await espera(1500)
+  wof = await janela(bots.Alvo, () => bots.Alvo.chat('50'))
+  checar(await esperarMsg('Alvo', /Preço salvo/, desde) && /Editar item/.test(tituloDe(wof)), 'o dono define o preço digitando no chat')
+  fechar(bots.Alvo)
+
+  let wvis = await janela(bots.Robo, () => bots.Robo.chat('/lojinha Alvo'))
+  let oferta = naJanela(wvis, 'cobblestone', false)
+  checar(/Loja do Alvo/.test(tituloDe(wvis)) && oferta >= 0, '/lojinha <jogador> abre a loja com o item à venda')
+  let wcomp = oferta >= 0 ? await janela(bots.Robo, () => clicar(bots.Robo, oferta)) : null
+  checar(/Comprar/.test(tituloDe(wcomp)), 'clicar no item abre a tela de compra')
+  if (wcomp) {
+    const saldoRobo = await saldo('Robo')
+    const saldoDono = await saldo('Alvo')
+    await clicar(bots.Robo, 23) // +1: duas compras
+    await espera(600)
+    desde = marca('Alvo')
+    await clicar(bots.Robo, 49)
+    checar(await esperarMsg('Alvo', /comprou .*na sua loja/, desde), 'o dono é avisado da venda')
+    await espera(1000)
+    checar(conta(bots.Robo, 'cobblestone') === 2, 'o comprador recebe os itens (2 compras)')
+    checar(Math.abs(saldoRobo - await saldo('Robo') - 100) < 2, 'o comprador paga $50 por compra')
+    checar(Math.abs(await saldo('Alvo') - saldoDono - 95) < 2, 'o dono recebe o dinheiro menos a taxa de 5%')
+  }
+  fechar(bots.Robo)
+
+  // pagamento em item: 2 diamantes por compra
+  let wger = await janela(bots.Alvo, () => bots.Alvo.chat('/lojinha minha'))
+  const ofertaDono = naJanela(wger, 'cobblestone', false)
+  let wed = ofertaDono >= 0 ? await janela(bots.Alvo, () => clicar(bots.Alvo, ofertaDono)) : null
+  checar(/Editar item/.test(tituloDe(wed)), 'clicar na oferta no gerenciar abre o editor')
+  if (wed) {
+    await clicar(bots.Alvo, 24) // cobrar em item (começa no diamante)
+    await espera(700)
+    await clicar(bots.Alvo, 33) // +1 item de pagamento
+    await espera(700)
+  }
+  fechar(bots.Alvo)
+  await rcon.comando('give Robo minecraft:diamond 3')
+  await espera(800)
+  wvis = await janela(bots.Robo, () => bots.Robo.chat('/lojinha Alvo'))
+  oferta = naJanela(wvis, 'cobblestone', false)
+  wcomp = oferta >= 0 ? await janela(bots.Robo, () => clicar(bots.Robo, oferta)) : null
+  if (wcomp) {
+    desde = marca('Alvo')
+    await clicar(bots.Robo, 49)
+    checar(await esperarMsg('Alvo', /pagou/, desde), 'compra paga com item avisa o dono')
+    await espera(1000)
+  }
+  checar(conta(bots.Robo, 'diamond') === 1 && conta(bots.Robo, 'cobblestone') === 3, 'o comprador paga 2 diamantes e recebe o item')
+  fechar(bots.Robo)
+  const wcofre = await janela(bots.Alvo, () => bots.Alvo.chat('/lojinha cofre'))
+  const diaCofre = naJanela(wcofre, 'diamond', false)
+  checar(/Cofre/.test(tituloDe(wcofre)) && diaCofre >= 0, 'o pagamento em item fica no cofre da loja')
+  if (diaCofre >= 0) await clicar(bots.Alvo, diaCofre)
+  await espera(1000)
+  checar(conta(bots.Alvo, 'diamond') === 2, 'o dono pega os diamantes do cofre')
+  fechar(bots.Alvo)
+  const wlista = await janela(bots.Robo, () => bots.Robo.chat('/lojinha'))
+  checar(/Lojas da Comunidade/.test(tituloDe(wlista)) && temItem(wlista, 'Loja do Alvo'), '/lojinha lista as lojas abertas')
+  fechar(bots.Robo)
+
   // ---------- procurados ----------
   desde = marca('Alvo')
   checar(await comando('Robo', '/procurado Alvo 100', /Você colocou/), '/procurado coloca dinheiro na cabeça de alguém')
@@ -628,7 +710,7 @@ async function main () {
 
   // ---------- botões novos no /menu ----------
   const wmenu = await janela(bots.Alvo, () => bots.Alvo.chat('/menu'))
-  checar(['Mercado', 'Empregos', 'Missões', 'Procurados'].every((t) => temItem(wmenu, t)), '/menu tem os botões novos (mercado, empregos, missões, procurados)')
+  checar(['Mercado', 'Lojas da Comunidade', 'Empregos', 'Missões', 'Procurados', 'Rankings'].every((t) => temItem(wmenu, t)), '/menu tem os botões novos (mercado, lojas da comunidade, empregos, missões, procurados)')
   if (bots.Alvo.currentWindow) bots.Alvo.closeWindow(bots.Alvo.currentWindow)
 
   // ---------- quiz do chat ----------

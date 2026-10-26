@@ -124,6 +124,7 @@ public class MenusModule extends Module {
             List<Button> economy = new ArrayList<>();
             if (can(viewer, "loja")) economy.add(button(Material.EMERALD, "&a&lLoja", "loja", "&7Compre e venda todos os itens.", "&8Vender rápido: /vender"));
             if (can(viewer, "mercado")) economy.add(button(Material.CHEST_MINECART, "&e&lMercado", "mercado", "&7Compre e venda itens", "&7com outros jogadores."));
+            if (can(viewer, "lojinha")) economy.add(button(Material.BELL, "&6&lLojas da Comunidade", "lojinha", "&7As lojas dos jogadores:", "&7pague com dinheiro ou itens."));
             if (can(viewer, "empregos")) {
                 JobsModule jobs = plugin.modules().get(JobsModule.class);
                 List<String> lore = new ArrayList<>(List.of("&7Ganhe dinheiro trabalhando:", "&7minerando, plantando, caçando..."));
@@ -147,10 +148,10 @@ public class MenusModule extends Module {
                         "&7Dias seguidos: &f" + d.getDailyStreak(),
                         wait == 0 ? "&a✔ Disponível agora!" : "&7Próxima em &f" + TimeUtil.format(wait)));
             }
-            if (can(viewer, "top")) economy.add(button(Material.GOLD_BLOCK, "&6&lRankings", "top", "&7Os mais ricos, quem mais", "&7abateu e quem mais jogou."));
             row(2, economy);
 
             List<Button> me = new ArrayList<>();
+            if (can(viewer, "top")) me.add(button(Material.GOLD_BLOCK, "&6&lRankings", "top", "&7Os mais ricos, quem mais", "&7abateu e quem mais jogou."));
             if (can(viewer, "tag")) me.add(button(Material.NAME_TAG, "&e&lTags", "tag", "&7Escolha a tag que aparece", "&7no chat e na TAB."));
             if (can(viewer, "preferencias")) me.add(button(Material.COMPARATOR, "&f&lPreferências", "preferencias", "&7Pedidos de TPA, mensagens", "&7privadas e menções."));
             if (can(viewer, "procurado")) me.add(button(Material.WITHER_SKELETON_SKULL, "&c&lProcurados", "procurado", "&7Quem tem prêmio pela cabeça.", "&7Mate e leve o dinheiro!"));
