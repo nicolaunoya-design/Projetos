@@ -633,8 +633,12 @@ async function main () {
   const pedraInv = naJanela(wlj, 'cobblestone', true)
   let wof = pedraInv >= 0 ? await janela(bots.Alvo, () => clicar(bots.Alvo, pedraInv)) : null
   checar(/Editar item/.test(tituloDe(wof)), 'clicar num item do inventário põe à venda e abre o editor')
-  await espera(800)
-  checar(conta(bots.Alvo, 'cobblestone') === 0, 'o item sai do inventário e vai para o estoque da loja')
+  const noServidor = async (quem, item) => {
+    const r = semCor(await rcon.comando(`execute if items entity ${quem} container.* minecraft:${item}`))
+    const m = /count: (\d+)/.exec(r)
+    return m ? Number(m[1]) : 0
+  }
+  checar(await aguardar(() => conta(bots.Alvo, 'cobblestone') === 0, 5000) && await noServidor('Alvo', 'cobblestone') === 0, 'o item sai do inventário e vai para o estoque da loja')
   desde = marca('Alvo')
   if (wof) await clicar(bots.Alvo, 31) // preço em dinheiro (pelo chat)
   await espera(1500)
@@ -685,7 +689,11 @@ async function main () {
     checar(await esperarMsg('Alvo', /pagou/, desde), 'compra paga com item avisa o dono')
     await espera(1000)
   }
-  checar(conta(bots.Robo, 'diamond') === 1 && conta(bots.Robo, 'cobblestone') === 3, 'o comprador paga 2 diamantes e recebe o item')
+  const diaServ = await noServidor('Robo', 'diamond')
+  const pedraServ = await noServidor('Robo', 'cobblestone')
+  checar(diaServ === 1 && pedraServ === 3, `no servidor o comprador pagou 2 diamantes e recebeu o item (diamantes: ${diaServ}, pedregulho: ${pedraServ})`)
+  checar(await aguardar(() => conta(bots.Robo, 'diamond') === 1 && conta(bots.Robo, 'cobblestone') === 3, 5000),
+    `o inventário do comprador mostra isso (diamantes: ${conta(bots.Robo, 'diamond')}, pedregulho: ${conta(bots.Robo, 'cobblestone')})`)
   fechar(bots.Robo)
   const wcofre = await janela(bots.Alvo, () => bots.Alvo.chat('/lojinha cofre'))
   const diaCofre = naJanela(wcofre, 'diamond', false)

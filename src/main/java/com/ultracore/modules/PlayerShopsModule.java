@@ -400,9 +400,19 @@ public class PlayerShopsModule extends Module {
             if (it == null || !it.isSimilar(one)) continue;
             int take = Math.min(n, it.getAmount());
             n -= take;
-            if (take == it.getAmount()) inv.setItem(i, null);
-            else it.setAmount(it.getAmount() - take);
+            inv.setItem(i, minus(it, take));
         }
+    }
+
+    /**
+     * O pacote com "take" itens a menos (null se acabou). Sempre devolve uma cópia para pôr de volta com
+     * setItem: mudar a quantidade do item que o getItem devolve nem sempre muda o inventário de verdade.
+     */
+    private static ItemStack minus(ItemStack it, int take) {
+        if (take >= it.getAmount()) return null;
+        ItemStack rest = it.clone();
+        rest.setAmount(it.getAmount() - take);
+        return rest;
     }
 
     /** "n" itens iguais a "one" em pacotes do tamanho certo. */
@@ -589,8 +599,7 @@ public class PlayerShopsModule extends Module {
             msg(p, "pshop.stock-full", "max", getInt("max-stock"));
             return o;
         }
-        if (take == it.getAmount()) inv.setItem(slot, null);
-        else it.setAmount(it.getAmount() - take);
+        inv.setItem(slot, minus(it, take));
         o.stock += take;
         save();
         Msg.tellItem(p, "pshop.stocked", counted(take, o.item), "stock", o.stock);
