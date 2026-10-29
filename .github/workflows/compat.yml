@@ -1,0 +1,195 @@
+name: Testes e Release
+
+# Compila o plugin, liga servidores Paper reais (1.21.x até 26.x, com e sem Vault), testa com
+# jogadores-robô e, se TUDO passar, publica a Release da versão do pom.xml.
+on:
+  push:
+  workflow_dispatch:
+
+# Um push novo cancela os testes do push anterior (economiza máquinas do GitHub).
+concurrency:
+  group: testes-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    outputs:
+      groups: ${{ steps.find.outputs.groups }}
+      bridge: ${{ steps.find.outputs.bridge }}
+      latest_api: ${{ steps.api.outputs.latest }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+      - name: Compilar
+        run: mvn -B package
+      - name: Texturas das cabeças existem na Mojang
+        run: bash .github/scripts/test-cabecas.sh
+      - uses: actions/upload-artifact@v4
+        with:
+          name: plugin-jar
+          path: target/UltraCore-*.jar
+      - name: Descobrir versões do Paper
+        id: find
+        run: |
+          UA="UltraCore-CI (github.com/nicolaunoya-design/Projetos)"
+          curl -fsSL --retry 3 -A "$UA" https://fill.papermc.io/v3/projects/paper > project.json
+          LIST=$(jq -c '.versions | (if type=="object" then [.[][]] else . end)
+                 | map(select(test("^1\\.21(\\.[0-9]+)?$") or test("^[2-9][0-9]\\.[0-9]+(\\.[0-9]+)?$")))
+                 | unique | sort_by(split(".") | map(tonumber))' project.json)
+          echo "Versões testadas: $LIST"
+          # grupos de até 5 versões (sem misturar 1.21.x, que usa Java 21, com 26.x, que usa Java 25)
+          GRUPOS=$(echo "$LIST" | jq -c 'def chunks(n): [range(0; length; n) as $i | .[$i:$i+n]];
+                   (map(select(startswith("1."))) | chunks(5)) + (map(select(startswith("1.") | not)) | chunks(5))')
+          echo "Grupos: $GRUPOS"
+          echo "groups=$GRUPOS" >> "$GITHUB_OUTPUT"
+          BRIDGE=$(echo "$LIST" | jq -c '[ (map(select(startswith("1.21"))) | last), last ] | unique')
+          echo "bridge=$BRIDGE" >> "$GITHUB_OUTPUT"
+      - name: Descobrir a paper-api mais nova
+        id: api
+        run: |
+          curl -fsSL --retry 3 https://repo.papermc.io/repository/maven-public/io/papermc/paper/paper-api/maven-metadata.xml > meta.xml
+          LATEST=$(grep -oP '(?<=<latest>)[^<]+' meta.xml)
+          echo "paper-api mais nova: $LATEST"
+          echo "latest=$LATEST" >> "$GITHUB_OUTPUT"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Ponte do WhatsApp (simulada)
+        run: node integracoes/whatsapp-bot/teste/teste-local.cjs
+
+  compile-latest-api:
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '25'
+          cache: maven
+      - name: Compilar contra a paper-api ${{ needs.build.outputs.latest_api }}
+        run: mvn -B compile -Dpaper.version=${{ needs.build.outputs.latest_api }}
+
+  server-test:
+    needs: build
+    name: Paper ${{ join(matrix.group, ', ') }} (Vault=${{ matrix.vault }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      matrix:
+        group: ${{ fromJson(needs.build.outputs.groups) }}
+        vault: [false, true]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: plugin-jar
+          path: jar
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: ${{ startsWith(matrix.group[0], '1.') && '21' || '25' }}
+      - name: Testar cada versão do grupo
+        run: |
+          FAIL=0
+          for V in $(echo '${{ toJson(matrix.group) }}' | jq -r '.[]'); do
+            echo "::group::Paper $V (Vault=${{ matrix.vault }})"
+            bash .github/scripts/test-server.sh "$V" "$(ls jar/UltraCore-*.jar)" "${{ matrix.vault && 'vault' || '' }}" || { FAIL=1; echo "::error::Paper $V falhou"; }
+            echo "::endgroup::"
+          done
+          exit $FAIL
+
+  player-test:
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: plugin-jar
+          path: jar
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Jogadores-robô (menus, cooldowns, diversão secreta, vanish) - Paper 1.21.4
+        run: bash .github/scripts/test-player.sh "1.21.4" "$(ls jar/UltraCore-*.jar)"
+      - name: Chat, conquistas e mortes no feed do WhatsApp - Paper 1.21.4
+        run: bash .github/scripts/test-feed.sh "1.21.4" "$(ls jar/UltraCore-*.jar)"
+
+  bridge-server:
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        mc: ${{ fromJson(needs.build.outputs.bridge) }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: plugin-jar
+          path: jar
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: ${{ startsWith(matrix.mc, '1.') && '21' || '25' }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Ponte WhatsApp + servidor Paper ${{ matrix.mc }}
+        run: bash .github/scripts/test-bridge.sh "${{ matrix.mc }}" "$(ls jar/UltraCore-*.jar)"
+
+  # Só publica a Release quando todos os testes passaram.
+  release:
+    needs: [build, compile-latest-api, server-test, player-test, bridge-server]
+    if: github.event_name == 'push' && !startsWith(github.ref, 'refs/tags/')
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: plugin-jar
+          path: jar
+      - name: Publicar release (se a versão do pom.xml for nova)
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          VERSION=$(basename "$(ls jar/UltraCore-*.jar | head -1)" .jar | sed 's/^UltraCore-//')
+          TAG="v$VERSION"
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            echo "Release $TAG já existe, nada a fazer."
+            exit 0
+          fi
+          cat > notes.md <<NOTES
+          Plugin tudo-em-um para **Paper 1.21 até 26.x** (Java 21 no 1.21.x, Java 25 no 26.x). Não precisa de nenhum outro plugin.
+
+          ✅ Esta versão passou em todos os testes automáticos: servidores Paper reais de todas as versões (com e sem Vault) e jogadores-robô usando os menus.
+
+          ### Como instalar
+          1. Baixe o arquivo **UltraCore-$VERSION.jar** abaixo (em *Assets*).
+          2. Coloque na pasta \`plugins/\` do servidor e **reinicie** (não use /reload).
+          3. Entre como OP e digite **/painel**. Jogadores usam **/menu**.
+
+          Veja o README para a lista de módulos, comandos e permissões.
+          NOTES
+          gh release create "$TAG" jar/UltraCore-*.jar \
+            --target "$GITHUB_SHA" \
+            --title "UltraCore $TAG" \
+            --notes-file notes.md
