@@ -7,6 +7,7 @@
  */
 'use strict'
 const path = require('node:path')
+const fs = require('node:fs')
 const { Rcon } = require(path.join(__dirname, '../../integracoes/whatsapp-bot/minecraft-bridge.cjs'))
 const mineflayer = require('mineflayer')
 
@@ -715,6 +716,24 @@ async function main () {
   await rcon.comando('damage Alvo 1000 minecraft:player_attack by Robo')
   checar(await esperarMsg('Robo', /ganhou o prêmio/, desde), 'quem mata o procurado leva o prêmio')
   await espera(2500)
+
+  // ---------- cabeças (jogador e animais) ----------
+  const cabecaNoChao = async () => /Test passed/.test(semCor(await rcon.comando('execute if entity @e[type=minecraft:item,nbt={Item:{id:"minecraft:player_head"}}]')))
+  // o Alvo morreu para o Robo logo acima (procurados): a cabeça dele dropou (no chão ou já no inventário de quem matou)
+  checar(await aguardar(async () => conta(bots.Robo, 'player_head') > 0 || await cabecaNoChao(), 6000), 'quem morre para outro jogador dropa a cabeça')
+  await rcon.comando('kill @e[type=minecraft:item]')
+  await rcon.comando('clear Robo')
+  await rcon.comando('gamemode survival Robo')
+  await rcon.comando('execute at Robo run summon minecraft:cow ~1 ~ ~')
+  await espera(800)
+  await rcon.comando('execute at Robo run damage @e[type=minecraft:cow,limit=1,sort=nearest] 1000 minecraft:player_attack by Robo')
+  await espera(500)
+  await rcon.comando('tp @e[type=minecraft:item] Robo')
+  checar(await aguardar(() => conta(bots.Robo, 'player_head') >= 1, 8000), 'vaca morta por jogador dropa a cabeça (chance 100% no teste)')
+  const vacaHash = (/^cow\s+([0-9a-f]+)/m.exec(fs.readFileSync(path.join(__dirname, '../../src/main/resources/cabecas.txt'), 'utf8')) || [])[1]
+  const invNbt = semCor(await rcon.comando('data get entity Robo Inventory'))
+  const texturas = [...invNbt.matchAll(/value:\s*"([A-Za-z0-9+/=]+)"/g)].map((m) => Buffer.from(m[1], 'base64').toString('utf8'))
+  checar(!!vacaHash && texturas.some((t) => t.includes('textures.minecraft.net/texture/' + vacaHash)), `a cabeça da vaca tem a textura da vaca [${texturas.map((t) => t.slice(0, 120)).join(' | ')}]`)
 
   // ---------- botões novos no /menu ----------
   const wmenu = await janela(bots.Alvo, () => bots.Alvo.chat('/menu'))

@@ -25,7 +25,7 @@ public final class MainMenu extends Menu {
         CHAT("&e&lChat e Social", Material.OAK_SIGN, Material.ORANGE_STAINED_GLASS_PANE, "chat", "privatemsg", "nick", "tags", "joinquit", "announcer", "menus"),
         VISUAL("&d&lVisual", Material.PAINTING, Material.MAGENTA_STAINED_GLASS_PANE, "scoreboard", "tablist", "motd"),
         STAFF("&c&lStaff e Moderação", Material.DIAMOND_SWORD, Material.RED_STAINED_GLASS_PANE, "moderation", "staff", "afk"),
-        WORLD("&a&lMundo", Material.GRASS_BLOCK, Material.LIME_STAINED_GLASS_PANE, "world", "pvp", "sleep", "harvest", "death", "clearlag"),
+        WORLD("&a&lMundo", Material.GRASS_BLOCK, Material.LIME_STAINED_GLASS_PANE, "world", "pvp", "sleep", "harvest", "death", "heads", "clearlag"),
         FUN("&5&lDiversão", Material.FIREWORK_ROCKET, Material.PURPLE_STAINED_GLASS_PANE, "fun"),
         INTEGRATIONS("&9&lIntegrações", Material.LIGHTNING_ROD, Material.BLUE_STAINED_GLASS_PANE, "discord", "webhook"),
         OTHER("&7&lOutros", Material.CHEST, Material.GRAY_STAINED_GLASS_PANE);

@@ -28,6 +28,8 @@ jobs:
           cache: maven
       - name: Compilar
         run: mvn -B package
+      - name: Texturas das cabeças existem na Mojang
+        run: bash .github/scripts/test-cabecas.sh
       - uses: actions/upload-artifact@v4
         with:
           name: plugin-jar

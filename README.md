@@ -4,6 +4,10 @@ Plugin para **Paper 1.21 até 26.x** (e forks como Purpur) que junta num só lug
 
 Cada recurso é um **módulo** que pode ser **ligado, desligado e configurado dentro do jogo** pelo comando `/painel`, sem mexer em arquivos nem reiniciar o servidor. Todas as mensagens podem ser editadas no `messages.yml`.
 
+## ✨ Novidades da 3.2
+
+- **Cabeças** (módulo `heads`): quem morre para outro jogador **dropa a própria cabeça** (padrão 100%), e **animais e monstros** mortos por um jogador podem dropar a deles, **cada grupo com a sua chance** (padrão 5%; o Saque da arma soma +1% por nível). Tem cabeça de vaca, porco, ovelha, galinha, lula, aldeão, golem de ferro, lobo, cavalo, coelho, morcego, abelha, gato, raposa, papagaio, tartaruga, panda, golfinho, cabra, allay, aranha, blaze, ghast, slime, enderman, bruxa, phantom e mais; zumbi, esqueleto, creeper, esqueleto Wither, piglin e dragão usam a cabeça do próprio jogo. Mobs de gerador (spawner) ou de ovo não dropam. Veja [Cabeças](#cabeças).
+
 ## ✨ Novidades da 3.1
 
 - **Lojas da Comunidade** (`/lojinha`): cada jogador paga uma taxa (padrão $2.500) e abre a própria loja, com nome, ícone e descrição. Clique num item do seu inventário para colocar à venda, escolha quantos vão em cada compra e o preço: **em dinheiro ou em qualquer item** (diamante, esmeralda, ferro, netherite... ou qualquer outro). Os outros compram pelo menu, mesmo com você offline. Veja [Lojas da Comunidade](#lojas-da-comunidade).
@@ -286,6 +290,12 @@ Fechar o menu, sair, morrer, se afastar ou clicar em **Cancelar** devolve tudo p
 - **Comprar:** clique no item, escolha quantas vezes (+1, +5, +10, máximo) e confirme. Pagamento em dinheiro cai no saldo do dono (menos a taxa de **5%**); pagamento em item vai para o **cofre** da loja (`/lojinha cofre`). O dono é avisado na hora ou quando entrar.
 - O que não couber no inventário (estoque retirado, loja apagada) vai para a **caixa de coleta** (`/lojinha coletar`).
 - No painel (Economia → Lojas da Comunidade): taxa para abrir, taxa por venda, itens por loja (até 28), estoque por item, preço mínimo/máximo e aviso no chat. Admins (`ultracore.lojinha.admin`) apagam lojas com `/lojinha apagar <jogador>` ou pelo botão dentro da loja.
+
+### Cabeças
+
+- **Jogador:** morreu para outro jogador, a cabeça dele cai no chão (com o nome de quem matou). No painel (Mundo → Cabeças): liga/desliga, chance (padrão 100%) e "também em mortes sem jogador" (queda, lava, monstro...). Com este módulo ligado, o drop de cabeça do módulo Mortes fica desativado para não dropar em dobro.
+- **Animais e monstros:** só quando um **jogador** mata. Chance de animal e chance de monstro separadas (padrão 5% cada, 0 = nunca) e "Bônus de Saque" (% somados por nível). Para testar: ponha a chance em 100 no painel, mate uma vaca e volte para 5.
+- **Texturas:** a lista fica em `cabecas.txt` dentro do plugin (conferida na Mojang a cada versão). Para acrescentar um mob, crie `plugins/UltraCore/cabecas.txt` com linhas `mob textura` (o mob como no jogo, ex: `llama`; a textura pode ser o código, o endereço completo ou o "Value" do minecraft-heads.com) e use `/painel reload`.
 
 ### Procurados
 

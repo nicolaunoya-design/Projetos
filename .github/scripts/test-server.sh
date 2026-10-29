@@ -61,7 +61,7 @@ if grep -q "Done (" server.log; then
              "msgtoggle" "menu" "painel nether desativar" "painel nether ativar" "trovao" "trovao Ninguem" "explodir todos" "foguete todos" "painel desativar fun" "painel ativar fun" \
              "loja recalcular" "preco diamond" "preco cobblestone" "loja zerar-dinamico" "empregos lista" "empregos top" "empregos stats Ninguem" \
              "empregos admin recarregar" "painel desativar jobs" "painel ativar jobs" "missoes" "procurado" "quiz agora" "quiz parar" \
-             "painel desativar market" "painel ativar market" "painel desativar quests" "painel ativar quests" "painel desativar bounty" "painel ativar bounty" \
+             "painel desativar market" "painel ativar market" "painel desativar quests" "painel ativar quests" "painel desativar bounty" "painel ativar bounty" "painel desativar heads" "painel ativar heads" \
              "lojinha" "painel desativar playershops" "painel ativar playershops" \
              "painel lista"; do
     echo "$cmd" >&3

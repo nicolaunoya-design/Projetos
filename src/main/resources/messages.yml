@@ -313,6 +313,12 @@ pshop:
   offline-sales: '&a💰 Enquanto você estava fora, sua loja vendeu &f{count} &avezes e você ganhou &f{money}&a.'
   vault-waiting: '&bTem pagamento em item esperando no &f/lojinha cofre&b.'
   pending-waiting: '&eVocê tem &f{count} &eitens esperando na &f/lojinha coletar&e.'
+heads:
+  player-name: '&eCabeça de &f{player}'
+  player-lore: '&7Morto por &f{killer}'
+  mob-name: '&eCabeça de &f{item}'
+  player-dropped: '&e☠ A cabeça de &f{player} &edropou!'
+  mob-dropped: '&e✦ A cabeça de &f{item} &edropou!'
 bounty:
   menu-title: '&8Procurados'
   list-header: '&c&lProcurados:'

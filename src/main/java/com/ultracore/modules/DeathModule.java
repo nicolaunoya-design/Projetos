@@ -66,7 +66,7 @@ public class DeathModule extends Module {
 
         bool("show-coords", true, Material.COMPASS, "Mostrar coordenadas", "Envia ao jogador o local exato onde ele morreu.");
         integer("head-drop-chance", 0, 0, 100, 5, Material.PLAYER_HEAD, "Chance de dropar cabeça (%)",
-                "Chance de a vítima dropar a própria cabeça ao ser morta por outro jogador (0 = nunca).");
+                "Chance de a vítima dropar a própria cabeça ao ser morta por outro jogador (0 = nunca). Com o módulo Cabeças ligado, é ele que cuida disso.");
         bool("log-deaths", true, Material.WRITABLE_BOOK, "Registro de mortes",
                 "Guarda cada morte (quem, onde, quando, causa) para ver no /painel → Mortes ou /mortes.");
         bool("log-items", true, Material.CHEST, "Guardar itens perdidos",
@@ -162,7 +162,9 @@ public class DeathModule extends Module {
         }
         Player killer = p.getKiller();
         int chance = getInt("head-drop-chance");
-        if (killer != null && killer != p && chance > 0 && ThreadLocalRandom.current().nextInt(100) < chance) {
+        HeadsModule heads = plugin.modules().get(HeadsModule.class);
+        boolean headsDoIt = heads != null && heads.isEnabled() && heads.getBool("player-heads");
+        if (!headsDoIt && killer != null && killer != p && chance > 0 && ThreadLocalRandom.current().nextInt(100) < chance) {
             ItemStack head = new ItemStack(Material.PLAYER_HEAD);
             SkullMeta meta = (SkullMeta) head.getItemMeta();
             if (meta != null) {
