@@ -731,9 +731,15 @@ async function main () {
   await rcon.comando('tp @e[type=minecraft:item] Robo')
   checar(await aguardar(() => conta(bots.Robo, 'player_head') >= 1, 8000), 'vaca morta por jogador dropa a cabeça (chance 100% no teste)')
   const vacaHash = (/^cow\s+([0-9a-f]+)/m.exec(fs.readFileSync(path.join(__dirname, '../../src/main/resources/cabecas.txt'), 'utf8')) || [])[1]
+  // a textura vai dentro do item em base64: procura em tudo que o servidor e o robô enxergam, sem depender do formato
+  const seguro = (v) => { try { return JSON.stringify(v) } catch { return '' } }
   const invNbt = semCor(await rcon.comando('data get entity Robo Inventory'))
-  const texturas = [...invNbt.matchAll(/value:\s*"([A-Za-z0-9+/=]+)"/g)].map((m) => Buffer.from(m[1], 'base64').toString('utf8'))
-  checar(!!vacaHash && texturas.some((t) => t.includes('textures.minecraft.net/texture/' + vacaHash)), `a cabeça da vaca tem a textura da vaca [${texturas.map((t) => t.slice(0, 120)).join(' | ')}]`)
+  const cabecaRobo = bots.Robo.inventory.items().find((i) => i.name === 'player_head')
+  const fontes = [invNbt, seguro(cabecaRobo && cabecaRobo.components), seguro(cabecaRobo && cabecaRobo.nbt)].join(' ')
+  const texturas = (fontes.match(/[A-Za-z0-9+/]{60,}={0,2}/g) || []).map((b) => { try { return Buffer.from(b, 'base64').toString('utf8') } catch { return '' } })
+  const temTextura = !!vacaHash && texturas.some((t) => t.includes('textures.minecraft.net/texture/' + vacaHash))
+  const trecho = invNbt.includes('profile') ? invNbt.slice(invNbt.indexOf('profile'), invNbt.indexOf('profile') + 260) : invNbt.slice(0, 200)
+  checar(temTextura, `a cabeça da vaca tem a textura da vaca (esperado ${vacaHash}; achei ${texturas.length} textura(s); inventário: ${trecho})`)
 
   // ---------- botões novos no /menu ----------
   const wmenu = await janela(bots.Alvo, () => bots.Alvo.chat('/menu'))
