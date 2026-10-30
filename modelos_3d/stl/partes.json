@@ -1,0 +1,136 @@
+[
+  {
+    "modelo": "espermatozoide",
+    "dimensoes_mm": [
+      90.0,
+      37.0,
+      9.4
+    ],
+    "partes": [
+      {
+        "arquivo": "espermatozoide/01_base.stl",
+        "parte": "base",
+        "cor": "#e9edf2",
+        "volume_cm3": 7.66
+      },
+      {
+        "arquivo": "espermatozoide/02_textos.stl",
+        "parte": "textos",
+        "cor": "#22314f",
+        "volume_cm3": 0.22
+      },
+      {
+        "arquivo": "espermatozoide/03_membrana.stl",
+        "parte": "membrana",
+        "cor": "#a9d3f0",
+        "volume_cm3": 0.82
+      },
+      {
+        "arquivo": "espermatozoide/04_acrossomo.stl",
+        "parte": "acrossomo",
+        "cor": "#3f74c9",
+        "volume_cm3": 0.07
+      },
+      {
+        "arquivo": "espermatozoide/05_nucleo.stl",
+        "parte": "nucleo",
+        "cor": "#7b3fa0",
+        "volume_cm3": 0.31
+      },
+      {
+        "arquivo": "espermatozoide/06_mitocondrias.stl",
+        "parte": "mitocondrias",
+        "cor": "#e8702a",
+        "volume_cm3": 0.05
+      },
+      {
+        "arquivo": "espermatozoide/07_axonema.stl",
+        "parte": "axonema",
+        "cor": "#f3f1ea",
+        "volume_cm3": 0.04
+      },
+      {
+        "arquivo": "espermatozoide/08_cauda.stl",
+        "parte": "cauda",
+        "cor": "#4a7fd4",
+        "volume_cm3": 0.27
+      }
+    ]
+  },
+  {
+    "modelo": "ovulo",
+    "dimensoes_mm": [
+      79.3,
+      79.3,
+      22.9
+    ],
+    "partes": [
+      {
+        "arquivo": "ovulo/01_coroa_radiada.stl",
+        "parte": "coroa_radiada",
+        "cor": "#c98ccf",
+        "volume_cm3": 24.78
+      },
+      {
+        "arquivo": "ovulo/02_nucleos_coroa.stl",
+        "parte": "nucleos_coroa",
+        "cor": "#5e2a74",
+        "volume_cm3": 0.71
+      },
+      {
+        "arquivo": "ovulo/03_zona_pelucida.stl",
+        "parte": "zona_pelucida",
+        "cor": "#f2913f",
+        "volume_cm3": 13.67
+      },
+      {
+        "arquivo": "ovulo/04_citoplasma.stl",
+        "parte": "citoplasma",
+        "cor": "#f6b4a6",
+        "volume_cm3": 31.75
+      },
+      {
+        "arquivo": "ovulo/05_nucleo.stl",
+        "parte": "nucleo",
+        "cor": "#8a63d2",
+        "volume_cm3": 3.16
+      },
+      {
+        "arquivo": "ovulo/06_nucleolo.stl",
+        "parte": "nucleolo",
+        "cor": "#3a2470",
+        "volume_cm3": 0.11
+      },
+      {
+        "arquivo": "ovulo/07_mitocondrias.stl",
+        "parte": "mitocondrias",
+        "cor": "#e8702a",
+        "volume_cm3": 0.69
+      },
+      {
+        "arquivo": "ovulo/08_mitocondrias_cristas.stl",
+        "parte": "mitocondrias_cristas",
+        "cor": "#f7c24a",
+        "volume_cm3": 0.02
+      },
+      {
+        "arquivo": "ovulo/09_golgi.stl",
+        "parte": "golgi",
+        "cor": "#3f6fd6",
+        "volume_cm3": 0.13
+      },
+      {
+        "arquivo": "ovulo/10_granulos.stl",
+        "parte": "granulos",
+        "cor": "#b3263a",
+        "volume_cm3": 0.13
+      },
+      {
+        "arquivo": "ovulo/11_vesiculas.stl",
+        "parte": "vesiculas",
+        "cor": "#f6eeea",
+        "volume_cm3": 0.06
+      }
+    ]
+  }
+]
