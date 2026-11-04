@@ -236,6 +236,42 @@ public final class UltraCore extends JavaPlugin {
     }
 
     public PlayerDataManager data() { return dataManager; }
+
+    /** Jogadores com salvamento marcado para o fim deste tick (ver commit). */
+    private final java.util.Set<java.util.UUID> pendingCommits = java.util.concurrent.ConcurrentHashMap.newKeySet();
+
+    /**
+     * Salva o inventário do jogador (arquivo do Minecraft) junto com os dados do UltraCore (saldo, kits...), no fim
+     * deste tick. Use depois de trocar itens por dinheiro ou guardar itens no plugin (loja, mercado, lojinha, troca):
+     * o Minecraft só salva o inventário a cada 5 minutos, e se o servidor cair no meio o item voltaria para o
+     * inventário E ficaria no anúncio/estoque (ou o dinheiro voltaria E o item ficaria) — duplicação.
+     */
+    public void commit(Player... players) {
+        for (Player p : players) {
+            if (p == null) continue;
+            if (!isEnabled()) {
+                if (Bukkit.isPrimaryThread()) saveNow(p); // desligando: o servidor salva os jogadores logo depois
+                continue;
+            }
+            if (pendingCommits.add(p.getUniqueId())) {
+                getServer().getScheduler().runTask(this, () -> {
+                    pendingCommits.remove(p.getUniqueId());
+                    saveNow(p);
+                });
+            }
+        }
+    }
+
+    private void saveNow(Player p) {
+        if (!p.isOnline()) return; // saiu: o servidor e o PlayerDataManager já salvaram na saída
+        try {
+            p.saveData();
+        } catch (Throwable t) {
+            getLogger().warning("Não consegui salvar o inventário de " + p.getName() + ": " + t);
+        }
+        PlayerData d = dataManager.getCached(p.getUniqueId());
+        if (d != null) dataManager.save(d);
+    }
     public ModuleManager modules() { return moduleManager; }
     public Teleporter teleporter() { return teleporter; }
     public ChatInput chatInput() { return chatInput; }

@@ -96,6 +96,7 @@ shop:
   admin-profit-warning: '&c&lCuidado: &co preço de venda está maior que o de compra. Jogadores podem comprar e vender sem parar para ganhar dinheiro infinito.'
   title: '&8Loja do Servidor'
   economy-off: '&cA loja precisa do módulo Economia ligado.'
+  creative: '&cSaia do modo criativo para vender, anunciar ou negociar itens.'
   empty: '&cA loja está vazia. Admins: /loja editar ou /loja automatico segurando um item.'
   not-for-sale: '&cEste item não está à venda.'
   not-buyable: '&cA loja não compra este item.'

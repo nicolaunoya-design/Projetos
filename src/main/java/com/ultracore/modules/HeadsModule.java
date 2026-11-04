@@ -46,24 +46,19 @@ import java.util.regex.Pattern;
  * Cabeças que dropam:
  * - do jogador que morre (por padrão, só quando outro jogador mata), com chance configurável;
  * - de animais e monstros mortos por um jogador, cada grupo com a sua chance (o Saque do jogador aumenta).
- * Zumbi, esqueleto, creeper, esqueleto Wither, piglin e dragão usam a cabeça do próprio jogo; os outros usam
- * uma textura da lista cabecas.txt (dentro do plugin; dá para acrescentar mais em plugins/UltraCore/cabecas.txt).
+ * Só o dragão usa a cabeça do próprio jogo; os outros usam uma textura da lista cabecas.txt (dentro do plugin; dá para
+ * acrescentar mais em plugins/UltraCore/cabecas.txt). Zumbi, esqueleto, creeper, esqueleto Wither e piglin têm cabeça
+ * no jogo, mas a /loja compra essas: com elas, matar monstro viraria dinheiro. A de textura (cabeça de jogador) a loja
+ * não compra.
  * Mobs que vieram de gerador (spawner) ou de ovo não dropam, para não virar fazenda de cabeça.
  */
 public class HeadsModule extends Module {
 
-    /** Mobs que têm cabeça no próprio jogo. */
-    private static final Map<String, Material> VANILLA = new HashMap<>();
-
-    static {
-        for (String z : List.of("zombie", "husk", "drowned", "zombie_villager")) VANILLA.put(z, Material.ZOMBIE_HEAD);
-        for (String s : List.of("skeleton", "stray", "bogged")) VANILLA.put(s, Material.SKELETON_SKULL);
-        VANILLA.put("wither_skeleton", Material.WITHER_SKELETON_SKULL);
-        VANILLA.put("creeper", Material.CREEPER_HEAD);
-        VANILLA.put("piglin", Material.PIGLIN_HEAD);
-        VANILLA.put("piglin_brute", Material.PIGLIN_HEAD);
-        VANILLA.put("ender_dragon", Material.DRAGON_HEAD);
-    }
+    /**
+     * Mobs que usam a cabeça do próprio jogo. Só o dragão: as de zumbi, esqueleto, creeper, esqueleto Wither e piglin
+     * a /loja compra, então eles usam a cabeça com textura (cabecas.txt), que não vende.
+     */
+    private static final Map<String, Material> VANILLA = Map.of("ender_dragon", Material.DRAGON_HEAD);
 
     /** Os que contam como "monstro" na chance; o resto (vaca, porco, aldeão...) conta como animal. */
     private static final Set<String> MONSTERS = Set.of("zombie", "husk", "drowned", "zombie_villager", "skeleton", "stray", "bogged",

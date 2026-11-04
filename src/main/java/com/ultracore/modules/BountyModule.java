@@ -158,6 +158,7 @@ public class BountyModule extends Module {
         b.amount = Math.round((b.amount + amount) * 100.0) / 100.0;
         b.contributors++;
         save();
+        plugin.commit(p); // o prêmio já está salvo: o saldo de quem pagou também
         msg(p, "bounty.placed", "player", b.name, "money", money(amount), "total", money(b.amount));
         if (getBool("broadcast")) Msg.broadcast(Msg.prefix() + Lang.get("bounty.broadcast", "by", p.getName(), "player", b.name, "money", money(amount), "total", money(b.amount)));
         Player t = Bukkit.getPlayer(target);
@@ -176,6 +177,7 @@ public class BountyModule extends Module {
         double prize = Math.max(0, b.amount - tax);
         EconomyModule eco = eco();
         if (eco != null && eco.isEnabled()) eco.deposit(killer, prize);
+        plugin.commit(killer);
         msg(killer, "bounty.claimed", "player", victim.getName(), "money", money(prize));
         if (getBool("broadcast")) Msg.broadcast(Msg.prefix() + Lang.get("bounty.claimed-broadcast", "killer", killer.getName(), "player", victim.getName(), "money", money(prize)));
     }

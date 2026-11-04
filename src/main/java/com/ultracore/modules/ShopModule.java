@@ -14,6 +14,7 @@ import com.ultracore.util.Lang;
 import com.ultracore.util.Msg;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -502,17 +503,26 @@ public class ShopModule extends Module {
         return n;
     }
 
+    /** No criativo não vende (os itens do criativo são infinitos: viraria dinheiro infinito). */
+    private boolean creativeBlocked(Player p) {
+        if (p.getGameMode() != GameMode.CREATIVE) return false;
+        msg(p, "shop.creative");
+        return true;
+    }
+
     private void sellAmount(Player p, Material m, int amount) {
         if (!cfgAllowSell) {
             msg(p, "shop.sell-disabled");
             return;
         }
+        if (creativeBlocked(p)) return;
         Map<Material, Integer> counts = takeFromInventory(p, m, amount);
         if (counts.isEmpty()) {
             Msg.tellItem(p, "shop.nothing-to-sell", m);
             return;
         }
         double got = payout(p, counts);
+        plugin.commit(p);
         Msg.tellItem(p, "shop.sold", m, "amount", total(counts), "money", money(got));
         p.playSound(p.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 0.6f, 1.4f);
     }
@@ -562,6 +572,7 @@ public class ShopModule extends Module {
             }
             left -= n;
         }
+        plugin.commit(p);
         Msg.tellItem(p, "shop.bought", pr.material(), "amount", amount, "money", money(cost));
         p.playSound(p.getLocation(), Sound.ENTITY_ITEM_PICKUP, 0.6f, 1.2f);
     }
@@ -817,6 +828,7 @@ public class ShopModule extends Module {
             msg(p, "shop.sell-disabled");
             return;
         }
+        if (creativeBlocked(p)) return;
         String sub = a.length > 0 ? normalize(a[0]) : "";
         switch (sub) {
             case "", "menu", "gui" -> openSellBox(p);
@@ -832,6 +844,7 @@ public class ShopModule extends Module {
                 Material m = hand.getType();
                 p.getInventory().setItemInMainHand(null);
                 double got = payout(p, counts);
+                plugin.commit(p);
                 Msg.tellItem(p, "shop.sold", m, "amount", counts.get(m), "money", money(got));
                 p.playSound(p.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 0.6f, 1.4f);
             }
@@ -842,6 +855,7 @@ public class ShopModule extends Module {
                     return;
                 }
                 double got = payout(p, counts);
+                plugin.commit(p);
                 msg(p, "shop.sell-all", "amount", total(counts), "money", money(got));
                 p.playSound(p.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 0.5f, 1.6f);
             }
@@ -1247,6 +1261,7 @@ public class ShopModule extends Module {
             msg(p, "shop.sell-disabled");
             return;
         }
+        if (creativeBlocked(p)) return;
         p.openInventory(new SellBox().getInventory());
         msg(p, "shop.sell-box-help");
     }
@@ -1294,7 +1309,8 @@ public class ShopModule extends Module {
         box.getInventory().clear();
         Map<Material, Integer> counts = new EnumMap<>(Material.class);
         List<ItemStack> back = new ArrayList<>();
-        boolean canPay = eco() != null && eco().isEnabled() && cfgAllowSell;
+        // no criativo devolve tudo (trocou de modo com a caixa aberta)
+        boolean canPay = eco() != null && eco().isEnabled() && cfgAllowSell && p.getGameMode() != GameMode.CREATIVE;
         for (ItemStack it : contents) {
             if (it == null || it.getType().isAir()) continue;
             if (canPay && cantSell(it) == null) counts.merge(it.getType(), it.getAmount(), Integer::sum);
@@ -1307,6 +1323,7 @@ public class ShopModule extends Module {
             }
         }
         if (!counts.isEmpty()) {
+            plugin.commit(p);
             msg(p, "shop.sell-box-done", "amount", total(counts), "money", money(got));
             p.playSound(p.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 0.5f, 1.6f);
         }

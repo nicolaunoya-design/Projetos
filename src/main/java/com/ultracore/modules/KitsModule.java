@@ -134,7 +134,8 @@ public class KitsModule extends Module {
         }
         give(p, kit);
         d.getKitUses().put(kit, System.currentTimeMillis());
-        plugin.data().save(d); // salva na hora: se o servidor cair, o kit não pode ser pego de novo
+        // salva o uso do kit e o inventário juntos: se o servidor cair, não dá para pegar de novo nem perde os itens
+        plugin.commit(p);
         msg(p, "kits.received", "kit", kit);
     }
 

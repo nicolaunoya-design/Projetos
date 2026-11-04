@@ -707,6 +707,28 @@ async function main () {
   checar(/Lojas da Comunidade/.test(tituloDe(wlista)) && temItem(wlista, 'Loja do Alvo'), '/lojinha lista as lojas abertas')
   fechar(bots.Robo)
 
+  // dupe antigo: o admin apaga a loja com o editor do dono aberto; o estoque volta UMA vez só
+  const estoqueAntes = 7 // 10 colocados - 2 - 1 vendidos
+  wger = await janela(bots.Alvo, () => bots.Alvo.chat('/lojinha minha'))
+  const ofertaAberta = naJanela(wger, 'cobblestone', false)
+  wed = ofertaAberta >= 0 ? await janela(bots.Alvo, () => clicar(bots.Alvo, ofertaAberta)) : null
+  checar(/Editar item/.test(tituloDe(wed)), 'o dono abre o editor do item antes de a loja ser apagada')
+  checar(await comando('Robo', '/lojinha apagar Alvo', /apagada/), 'admin apaga a loja de outro jogador')
+  await espera(800)
+  checar(await noServidor('Alvo', 'cobblestone') === estoqueAntes, `o estoque volta para o dono ao apagar a loja (${estoqueAntes})`)
+  if (wed && bots.Alvo.currentWindow) await clicar(bots.Alvo, 48) // "tirar do estoque" no editor que ficou aberto
+  await espera(1000)
+  const pedraDepois = await noServidor('Alvo', 'cobblestone')
+  checar(pedraDepois === estoqueAntes, `tirar do estoque depois de a loja ser apagada não duplica (tem ${pedraDepois}, devia ter ${estoqueAntes})`)
+  fechar(bots.Alvo)
+
+  // no criativo não dá para vender (itens do criativo são infinitos)
+  await rcon.comando('gamemode creative Alvo')
+  await espera(500)
+  checar(await comando('Alvo', '/vender tudo', /criativo/), 'no criativo não dá para vender na loja')
+  await rcon.comando('gamemode survival Alvo')
+  await espera(500)
+
   // ---------- procurados ----------
   desde = marca('Alvo')
   checar(await comando('Robo', '/procurado Alvo 100', /Você colocou/), '/procurado coloca dinheiro na cabeça de alguém')
@@ -740,6 +762,20 @@ async function main () {
   const temTextura = !!vacaHash && texturas.some((t) => t.includes('textures.minecraft.net/texture/' + vacaHash))
   const trecho = invNbt.includes('profile') ? invNbt.slice(invNbt.indexOf('profile'), invNbt.indexOf('profile') + 260) : invNbt.slice(0, 200)
   checar(temTextura, `a cabeça da vaca tem a textura da vaca (esperado ${vacaHash}; achei ${texturas.length} textura(s); inventário: ${trecho})`)
+
+  // cabeça de monstro: o zumbi dá cabeça com textura (que a /loja não compra), não a cabeça de zumbi do jogo (que ela compra)
+  await rcon.comando('kill @e[type=minecraft:item]')
+  await rcon.comando('clear Robo')
+  await rcon.comando('execute at Robo run summon minecraft:zombie ~1 ~ ~ {NoAI:1b}')
+  await espera(800)
+  await rcon.comando('execute at Robo run damage @e[type=minecraft:zombie,limit=1,sort=nearest] 1000 minecraft:player_attack by Robo')
+  await espera(500)
+  await rcon.comando('tp @e[type=minecraft:item] Robo')
+  checar(await aguardar(() => conta(bots.Robo, 'player_head') >= 1, 8000) && conta(bots.Robo, 'zombie_head') === 0,
+    `zumbi dropa cabeça com textura, não a do jogo (player_head: ${conta(bots.Robo, 'player_head')}, zombie_head: ${conta(bots.Robo, 'zombie_head')})`)
+  const cabecaZumbi = bots.Robo.inventory.items().find((i) => i.name === 'player_head')
+  if (cabecaZumbi) { try { await bots.Robo.equip(cabecaZumbi, 'hand') } catch (e) { console.log('  equipar:', e.message) } }
+  checar(await comando('Robo', '/vender mao', /não compra o item da sua mão/) && conta(bots.Robo, 'player_head') >= 1, 'a loja não compra a cabeça do zumbi')
 
   // ---------- botões novos no /menu ----------
   const wmenu = await janela(bots.Alvo, () => bots.Alvo.chat('/menu'))

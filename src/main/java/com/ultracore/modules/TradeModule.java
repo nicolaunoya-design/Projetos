@@ -582,6 +582,8 @@ public class TradeModule extends Module {
                 if (moneyB > 0) eco.deposit(a, moneyB);
                 if (moneyA > 0) eco.deposit(b, moneyA);
             }
+            // os dois inventários salvos juntos: se o servidor cair, um não volta com o item que já passou para o outro
+            plugin.commit(a, b);
             for (Player p : List.of(a, b)) {
                 msg(p, "trade.done", "player", (p == a ? b : a).getName());
                 p.playSound(p.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 0.7f, 1.3f);

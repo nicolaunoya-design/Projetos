@@ -10,6 +10,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextReplacementConfig;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.Sound;
@@ -461,6 +462,7 @@ public class PlayerShopsModule extends Module {
         Player p = Bukkit.getPlayer(owner);
         if (p != null) {
             if (!give(p, one, n)) msg(p, "pshop.to-pending");
+            plugin.commit(p);
         } else {
             addTo(pending.computeIfAbsent(owner, k -> new ArrayList<>()), one, n);
         }
@@ -555,6 +557,7 @@ public class PlayerShopsModule extends Module {
         sh.created = System.currentTimeMillis();
         shops.put(sh.owner, sh);
         save();
+        plugin.commit(p);
         msg(p, "pshop.created", "money", money(cost));
         p.playSound(p.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 0.6f, 1.4f);
         if (getBool("broadcast")) {
@@ -568,7 +571,10 @@ public class PlayerShopsModule extends Module {
     private void deleteShop(Shop sh) {
         if (shops.get(sh.owner) != sh) return;
         shops.remove(sh.owner);
-        for (Offer o : sh.offers) returnTo(sh.owner, o.item, o.stock);
+        for (Offer o : sh.offers) {
+            returnTo(sh.owner, o.item, o.stock);
+            o.stock = 0; // um editor ainda aberto não pode devolver de novo
+        }
         for (ItemStack it : sh.vault) returnTo(sh.owner, it.asOne(), it.getAmount());
         sh.offers.clear();
         sh.vault.clear();
@@ -579,6 +585,7 @@ public class PlayerShopsModule extends Module {
 
     /** Põe "it" (do inventário do dono) no estoque de uma oferta (nova se não houver igual). Devolve a oferta. */
     private Offer stockFrom(Player p, Shop sh, Inventory inv, int slot) {
+        if (!alive(sh, null) || creativeBlocked(p)) return null;
         ItemStack it = inv.getItem(slot);
         if (it == null || it.getType().isAir()) return null;
         Offer o = null;
@@ -602,12 +609,18 @@ public class PlayerShopsModule extends Module {
         inv.setItem(slot, minus(it, take));
         o.stock += take;
         save();
+        plugin.commit(p);
         Msg.tellItem(p, "pshop.stocked", counted(take, o.item), "stock", o.stock);
         return o;
     }
 
     /** Põe no estoque todos os itens iguais do inventário. */
     private void stockAll(Player p, Shop sh, Offer o) {
+        if (!alive(sh, o)) {
+            msg(p, "pshop.gone");
+            return;
+        }
+        if (creativeBlocked(p)) return;
         int have = count(p, o.item);
         int take = Math.min(have, getInt("max-stock") - o.stock);
         if (have <= 0) {
@@ -621,11 +634,16 @@ public class PlayerShopsModule extends Module {
         takeItems(p, o.item, take);
         o.stock += take;
         save();
+        plugin.commit(p);
         Msg.tellItem(p, "pshop.stocked", counted(take, o.item), "stock", o.stock);
     }
 
     /** Tira do estoque o que couber no inventário do dono. */
     private void unstock(Player p, Shop sh, Offer o) {
+        if (!alive(sh, o)) { // loja ou oferta apagada com o editor aberto: o estoque já voltou
+            msg(p, "pshop.gone");
+            return;
+        }
         int n = Math.min(o.stock, room(p, o.item));
         if (o.stock <= 0) return;
         if (n <= 0) {
@@ -635,12 +653,14 @@ public class PlayerShopsModule extends Module {
         o.stock -= n;
         give(p, o.item, n);
         save();
+        plugin.commit(p);
         Msg.tellItem(p, "pshop.unstocked", counted(n, o.item), "stock", o.stock);
     }
 
     private void removeOffer(Player p, Shop sh, Offer o) {
-        if (!sh.offers.remove(o)) return;
+        if (!alive(sh, o) || !sh.offers.remove(o)) return;
         returnTo(sh.owner, o.item, o.stock);
+        o.stock = 0;
         save();
         Msg.tellItem(p, "pshop.offer-removed", itemName(o.item));
     }
@@ -662,6 +682,7 @@ public class PlayerShopsModule extends Module {
             msg(p, "pshop.closed");
             return;
         }
+        if (creativeBlocked(p)) return;
         int items = o.amount * times;
         if (o.stock < items) {
             msg(p, "pshop.out-of-stock");
@@ -712,6 +733,14 @@ public class PlayerShopsModule extends Module {
         plugin.getLogger().info("Lojinha: " + p.getName() + " comprou " + items + "x " + o.item.getType() + " de " + sh.ownerName + " por "
                 + (o.currency == null ? String.valueOf(round(o.price * times)) : (o.cost * times) + "x " + o.currency.getType()));
         save();
+        plugin.commit(p, owner);
+    }
+
+    /** No criativo não põe estoque nem compra (os itens do criativo são infinitos). */
+    private boolean creativeBlocked(Player p) {
+        if (p.getGameMode() != GameMode.CREATIVE) return false;
+        msg(p, "shop.creative");
+        return true;
     }
 
     @EventHandler
@@ -1464,9 +1493,11 @@ public class PlayerShopsModule extends Module {
                 box.addAll(0, rest.values());
                 msg(viewer, "shop.no-space");
                 save();
+                plugin.commit(viewer);
                 return false;
             }
             save();
+            plugin.commit(viewer);
             return true;
         }
     }

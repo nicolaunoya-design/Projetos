@@ -10,6 +10,7 @@ import com.ultracore.util.Msg;
 import com.ultracore.util.TimeUtil;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.command.CommandSender;
@@ -295,6 +296,10 @@ public class MarketModule extends Module {
             msg(p, "market.hand-empty");
             return;
         }
+        if (p.getGameMode() == GameMode.CREATIVE) {
+            msg(p, "shop.creative");
+            return;
+        }
         double price = parse(a[1]);
         if (Double.isNaN(price) || price < getDouble("min-price") || price > getDouble("max-price")) {
             msg(p, "market.invalid-price", "min", money(getDouble("min-price")), "max", money(getDouble("max-price")));
@@ -315,6 +320,7 @@ public class MarketModule extends Module {
         p.getInventory().setItemInMainHand(null);
         listings.put(l.id, l);
         changed();
+        plugin.commit(p); // inventário salvo junto com o anúncio: se o servidor cair, o item não volta para a mão
         Msg.tellItem(p, "market.listed", name(l.item), "money", money(price), "tax", getInt("tax"));
         if (getBool("broadcast")) {
             Component text = Msg.withItem(Msg.prefix() + Lang.get("market.broadcast", "player", p.getName(), "money", money(price)), name(l.item));
@@ -361,6 +367,7 @@ public class MarketModule extends Module {
         plugin.getLogger().info("Mercado: " + p.getName() + " comprou " + l.item.getAmount() + "x " + l.item.getType()
                 + " de " + l.sellerName + " por " + l.price);
         changed();
+        plugin.commit(p, seller);
     }
 
     private void cancel(Player p, String id) {
@@ -378,6 +385,7 @@ public class MarketModule extends Module {
         }
         Msg.tellItem(p, "market.cancelled", name(l.item));
         changed();
+        plugin.commit(p, owner);
     }
 
     @EventHandler
@@ -579,10 +587,12 @@ public class MarketModule extends Module {
                 box.addAll(rest.values());
                 msg(viewer, "shop.no-space");
                 changed();
+                plugin.commit(viewer);
                 return false;
             }
             if (box.isEmpty()) mailbox.remove(viewer.getUniqueId());
             changed();
+            plugin.commit(viewer);
             return true;
         }
 

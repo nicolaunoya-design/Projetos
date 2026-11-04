@@ -1,7 +1,8 @@
 # Cabeças de mobs: "mob textura" (uma por linha).
 # O mob é o nome dele no jogo (cow, pig, wolf...). A textura pode ser o código (como aqui), o endereço completo
-# ou o "Value" do minecraft-heads.com. Zumbi, esqueleto, creeper, esqueleto Wither, piglin e dragão já usam a
-# cabeça do próprio jogo. Para acrescentar mais, crie plugins/UltraCore/cabecas.txt no mesmo formato.
+# ou o "Value" do minecraft-heads.com. Só o dragão usa a cabeça do próprio jogo: as outras são cabeças com textura,
+# que a /loja não compra (senão matar monstro viraria dinheiro). Para acrescentar mais, crie
+# plugins/UltraCore/cabecas.txt no mesmo formato.
 # Texturas das contas oficiais MHF_* (cabeças de mobs), conferidas na Mojang.
 
 # animais
@@ -45,3 +46,14 @@ endermite 1730127e3ac7677122422df0028d9e7368bd157738c8c3cddecc502e896be01c
 silverfish 92ec2c3cb95ab77f7a60fb4d160bced4b879329b62663d7a9860642e588ab210
 guardian fa115bac9ee11cfaf9c9d623a3823b21cfbddc1b3734f71cf67fe2ac0aed175c
 vex 2f8c6227982f3993420f7d686df0f05d96d9f1f9cce06c30d962e489d2b808dd
+zombie d97e4259379a06f24843c1bb42f2df35c13f801ad079f715bded488db8f57c3
+husk d97e4259379a06f24843c1bb42f2df35c13f801ad079f715bded488db8f57c3
+drowned d97e4259379a06f24843c1bb42f2df35c13f801ad079f715bded488db8f57c3
+zombie_villager d97e4259379a06f24843c1bb42f2df35c13f801ad079f715bded488db8f57c3
+skeleton 22795c3c6f36d67decf9a3195e128040bec5226b055f2b16d46fa19a9180e023
+stray 22795c3c6f36d67decf9a3195e128040bec5226b055f2b16d46fa19a9180e023
+bogged 22795c3c6f36d67decf9a3195e128040bec5226b055f2b16d46fa19a9180e023
+wither_skeleton ba96e9d76bed30090ce6e2d8425996594eec6d68ac88cf07356e9814834243ec
+creeper ba5e95735a3f3772b1b485e1502807ae396a72c61bfd36ab41fa71bec2f64aa2
+piglin da51b8396b7d10a43afd1fbbcdd475b737c14bab94a6ec4c4de39df2f63443fb
+piglin_brute da51b8396b7d10a43afd1fbbcdd475b737c14bab94a6ec4c4de39df2f63443fb

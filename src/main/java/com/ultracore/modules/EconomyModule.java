@@ -180,6 +180,8 @@ public class EconomyModule extends Module {
         if (!plugin.data().isLoaded(id)) plugin.data().save(to);
         msg(p, "economy.pay-sent", "money", format(amount), "player", to.getName());
         Player target = Bukkit.getPlayer(id);
+        // salva quem pagou na hora (o offline já foi salvo acima): se o servidor cair, o dinheiro não fica nos dois
+        plugin.commit(p, target);
         if (target != null) msg(target, "economy.pay-received", "money", format(amount), "player", p.getName());
     }
 

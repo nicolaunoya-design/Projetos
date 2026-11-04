@@ -388,6 +388,7 @@ public class DeathModule extends Module {
         Map<Integer, ItemStack> left = owner.getInventory().addItem(copy.toArray(new ItemStack[0]));
         for (ItemStack it : left.values()) owner.getWorld().dropItemNaturally(owner.getLocation(), it);
         save();
+        plugin.commit(owner);
         msg(admin, "death.log-restored", "player", owner.getName());
         msg(owner, "death.log-restored-you");
         plugin.getLogger().info("[Mortes] " + admin.getName() + " devolveu os itens da morte de " + d.name + " (" + date(d.time) + ")");

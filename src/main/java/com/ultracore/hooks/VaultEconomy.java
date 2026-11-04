@@ -5,7 +5,9 @@ import com.ultracore.modules.EconomyModule;
 import net.milkbowl.vault.economy.Economy;
 import net.milkbowl.vault.economy.EconomyResponse;
 import net.milkbowl.vault.economy.EconomyResponse.ResponseType;
+import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.entity.Player;
 
 import java.util.List;
 import java.util.UUID;
@@ -155,17 +157,29 @@ public final class VaultEconomy implements Economy {
     private EconomyResponse withdraw(UUID id, double amount) {
         if (id == null) return new EconomyResponse(0, 0, ResponseType.FAILURE, "Jogador não encontrado");
         if (amount < 0) return new EconomyResponse(0, eco.getBalance(id), ResponseType.FAILURE, "Valor negativo");
+        if (!Double.isFinite(amount)) return new EconomyResponse(0, eco.getBalance(id), ResponseType.FAILURE, "Valor inválido");
         if (!eco.withdraw(id, amount)) {
             return new EconomyResponse(0, eco.getBalance(id), ResponseType.FAILURE, "Saldo insuficiente");
         }
+        commit(id);
         return new EconomyResponse(amount, eco.getBalance(id), ResponseType.SUCCESS, null);
     }
 
     private EconomyResponse deposit(UUID id, double amount) {
         if (id == null) return new EconomyResponse(0, 0, ResponseType.FAILURE, "Jogador não encontrado");
         if (amount < 0) return new EconomyResponse(0, eco.getBalance(id), ResponseType.FAILURE, "Valor negativo");
-        eco.deposit(id, amount);
+        if (!eco.deposit(id, amount)) return new EconomyResponse(0, eco.getBalance(id), ResponseType.FAILURE, "Valor inválido");
+        commit(id);
         return new EconomyResponse(amount, eco.getBalance(id), ResponseType.SUCCESS, null);
+    }
+
+    /**
+     * Outro plugin mexeu no dinheiro de alguém online (normalmente junto com itens: uma loja, um leilão...):
+     * salva o saldo e o inventário juntos no fim do tick, para nada duplicar se o servidor cair.
+     */
+    private void commit(UUID id) {
+        Player p = Bukkit.getPlayer(id);
+        if (p != null) UltraCore.get().commit(p);
     }
 
     @Override

@@ -43,6 +43,7 @@ modules:
     playtime-money: 1
   heads:
     animal-chance: 100
+    monster-chance: 100
 CFG
 RCON_PORTA=25575 RCON_SENHA=senha-ci MC_VERSAO="$VERSION" \
   node "$ROOT/.github/scripts/teste-jogadores.cjs" > teste.log 2>&1 &

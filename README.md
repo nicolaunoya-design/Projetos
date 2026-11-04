@@ -6,7 +6,13 @@ Cada recurso é um **módulo** que pode ser **ligado, desligado e configurado de
 
 ## ✨ Novidades da 3.2
 
-- **Cabeças** (módulo `heads`): quem morre para outro jogador **dropa a própria cabeça** (padrão 100%), e **animais e monstros** mortos por um jogador podem dropar a deles, **cada grupo com a sua chance** (padrão 5%; o Saque da arma soma +1% por nível). Tem cabeça de vaca, porco, ovelha, galinha, lula, aldeão, golem de ferro, lobo, cavalo, coelho, morcego, abelha, gato, raposa, papagaio, tartaruga, panda, golfinho, cabra, allay, aranha, blaze, ghast, slime, enderman, bruxa, phantom e mais; zumbi, esqueleto, creeper, esqueleto Wither, piglin e dragão usam a cabeça do próprio jogo. Mobs de gerador (spawner) ou de ovo não dropam. Veja [Cabeças](#cabeças).
+- **3.2.1 (correções de duplicação):**
+  - Loja, `/vender`, mercado, `/lojinha`, troca, `/pay`, procurados, kits e o Vault agora **salvam o inventário junto com o dinheiro/anúncio/estoque** na hora. Antes, se o servidor caísse logo depois (o Minecraft só salva o inventário a cada 5 minutos), o item podia voltar para o inventário e continuar no anúncio ou no estoque, ou o dinheiro voltar e o item ficar.
+  - `/lojinha`: se um admin apagasse a loja com o editor do dono aberto, "tirar do estoque" devolvia o estoque de novo. Corrigido.
+  - Não dá mais para vender na loja, anunciar no mercado nem negociar na `/lojinha` no **modo criativo**.
+  - As cabeças de zumbi, esqueleto, creeper, esqueleto Wither e piglin que o módulo Cabeças dropa agora são de textura (a `/loja` comprava as do jogo).
+  - Vault: depósito com valor inválido não responde mais "deu certo".
+- **Cabeças** (módulo `heads`): quem morre para outro jogador **dropa a própria cabeça** (padrão 100%), e **animais e monstros** mortos por um jogador podem dropar a deles, **cada grupo com a sua chance** (padrão 5%; o Saque da arma soma +1% por nível). Tem cabeça de vaca, porco, ovelha, galinha, lula, aldeão, golem de ferro, lobo, cavalo, coelho, morcego, abelha, gato, raposa, papagaio, tartaruga, panda, golfinho, cabra, allay, aranha, blaze, ghast, slime, enderman, bruxa, phantom e mais; zumbi, esqueleto, creeper, esqueleto Wither e piglin também têm (com textura; a `/loja` não compra cabeças de mob, senão matar monstro viraria dinheiro) e o dragão usa a do próprio jogo. Mobs de gerador (spawner) ou de ovo não dropam. Veja [Cabeças](#cabeças).
 
 ## ✨ Novidades da 3.1
 
