@@ -90,6 +90,9 @@ async function main () {
   const ligado = await aguardar(async () => { try { await rcon.comando('list'); return true } catch { return false } }, 6 * 60 * 1000, 3000)
   checar(ligado, 'servidor ligou (RCON)')
   if (!ligado) process.exit(1)
+  // monstros ligados só para o teste das cabeças poder invocar um zumbi; nada nasce sozinho
+  for (const g of ['doMobSpawning', 'doInsomnia', 'doPatrolSpawning', 'doTraderSpawning']) await rcon.comando(`gamerule ${g} false`)
+  await rcon.comando('kill @e[type=!minecraft:player]') // o que nasceu antes da gamerule valer (slime no mundo plano)
 
   // ---------- entrada ----------
   checar(!!(await criar('Robo')), 'Robo (OP) entrou')
@@ -772,7 +775,7 @@ async function main () {
   await espera(500)
   await rcon.comando('tp @e[type=minecraft:item] Robo')
   checar(await aguardar(() => conta(bots.Robo, 'player_head') >= 1, 8000) && conta(bots.Robo, 'zombie_head') === 0,
-    `zumbi dropa cabeça com textura, não a do jogo (player_head: ${conta(bots.Robo, 'player_head')}, zombie_head: ${conta(bots.Robo, 'zombie_head')})`)
+    `zumbi dropa cabeça com textura, não a do jogo (player_head: ${conta(bots.Robo, 'player_head')}, zombie_head: ${conta(bots.Robo, 'zombie_head')}; servidor: ${zumbi.slice(0, 120)})`)
   const cabecaZumbi = bots.Robo.inventory.items().find((i) => i.name === 'player_head')
   if (cabecaZumbi) { try { await bots.Robo.equip(cabecaZumbi, 'hand') } catch (e) { console.log('  equipar:', e.message) } }
   checar(await comando('Robo', '/vender mao', /não compra o item da sua mão/) && conta(bots.Robo, 'player_head') >= 1, 'a loja não compra a cabeça do zumbi')
