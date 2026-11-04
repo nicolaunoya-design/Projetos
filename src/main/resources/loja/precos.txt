@@ -1,0 +1,376 @@
+# Preços base da loja do UltraCore (preço de COMPRA de 1 unidade).
+# Só os itens "naturais" (minérios, drops de mobs, plantas, blocos do mundo) ficam aqui; todo o resto
+# (tábuas, ferramentas, lingotes em bloco, vidro, comidas...) é calculado sozinho pelas receitas do
+# próprio servidor (bancada, fornalha, cortador e mesa de ferraria). Preço de venda = % do painel.
+#
+#   nome valor             -> compra e venda
+#   nome valor venda       -> só dá para VENDER (não aparece para comprar)
+#   nome valor compra      -> só dá para COMPRAR (a loja não compra de volta)
+#   nome valor semreceita  -> só vale se o item não tiver receita nesta versão (senão usa a receita)
+#   nome nao               -> fora da loja
+#   padrão = ingrediente [ingrediente...] [+valor]   -> vale o mesmo que os ingredientes (+ extra)
+# "*" funciona como curinga (ex: *_spawn_egg). Nomes que não existem na versão do servidor são ignorados.
+
+# ---------- fora da loja (criativo, dados especiais ou únicos) ----------
+bedrock nao
+barrier nao
+light nao
+structure_block nao
+structure_void nao
+jigsaw nao
+command_block nao
+chain_command_block nao
+repeating_command_block nao
+command_block_minecart nao
+debug_stick nao
+knowledge_book nao
+test_block nao
+test_instance_block nao
+spawner nao
+trial_spawner nao
+vault nao
+end_portal_frame nao
+reinforced_deepslate nao
+budding_amethyst nao
+petrified_oak_slab nao
+infested_* nao
+*_spawn_egg nao
+player_head nao
+dragon_egg nao
+dirt_path nao
+farmland nao
+frogspawn nao
+chorus_plant nao
+suspicious_sand nao
+suspicious_gravel nao
+chipped_anvil nao
+damaged_anvil nao
+filled_map nao
+written_book nao
+enchanted_book nao
+potion nao
+splash_potion nao
+lingering_potion nao
+tipped_arrow nao
+firework_star nao
+goat_horn nao
+elytra nao
+trident nao
+chainmail_* nao
+*_nautilus_armor nao
+netherite_horse_armor nao
+pufferfish_bucket nao
+salmon_bucket nao
+cod_bucket nao
+tropical_fish_bucket nao
+axolotl_bucket nao
+tadpole_bucket nao
+suspicious_stew nao
+
+# ---------- pedras e terra ----------
+cobblestone 0.5
+cobbled_deepslate 0.6
+granite 0.6
+diorite 0.6
+andesite 0.6
+tuff 0.6
+calcite 1
+dripstone_block 0.6
+pointed_dripstone 0.4
+dirt 0.4
+grass_block 0.5
+podzol 0.5
+rooted_dirt 0.5
+mycelium 0.6
+mud 0.5
+sand 0.5
+red_sand 0.6
+gravel 0.5
+flint 1.2
+clay_ball 0.8
+ice 0.6
+snowball 0.1
+obsidian 3
+crying_obsidian 5
+terracotta 1.5
+sculk 0.4
+sculk_vein 0.2
+sculk_catalyst 10
+sculk_shrieker 10
+sculk_sensor 10
+moss_block 0.3
+pale_moss_block 0.3
+pale_hanging_moss 0.2
+end_stone 0.8
+
+# ---------- nether ----------
+netherrack 0.2
+soul_sand 0.8
+soul_soil 0.8
+basalt 0.5
+blackstone 0.6
+gilded_blackstone 8
+magma_block 1
+glowstone_dust 1
+crimson_nylium 0.4
+warped_nylium 0.4
+crimson_fungus 0.8
+warped_fungus 0.8
+crimson_roots 0.2
+warped_roots 0.2
+nether_sprouts 0.2
+weeping_vines 0.3
+twisting_vines 0.3
+shroomlight 2
+nether_wart 0.8
+warped_wart_block 2
+quartz 4
+ancient_debris 300
+netherite_scrap 300
+
+# ---------- minérios (o bloco do minério vale o que ele dá com Fortuna III) ----------
+coal 4
+raw_iron 7
+iron_ingot 8
+raw_copper 1.2
+copper_ingot 1.5
+raw_gold 14
+gold_ingot 16
+redstone 1.5
+lapis_lazuli 2
+diamond 150
+emerald 40 compra
+amethyst_shard 3
+amethyst_cluster 30
+small_amethyst_bud 1
+medium_amethyst_bud 2
+large_amethyst_bud 3
+coal_ore 8.8
+deepslate_coal_ore 8.8
+iron_ore 15.4
+deepslate_iron_ore 15.4
+copper_ore 9.2
+deepslate_copper_ore 9.2
+gold_ore 30.8
+deepslate_gold_ore 30.8
+redstone_ore 9
+deepslate_redstone_ore 9
+lapis_ore 28.6
+deepslate_lapis_ore 28.6
+diamond_ore 330
+deepslate_diamond_ore 330
+emerald_ore 88
+deepslate_emerald_ore 88
+nether_quartz_ore 8.8
+nether_gold_ore 15.6
+
+# ---------- madeiras e plantas ----------
+oak_log 2
+spruce_log 2
+birch_log 2
+jungle_log 2
+acacia_log 2
+dark_oak_log 2
+mangrove_log 2
+cherry_log 2
+pale_oak_log 2
+crimson_stem 2
+warped_stem 2
+bamboo 0.2
+*_leaves 0.1
+azalea_leaves 0.15
+flowering_azalea_leaves 0.2
+*_sapling 0.5
+mangrove_propagule 0.5
+mangrove_roots 0.5
+azalea 1
+flowering_azalea 1.5
+brown_mushroom 0.5
+red_mushroom 0.5
+brown_mushroom_block 0.4
+red_mushroom_block 0.4
+mushroom_stem 0.4
+cobweb 0.5
+*_wool 1
+short_grass 0.05
+grass 0.05
+tall_grass 0.1
+fern 0.05
+large_fern 0.1
+dead_bush 0.2
+bush 0.2
+firefly_bush 1
+short_dry_grass 0.1
+tall_dry_grass 0.2
+leaf_litter 0.1
+cactus 0.3
+cactus_flower 0.5
+sugar_cane 0.4
+kelp 0.1
+seagrass 0.1
+sea_pickle 0.5
+lily_pad 0.5
+vine 0.2
+glow_lichen 0.3
+hanging_roots 0.3
+big_dripleaf 1
+small_dripleaf 1
+spore_blossom 5
+pink_petals 0.2
+wildflowers 0.2
+dandelion 0.3
+golden_dandelion 1
+poppy 0.3
+blue_orchid 0.4
+allium 0.4
+azure_bluet 0.3
+red_tulip 0.3
+orange_tulip 0.3
+white_tulip 0.3
+pink_tulip 0.3
+oxeye_daisy 0.3
+cornflower 0.3
+lily_of_the_valley 0.3
+open_eyeblossom 0.5
+closed_eyeblossom 0.5
+wither_rose 3
+torchflower 2
+pitcher_plant 3
+sunflower 0.5
+lilac 0.5
+rose_bush 0.5
+peony 0.5
+chorus_flower 2
+chorus_fruit 0.5
+creaking_heart 5
+resin_clump 1
+
+# ---------- plantação ----------
+wheat 0.5
+wheat_seeds 0.1
+carrot 0.4
+potato 0.4
+poisonous_potato 0.1
+beetroot 0.5
+beetroot_seeds 0.1
+pumpkin 1
+melon_slice 0.25
+cocoa_beans 0.5
+sweet_berries 0.3
+glow_berries 0.4
+apple 1
+torchflower_seeds 2
+pitcher_pod 2
+honeycomb 2
+honey_bottle 2.5
+bee_nest 5
+
+# ---------- animais e mobs ----------
+egg 0.3
+blue_egg 0.3
+brown_egg 0.3
+feather 0.4
+leather 1.5
+rabbit_hide 0.4
+rabbit_foot 3
+beef 1
+porkchop 1
+mutton 0.8
+chicken 0.8
+rabbit 0.8
+cod 0.8
+salmon 1
+tropical_fish 1
+pufferfish 1
+rotten_flesh 0.1
+bone 1 venda
+string 0.5
+spider_eye 0.8
+gunpowder 1.5
+ender_pearl 3
+blaze_rod 4
+breeze_rod 5
+ghast_tear 10
+slime_ball 1.5
+magma_cream 2
+phantom_membrane 3
+shulker_shell 20
+ink_sac 0.5
+glow_ink_sac 2
+prismarine_shard 1.5
+prismarine_crystals 2
+nautilus_shell 8
+turtle_scute 5
+scute 5
+armadillo_scute 3
+turtle_egg 5
+ochre_froglight 3
+verdant_froglight 3
+pearlescent_froglight 3
+dragon_breath 8
+nether_star 2500
+experience_bottle 5
+
+# ---------- oceano ----------
+sponge 15
+wet_sponge = sponge
+dead_*_coral_block 0.5
+dead_*_coral_fan 0.3
+dead_*_coral 0.3
+*_coral_block 1.5
+*_coral_fan 1
+*_coral 1
+
+# ---------- raros (só vende) ----------
+heart_of_the_sea 60 venda
+totem_of_undying 60 venda
+enchanted_golden_apple 300 venda
+echo_shard 20 venda
+disc_fragment_5 5 venda
+music_disc_* 40 venda
+*_pottery_sherd 10 venda
+netherite_upgrade_smithing_template 200 venda
+*_armor_trim_smithing_template 20 venda
+globe_banner_pattern 10 venda
+piglin_banner_pattern 10 venda
+flow_banner_pattern 10 venda
+guster_banner_pattern 10 venda
+skeleton_skull 30 venda
+wither_skeleton_skull 80 venda
+zombie_head 30 venda
+creeper_head 30 venda
+piglin_head 30 venda
+dragon_head 300 venda
+heavy_core 400 venda
+trial_key 5 venda
+ominous_trial_key 25 venda
+ominous_bottle 10 venda
+sniffer_egg 50 venda
+iron_horse_armor 20 venda
+golden_horse_armor 25 venda
+diamond_horse_armor 60 venda
+copper_horse_armor 10 venda
+
+# ---------- itens sem receita na bancada ----------
+saddle 8 semreceita
+name_tag 10 semreceita
+bell 30 compra
+firework_rocket 0.7
+copper_golem_statue 10
+
+# ---------- equivalências (vale o mesmo que o outro item) ----------
+*_concrete = *_concrete_powder
+stripped_* = *
+exposed_copper = copper_block
+weathered_copper = copper_block
+oxidized_copper = copper_block
+exposed_* = *
+weathered_* = *
+oxidized_* = *
+carved_pumpkin = pumpkin
+*_shulker_box = shulker_box *_dye
+*_bundle = bundle *_dye
+water_bucket = bucket +0.2
+lava_bucket = bucket +1
+milk_bucket = bucket +0.5
+powder_snow_bucket = bucket +0.5

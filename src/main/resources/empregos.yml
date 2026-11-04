@@ -1,0 +1,535 @@
+# Empregos do UltraCore (parecido com o Jobs Reborn).
+# Cada ação paga [dinheiro, xp] no nível 1. A cada nível o dinheiro sobe (opção "Bônus por nível" no /painel).
+# Ações: quebrar, colocar, matar, pescar, craftar, fundir, encantar (por nível gasto), fermentar (por poção),
+#        reproduzir, domar, tosquiar, colher, explorar (por chunk novo), forjar.
+# Os alvos são nomes de itens/blocos/mobs do Minecraft em maiúsculas; "*" funciona como curinga (ex: *_LOG).
+# O que não estiver na lista não paga. Proteções contra abuso (bloco colocado não paga, spawner, farm...)
+# valem para todos. Depois de mudar, use /empregos admin recarregar.
+
+empregos:
+  minerador:
+    nome: Minerador
+    cor: '&7'
+    icone: IRON_PICKAXE
+    descricao: Quebra pedras e minérios nas cavernas.
+    acoes:
+      quebrar:
+        STONE: [0.06, 0.5]
+        DEEPSLATE: [0.07, 0.6]
+        COBBLESTONE: [0.05, 0.4]
+        MOSSY_COBBLESTONE: [0.06, 0.5]
+        GRANITE: [0.06, 0.5]
+        DIORITE: [0.06, 0.5]
+        ANDESITE: [0.06, 0.5]
+        TUFF: [0.06, 0.5]
+        CALCITE: [0.08, 0.6]
+        DRIPSTONE_BLOCK: [0.06, 0.5]
+        POINTED_DRIPSTONE: [0.05, 0.4]
+        SANDSTONE: [0.06, 0.5]
+        RED_SANDSTONE: [0.06, 0.5]
+        TERRACOTTA: [0.08, 0.6]
+        '*_TERRACOTTA': [0.08, 0.6]
+        NETHERRACK: [0.02, 0.2]
+        BLACKSTONE: [0.06, 0.5]
+        BASALT: [0.05, 0.4]
+        SMOOTH_BASALT: [0.06, 0.5]
+        MAGMA_BLOCK: [0.1, 0.8]
+        GLOWSTONE: [0.3, 1.5]
+        END_STONE: [0.08, 0.6]
+        OBSIDIAN: [0.5, 2]
+        CRYING_OBSIDIAN: [0.8, 3]
+        ICE: [0.05, 0.4]
+        PACKED_ICE: [0.1, 0.8]
+        BLUE_ICE: [0.3, 1.5]
+        PRISMARINE: [0.1, 0.8]
+        PRISMARINE_BRICKS: [0.1, 0.8]
+        DARK_PRISMARINE: [0.12, 0.9]
+        AMETHYST_BLOCK: [0.15, 1]
+        AMETHYST_CLUSTER: [0.5, 1.5]
+        COAL_ORE: [0.75, 3]
+        DEEPSLATE_COAL_ORE: [0.85, 3.5]
+        COPPER_ORE: [0.5, 2]
+        DEEPSLATE_COPPER_ORE: [0.6, 2.5]
+        IRON_ORE: [1.25, 5]
+        DEEPSLATE_IRON_ORE: [1.4, 5.5]
+        GOLD_ORE: [2, 6]
+        DEEPSLATE_GOLD_ORE: [2.2, 6.5]
+        NETHER_GOLD_ORE: [0.75, 2]
+        REDSTONE_ORE: [1, 4]
+        DEEPSLATE_REDSTONE_ORE: [1.1, 4.5]
+        LAPIS_ORE: [1.5, 5]
+        DEEPSLATE_LAPIS_ORE: [1.7, 5.5]
+        DIAMOND_ORE: [10, 20]
+        DEEPSLATE_DIAMOND_ORE: [11, 22]
+        EMERALD_ORE: [12, 25]
+        DEEPSLATE_EMERALD_ORE: [13, 27]
+        NETHER_QUARTZ_ORE: [0.6, 2.5]
+        ANCIENT_DEBRIS: [25, 40]
+        GILDED_BLACKSTONE: [1, 3]
+
+  lenhador:
+    nome: Lenhador
+    cor: '&6'
+    icone: IRON_AXE
+    descricao: Corta árvores (troncos de verdade, não os colocados).
+    acoes:
+      quebrar:
+        '*_LOG': [0.15, 1]
+        '*_WOOD': [0.15, 1]
+        CRIMSON_STEM: [0.12, 0.9]
+        WARPED_STEM: [0.12, 0.9]
+        CRIMSON_HYPHAE: [0.12, 0.9]
+        WARPED_HYPHAE: [0.12, 0.9]
+        MANGROVE_ROOTS: [0.05, 0.3]
+        '*_LEAVES': [0.01, 0.1]
+        BROWN_MUSHROOM_BLOCK: [0.05, 0.3]
+        RED_MUSHROOM_BLOCK: [0.05, 0.3]
+        MUSHROOM_STEM: [0.05, 0.3]
+        NETHER_WART_BLOCK: [0.03, 0.2]
+        WARPED_WART_BLOCK: [0.03, 0.2]
+        SHROOMLIGHT: [0.2, 1]
+
+  fazendeiro:
+    nome: Fazendeiro
+    cor: '&e'
+    icone: IRON_HOE
+    descricao: Colhe plantações maduras, cria animais e tosquia ovelhas.
+    acoes:
+      quebrar:
+        WHEAT: [0.08, 0.8]
+        CARROTS: [0.08, 0.8]
+        POTATOES: [0.08, 0.8]
+        BEETROOTS: [0.08, 0.8]
+        NETHER_WART: [0.08, 0.8]
+        COCOA: [0.08, 0.8]
+        MELON: [0.1, 1]
+        PUMPKIN: [0.15, 1.2]
+        SUGAR_CANE: [0.03, 0.3]
+        CACTUS: [0.03, 0.3]
+        BAMBOO: [0.02, 0.1]
+        SWEET_BERRY_BUSH: [0.05, 0.5]
+        TORCHFLOWER_CROP: [0.2, 1.5]
+        PITCHER_CROP: [0.3, 2]
+        KELP_PLANT: [0.01, 0.1]
+      colher:
+        SWEET_BERRY_BUSH: [0.05, 0.5]
+        CAVE_VINES: [0.05, 0.5]
+        CAVE_VINES_PLANT: [0.05, 0.5]
+      reproduzir:
+        COW: [0.5, 2]
+        MOOSHROOM: [0.6, 2.5]
+        SHEEP: [0.5, 2]
+        PIG: [0.5, 2]
+        CHICKEN: [0.3, 1.5]
+        RABBIT: [0.4, 2]
+        GOAT: [0.5, 2]
+        HORSE: [0.6, 2.5]
+        DONKEY: [0.6, 2.5]
+        LLAMA: [0.5, 2]
+        CAMEL: [0.6, 2.5]
+        TURTLE: [1, 4]
+        PANDA: [1, 4]
+        FOX: [0.5, 2]
+        BEE: [0.5, 2]
+        FROG: [0.5, 2]
+        AXOLOTL: [0.5, 2]
+        STRIDER: [0.5, 2]
+        HOGLIN: [0.6, 2.5]
+        SNIFFER: [2, 6]
+        ARMADILLO: [0.5, 2]
+        CAT: [0.4, 1.5]
+        WOLF: [0.4, 1.5]
+        OCELOT: [0.4, 1.5]
+      tosquiar:
+        SHEEP: [0.15, 1]
+        MOOSHROOM: [0.3, 1.5]
+
+  cacador:
+    nome: Caçador
+    cor: '&c'
+    icone: IRON_SWORD
+    descricao: Mata monstros e caça animais. Mob de spawner e de farm paga menos.
+    acoes:
+      matar:
+        ZOMBIE: [0.5, 3]
+        HUSK: [0.55, 3]
+        DROWNED: [0.6, 3]
+        ZOMBIE_VILLAGER: [0.6, 3]
+        SKELETON: [0.6, 3]
+        STRAY: [0.65, 3.5]
+        BOGGED: [0.65, 3.5]
+        PARCHED: [0.65, 3.5]
+        SPIDER: [0.5, 3]
+        CAVE_SPIDER: [0.5, 3]
+        CREEPER: [0.75, 4]
+        ENDERMAN: [1, 5]
+        WITCH: [1.25, 6]
+        SLIME: [0.25, 1]
+        MAGMA_CUBE: [0.3, 1.5]
+        BLAZE: [1.25, 6]
+        GHAST: [2, 8]
+        WITHER_SKELETON: [1.5, 7]
+        PIGLIN: [0.75, 3]
+        PIGLIN_BRUTE: [3, 10]
+        ZOMBIFIED_PIGLIN: [0.3, 2]
+        HOGLIN: [1, 4]
+        ZOGLIN: [1, 4]
+        PILLAGER: [1, 5]
+        VINDICATOR: [1.5, 6]
+        EVOKER: [3, 12]
+        RAVAGER: [4, 15]
+        VEX: [0.5, 2]
+        PHANTOM: [1, 5]
+        GUARDIAN: [1.25, 6]
+        ELDER_GUARDIAN: [25, 60]
+        SHULKER: [2, 8]
+        ENDERMITE: [0.2, 1]
+        SILVERFISH: [0.1, 0.5]
+        BREEZE: [2, 8]
+        WARDEN: [50, 100]
+        WITHER: [100, 300]
+        ENDER_DRAGON: [200, 500]
+        COW: [0.15, 1]
+        PIG: [0.15, 1]
+        SHEEP: [0.15, 1]
+        CHICKEN: [0.1, 0.8]
+        RABBIT: [0.15, 1]
+        MOOSHROOM: [0.2, 1]
+        GOAT: [0.2, 1]
+        SQUID: [0.15, 1]
+        GLOW_SQUID: [0.25, 1.5]
+        POLAR_BEAR: [0.4, 2]
+        COD: [0.05, 0.3]
+        SALMON: [0.05, 0.3]
+        TROPICAL_FISH: [0.05, 0.3]
+        PUFFERFISH: [0.1, 0.5]
+      domar:
+        WOLF: [1, 5]
+        CAT: [1, 5]
+        HORSE: [1.5, 6]
+        DONKEY: [1, 5]
+        MULE: [1, 5]
+        LLAMA: [1, 5]
+        PARROT: [1.5, 6]
+
+  pescador:
+    nome: Pescador
+    cor: '&b'
+    icone: FISHING_ROD
+    descricao: Pesca peixes e tesouros.
+    acoes:
+      pescar:
+        COD: [0.8, 4]
+        SALMON: [1, 5]
+        TROPICAL_FISH: [1.5, 6]
+        PUFFERFISH: [1.2, 5]
+        NAME_TAG: [3, 8]
+        SADDLE: [3, 8]
+        NAUTILUS_SHELL: [3, 8]
+        ENCHANTED_BOOK: [4, 10]
+        BOW: [2, 6]
+        FISHING_ROD: [1.5, 5]
+        LILY_PAD: [0.5, 2]
+        '*': [0.2, 1]
+
+  construtor:
+    nome: Construtor
+    cor: '&a'
+    icone: BRICKS
+    descricao: Coloca blocos (o bloco precisa ficar no lugar por um tempo).
+    acoes:
+      colocar:
+        '*': [0.03, 0.3]
+        GLASS: [0.04, 0.4]
+        '*_GLASS': [0.04, 0.4]
+        BRICKS: [0.05, 0.5]
+        STONE_BRICKS: [0.05, 0.5]
+        '*_CONCRETE': [0.04, 0.4]
+        '*_TERRACOTTA': [0.04, 0.4]
+        QUARTZ_BLOCK: [0.06, 0.6]
+        '*_PLANKS': [0.04, 0.4]
+        LANTERN: [0.1, 0.8]
+        BOOKSHELF: [0.1, 0.8]
+        TORCH: [0, 0]
+        WALL_TORCH: [0, 0]
+        SOUL_TORCH: [0, 0]
+        REDSTONE_WIRE: [0, 0]
+        SCAFFOLDING: [0, 0]
+        TNT: [0, 0]
+        FIRE: [0, 0]
+        SAND: [0, 0]
+        GRAVEL: [0, 0]
+        '*_SAPLING': [0, 0]
+        WHEAT: [0, 0]
+        CARROTS: [0, 0]
+        POTATOES: [0, 0]
+        BEETROOTS: [0, 0]
+        SUGAR_CANE: [0, 0]
+        CACTUS: [0, 0]
+        BAMBOO: [0, 0]
+        DIRT: [0.01, 0.1]
+        COBBLESTONE: [0.02, 0.2]
+        NETHERRACK: [0.01, 0.1]
+
+  escavador:
+    nome: Escavador
+    cor: '&6'
+    icone: IRON_SHOVEL
+    descricao: Cava terra, areia, cascalho e argila.
+    acoes:
+      quebrar:
+        DIRT: [0.04, 0.4]
+        GRASS_BLOCK: [0.05, 0.4]
+        COARSE_DIRT: [0.04, 0.4]
+        PODZOL: [0.05, 0.4]
+        ROOTED_DIRT: [0.05, 0.4]
+        MYCELIUM: [0.06, 0.5]
+        MUD: [0.05, 0.4]
+        MUDDY_MANGROVE_ROOTS: [0.05, 0.4]
+        SAND: [0.05, 0.4]
+        RED_SAND: [0.06, 0.5]
+        GRAVEL: [0.06, 0.5]
+        CLAY: [0.15, 1]
+        SOUL_SAND: [0.06, 0.5]
+        SOUL_SOIL: [0.06, 0.5]
+        SNOW_BLOCK: [0.04, 0.3]
+        SNOW: [0.02, 0.2]
+        FARMLAND: [0.04, 0.3]
+        DIRT_PATH: [0.04, 0.3]
+
+  artesao:
+    nome: Artesão
+    cor: '&d'
+    icone: CRAFTING_TABLE
+    descricao: Crafta móveis, blocos de utilidade e itens de redstone.
+    acoes:
+      craftar:
+        CRAFTING_TABLE: [0.2, 1]
+        FURNACE: [0.3, 1.5]
+        CHEST: [0.3, 1.5]
+        BARREL: [0.3, 1.5]
+        SMOKER: [0.5, 2]
+        BLAST_FURNACE: [1, 4]
+        LADDER: [0.02, 0.1]
+        BOOK: [0.1, 0.5]
+        BOOKSHELF: [0.5, 2]
+        CHISELED_BOOKSHELF: [0.5, 2]
+        LANTERN: [0.2, 1]
+        SOUL_LANTERN: [0.2, 1]
+        CAMPFIRE: [0.2, 1]
+        ITEM_FRAME: [0.1, 0.5]
+        GLOW_ITEM_FRAME: [0.2, 1]
+        PAINTING: [0.1, 0.5]
+        ARMOR_STAND: [0.2, 1]
+        '*_BED': [0.15, 0.8]
+        '*_BANNER': [0.15, 0.8]
+        '*_CARPET': [0.01, 0.05]
+        CANDLE: [0.05, 0.3]
+        FLOWER_POT: [0.05, 0.3]
+        DECORATED_POT: [0.1, 0.5]
+        COMPOSTER: [0.1, 0.5]
+        BEEHIVE: [0.3, 1.5]
+        LOOM: [0.3, 1.5]
+        CARTOGRAPHY_TABLE: [0.3, 1.5]
+        FLETCHING_TABLE: [0.3, 1.5]
+        SMITHING_TABLE: [0.3, 1.5]
+        STONECUTTER: [0.3, 1.5]
+        GRINDSTONE: [0.3, 1.5]
+        LECTERN: [0.3, 1.5]
+        JUKEBOX: [1, 4]
+        NOTE_BLOCK: [0.3, 1.5]
+        ENCHANTING_TABLE: [2, 8]
+        ANVIL: [2, 8]
+        BREWING_STAND: [0.5, 2]
+        CAULDRON: [0.5, 2]
+        HOPPER: [0.5, 2]
+        DROPPER: [0.4, 2]
+        DISPENSER: [0.4, 2]
+        OBSERVER: [0.4, 2]
+        PISTON: [0.4, 2]
+        STICKY_PISTON: [0.2, 1]
+        REPEATER: [0.2, 1]
+        COMPARATOR: [0.3, 1.5]
+        REDSTONE_TORCH: [0.05, 0.3]
+        REDSTONE_LAMP: [0.3, 1.5]
+        DAYLIGHT_DETECTOR: [0.3, 1.5]
+        TARGET: [0.2, 1]
+        CRAFTER: [1, 4]
+        RAIL: [0.02, 0.1]
+        POWERED_RAIL: [0.1, 0.5]
+        DETECTOR_RAIL: [0.1, 0.5]
+        ACTIVATOR_RAIL: [0.1, 0.5]
+        MINECART: [0.5, 2]
+        '*_BOAT': [0.3, 1.5]
+        '*_RAFT': [0.3, 1.5]
+        '*_SIGN': [0.03, 0.2]
+        '*_DOOR': [0.03, 0.2]
+        '*_TRAPDOOR': [0.03, 0.2]
+        '*_FENCE_GATE': [0.05, 0.3]
+        TORCH: [0.01, 0.05]
+        LEAD: [0.1, 0.5]
+        COMPASS: [0.5, 2]
+        CLOCK: [0.5, 2]
+        SPYGLASS: [0.3, 1.5]
+        MAP: [0.3, 1.5]
+        SHULKER_BOX: [1, 4]
+        ENDER_CHEST: [1, 4]
+        BEACON: [10, 30]
+        CONDUIT: [5, 15]
+
+  ferreiro:
+    nome: Ferreiro
+    cor: '&8'
+    icone: ANVIL
+    descricao: Crafta armas, ferramentas e armaduras, derrete minérios e forja netherite.
+    acoes:
+      craftar:
+        WOODEN_SWORD: [0.1, 0.5]
+        WOODEN_PICKAXE: [0.1, 0.5]
+        WOODEN_AXE: [0.1, 0.5]
+        WOODEN_SHOVEL: [0.05, 0.3]
+        WOODEN_HOE: [0.05, 0.3]
+        STONE_SWORD: [0.2, 1]
+        STONE_PICKAXE: [0.2, 1]
+        STONE_AXE: [0.2, 1]
+        STONE_SHOVEL: [0.1, 0.5]
+        STONE_HOE: [0.1, 0.5]
+        COPPER_SWORD: [0.3, 1.5]
+        COPPER_PICKAXE: [0.3, 1.5]
+        COPPER_AXE: [0.3, 1.5]
+        COPPER_SHOVEL: [0.15, 0.8]
+        COPPER_HOE: [0.15, 0.8]
+        IRON_SWORD: [0.8, 3]
+        IRON_PICKAXE: [1, 4]
+        IRON_AXE: [1, 4]
+        IRON_SHOVEL: [0.5, 2]
+        IRON_HOE: [0.6, 2.5]
+        GOLDEN_SWORD: [0.6, 2.5]
+        GOLDEN_PICKAXE: [0.8, 3]
+        GOLDEN_AXE: [0.8, 3]
+        GOLDEN_SHOVEL: [0.4, 1.5]
+        GOLDEN_HOE: [0.5, 2]
+        DIAMOND_SWORD: [4, 12]
+        DIAMOND_PICKAXE: [5, 15]
+        DIAMOND_AXE: [5, 15]
+        DIAMOND_SHOVEL: [2.5, 8]
+        DIAMOND_HOE: [3, 10]
+        '*_SPEAR': [0.5, 2]
+        LEATHER_HELMET: [0.3, 1.5]
+        LEATHER_CHESTPLATE: [0.6, 2.5]
+        LEATHER_LEGGINGS: [0.5, 2]
+        LEATHER_BOOTS: [0.3, 1.5]
+        COPPER_HELMET: [0.5, 2]
+        COPPER_CHESTPLATE: [0.8, 3]
+        COPPER_LEGGINGS: [0.7, 2.8]
+        COPPER_BOOTS: [0.4, 1.8]
+        IRON_HELMET: [1.2, 5]
+        IRON_CHESTPLATE: [2.5, 8]
+        IRON_LEGGINGS: [2, 7]
+        IRON_BOOTS: [1, 4]
+        GOLDEN_HELMET: [1, 4]
+        GOLDEN_CHESTPLATE: [2, 7]
+        GOLDEN_LEGGINGS: [1.8, 6]
+        GOLDEN_BOOTS: [0.8, 3]
+        DIAMOND_HELMET: [6, 18]
+        DIAMOND_CHESTPLATE: [10, 30]
+        DIAMOND_LEGGINGS: [9, 26]
+        DIAMOND_BOOTS: [5, 15]
+        TURTLE_HELMET: [2, 6]
+        SHIELD: [0.5, 2]
+        BOW: [0.3, 1.5]
+        CROSSBOW: [0.5, 2]
+        ARROW: [0.01, 0.05]
+        SPECTRAL_ARROW: [0.03, 0.15]
+        FISHING_ROD: [0.2, 1]
+        SHEARS: [0.3, 1.5]
+        FLINT_AND_STEEL: [0.2, 1]
+        BRUSH: [0.2, 1]
+        MACE: [10, 30]
+        WOLF_ARMOR: [1, 4]
+      fundir:
+        IRON_INGOT: [0.1, 0.5]
+        GOLD_INGOT: [0.15, 0.6]
+        COPPER_INGOT: [0.05, 0.3]
+        NETHERITE_SCRAP: [2, 5]
+      forjar:
+        'NETHERITE_*': [10, 30]
+
+  encantador:
+    nome: Encantador
+    cor: '&5'
+    icone: ENCHANTING_TABLE
+    descricao: Encanta itens na mesa de encantamento (paga por nível usado).
+    acoes:
+      encantar:
+        '*': [0.25, 1]
+        BOOK: [0.3, 1.2]
+
+  alquimista:
+    nome: Alquimista
+    cor: '&d'
+    icone: BREWING_STAND
+    descricao: Faz poções no suporte de poções (paga por poção pronta).
+    acoes:
+      fermentar:
+        NETHER_WART: [0.1, 0.8]
+        REDSTONE: [0.1, 0.8]
+        GLOWSTONE_DUST: [0.1, 0.8]
+        GUNPOWDER: [0.15, 1]
+        DRAGON_BREATH: [0.3, 2]
+        FERMENTED_SPIDER_EYE: [0.15, 1]
+        SUGAR: [0.1, 0.8]
+        RABBIT_FOOT: [0.3, 2]
+        GLISTERING_MELON_SLICE: [0.2, 1.5]
+        SPIDER_EYE: [0.15, 1]
+        GHAST_TEAR: [0.4, 2.5]
+        MAGMA_CREAM: [0.2, 1.5]
+        BLAZE_POWDER: [0.2, 1.5]
+        GOLDEN_CARROT: [0.2, 1.5]
+        PUFFERFISH: [0.2, 1.5]
+        TURTLE_HELMET: [0.5, 3]
+        PHANTOM_MEMBRANE: [0.3, 2]
+        BREEZE_ROD: [0.3, 2]
+        SLIME_BLOCK: [0.3, 2]
+        STONE: [0.2, 1.5]
+        COBWEB: [0.2, 1.5]
+        '*': [0.1, 0.5]
+
+  explorador:
+    nome: Explorador
+    cor: '&2'
+    icone: COMPASS
+    descricao: Descobre terras novas (paga o primeiro a entrar em cada chunk novo, andando ou a cavalo).
+    acoes:
+      explorar:
+        NORMAL: [0.15, 1]
+        NETHER: [0.25, 1.5]
+        THE_END: [0.3, 2]
+
+  cozinheiro:
+    nome: Cozinheiro
+    cor: '&c'
+    icone: SMOKER
+    descricao: Assa comidas na fornalha/defumador e crafta pratos.
+    acoes:
+      fundir:
+        COOKED_BEEF: [0.05, 0.5]
+        COOKED_PORKCHOP: [0.05, 0.5]
+        COOKED_MUTTON: [0.04, 0.4]
+        COOKED_CHICKEN: [0.04, 0.4]
+        COOKED_RABBIT: [0.04, 0.4]
+        COOKED_COD: [0.04, 0.4]
+        COOKED_SALMON: [0.05, 0.5]
+        BAKED_POTATO: [0.03, 0.3]
+        DRIED_KELP: [0.01, 0.05]
+      craftar:
+        BREAD: [0.05, 0.5]
+        CAKE: [0.5, 3]
+        COOKIE: [0.01, 0.1]
+        PUMPKIN_PIE: [0.1, 0.8]
+        MUSHROOM_STEW: [0.1, 0.8]
+        RABBIT_STEW: [0.3, 2]
+        BEETROOT_SOUP: [0.1, 0.8]
+        SUSPICIOUS_STEW: [0.1, 0.8]
+        GOLDEN_CARROT: [0.1, 0.8]
+        GOLDEN_APPLE: [1, 5]
