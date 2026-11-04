@@ -766,9 +766,9 @@ async function main () {
   // cabeça de monstro: o zumbi dá cabeça com textura (que a /loja não compra), não a cabeça de zumbi do jogo (que ela compra)
   await rcon.comando('kill @e[type=minecraft:item]')
   await rcon.comando('clear Robo')
-  await rcon.comando('execute at Robo run summon minecraft:zombie ~1 ~ ~ {NoAI:1b}')
-  await espera(800)
-  await rcon.comando('execute at Robo run damage @e[type=minecraft:zombie,limit=1,sort=nearest] 1000 minecraft:player_attack by Robo')
+  // o servidor de teste não deixa monstro ficar no mundo (spawn-monsters=false): invoca e mata no mesmo comando
+  const zumbi = semCor(await rcon.comando('execute at Robo positioned ~1 ~ ~ summon minecraft:zombie run damage @s 1000 minecraft:player_attack by Robo'))
+  console.log('  zumbi:', zumbi)
   await espera(500)
   await rcon.comando('tp @e[type=minecraft:item] Robo')
   checar(await aguardar(() => conta(bots.Robo, 'player_head') >= 1, 8000) && conta(bots.Robo, 'zombie_head') === 0,
