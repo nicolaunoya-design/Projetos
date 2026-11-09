@@ -42,6 +42,8 @@ public abstract class NotifierModule extends Module {
         bool("advancements", true, Material.GOLD_BLOCK, "Conquistas", "Envia as conquistas que aparecem no chat do jogo.");
         bool("deaths", true, Material.SKELETON_SKULL, "Mortes", "Envia as mensagens de morte dos jogadores.");
         bool("server-start", true, Material.BEACON, "Servidor ligado", "Avisa quando o servidor liga.");
+        bool("anticheat", true, Material.SHIELD, "Anti-Cheat",
+                "Envia os alertas do anti-cheat (só a partir de VL 5 e no máximo 1 por minuto por jogador e tipo de hack).");
     }
 
     /** Envia o texto (já sem cores). Pode ser chamado de qualquer thread. */

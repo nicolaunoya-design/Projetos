@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Servidor Paper real + UltraCore + dois jogadores-robô (mineflayer): cooldowns, diversão secreta,
-# menus (abrindo e clicando), painel, editor da loja e vanish ao relogar.
+# menus (abrindo e clicando), painel, editor da loja, vanish ao relogar e anti-cheat (robô que "hackeia").
 # Uso: test-player.sh <versão-do-minecraft> <jar-do-plugin>
 set -uo pipefail
 VERSION="$1"
@@ -44,6 +44,8 @@ modules:
   heads:
     animal-chance: 100
     monster-chance: 100
+  anticheat:
+    lag-tps: 0
 CFG
 RCON_PORTA=25575 RCON_SENHA=senha-ci MC_VERSAO="$VERSION" \
   node "$ROOT/.github/scripts/teste-jogadores.cjs" > teste.log 2>&1 &

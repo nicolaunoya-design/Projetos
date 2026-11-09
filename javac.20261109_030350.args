@@ -1,0 +1,6 @@
+-proc:none
+-d
+/tmp/claude-0/-home-user-Projetos/334dfd1a-b035-58dd-9f54-6e55010c59c7/scratchpad/jc
+-sourcepath
+src/main/java
+src/main/java/com/ultracore/modules/AntiCheatModule.java

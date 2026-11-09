@@ -63,6 +63,7 @@ if grep -q "Done (" server.log; then
              "empregos admin recarregar" "painel desativar jobs" "painel ativar jobs" "missoes" "procurado" "quiz agora" "quiz parar" \
              "painel desativar market" "painel ativar market" "painel desativar quests" "painel ativar quests" "painel desativar bounty" "painel ativar bounty" "painel desativar heads" "painel ativar heads" \
              "lojinha" "painel desativar playershops" "painel ativar playershops" \
+             "ac" "ac info Ninguem" "ss Ninguem" "painel desativar anticheat" "painel ativar anticheat" \
              "painel lista"; do
     echo "$cmd" >&3
     sleep 2
@@ -125,7 +126,7 @@ fi
 for esperado in "Preços recalculados" "Empregos recarregados" "Loja: " "Quiz parado" \
                 "Tag lenda criada" "Tag lenda apagada" "restauradas para o padrão" \
                 "Comando /broadcast desligado" "Este comando está desativado" "Comando /broadcast ligado" \
-                "Ninguém online" "Nether desligado" "Nether liberado"; do
+                "Ninguém online" "Nether desligado" "Nether liberado" "verificações ligadas"; do
   if ! grep -q "$esperado" server.log; then
     echo "::error::Não encontrei \"$esperado\" no log (tags / restaurar padrão / comandos)"
     FAIL=1

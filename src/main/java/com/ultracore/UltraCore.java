@@ -74,6 +74,7 @@ public final class UltraCore extends JavaPlugin {
         moduleManager.register(new MotdModule(this));
         moduleManager.register(new ModerationModule(this));
         moduleManager.register(new StaffModule(this));
+        moduleManager.register(new AntiCheatModule(this));
         moduleManager.register(new UtilitiesModule(this));
         moduleManager.register(new WorldProtectionModule(this));
         moduleManager.register(new PvpModule(this));

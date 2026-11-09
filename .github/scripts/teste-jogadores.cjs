@@ -849,6 +849,181 @@ async function main () {
   // ---------- dinheiro por tempo online (no teste: 1 a cada 2 minutos) ----------
   checar(await esperarMsg('Alvo', /por jogar 2 minutos/, 0, 30000), 'quem joga ganha dinheiro por tempo online')
 
+  // ---------- anti-cheat ----------
+  // o Robo (OP) recebe os alertas; os de antes daqui vêm das brincadeiras/teleportes (só aviso, para conferir falsos alarmes)
+  const ehAlerta = (m) => /\[AC\]/.test(m)
+  const alertasAntes = msgs.Robo.filter(ehAlerta)
+  if (alertasAntes.length) anotar('warning', `Alertas do anti-cheat antes do teste dele: ${alertasAntes.slice(0, 6).join(' | ')}`)
+  const A = bots.Alvo
+  const posServidor = async (nome) => {
+    const r = semCor(await rcon.comando(`data get entity ${nome} Pos`))
+    const m = /\[(-?[\d.E-]+)d?, (-?[\d.E-]+)d?, (-?[\d.E-]+)d?\]/.exec(r)
+    return m ? { x: +m[1], y: +m[2], z: +m[3] } : null
+  }
+  const alertaDe = (re, desde) => aguardar(() => msgs.Robo.slice(desde).some((m) => ehAlerta(m) && /Alvo/.test(m) && re.test(m)), 8000)
+  const semFisica = () => { A.physicsEnabled = false; A.entity.velocity.set(0, 0, 0) }
+  const comFisica = async () => { A.physicsEnabled = true; await espera(2500) }
+  await rcon.comando('effect clear Alvo')
+  await rcon.comando('gamemode survival Alvo')
+  await rcon.comando('kill @e[type=!minecraft:player]')
+  await rcon.comando('execute in minecraft:overworld run tp Alvo 40 -60 40')
+  await rcon.comando('execute in minecraft:overworld run tp Robo 34 -60 34')
+  await espera(4000)
+
+  // jogo normal: andar, correr e pular não pode virar alerta
+  let desdeAc = marca('Robo')
+  A.setControlState('forward', true)
+  A.setControlState('sprint', true)
+  A.setControlState('jump', true)
+  await espera(4000)
+  A.clearControlStates()
+  await espera(2000)
+  const falsos = msgs.Robo.slice(desdeAc).filter(ehAlerta)
+  checar(falsos.length === 0, 'andar, correr e pular normalmente não gera alerta do anti-cheat' + (falsos.length ? ': ' + falsos.join(' | ') : ''))
+
+  // voo: sobe no ar sem nada embaixo
+  semFisica()
+  desdeAc = marca('Robo')
+  const chao = A.entity.position.y
+  for (let i = 0; i < 30; i++) { A.entity.position.y += 0.25; A.entity.onGround = false; await espera(50) }
+  checar(await alertaDe(/Voo/, desdeAc), 'anti-cheat pega o robô voando (alerta para a staff)')
+  const pv = await posServidor('Alvo')
+  checar(!!pv && pv.y < chao + 2.5, `quem voa é puxado de volta para o chão (y=${pv && pv.y.toFixed(2)}, chão=${chao.toFixed(2)})`)
+  await comFisica()
+
+  // velocidade: 18 m/s no chão
+  semFisica()
+  desdeAc = marca('Robo')
+  const x0 = A.entity.position.x
+  for (let i = 0; i < 30; i++) { A.entity.position.x += 0.9; A.entity.onGround = true; await espera(50) }
+  checar(await alertaDe(/Velocidade/, desdeAc), 'anti-cheat pega o robô correndo rápido demais')
+  const ps = await posServidor('Alvo')
+  checar(!!ps && ps.x - x0 < 20, `quem corre rápido demais é puxado de volta (andou ${ps && (ps.x - x0).toFixed(1)} de 27 blocos)`)
+  await comFisica()
+
+  // sem dano de queda: cai 10 blocos dizendo que está no chão
+  await rcon.comando('effect give Alvo minecraft:instant_health 1 5')
+  await espera(1500)
+  const vidaQueda = A.health
+  const base = A.entity.position.clone()
+  semFisica()
+  await rcon.comando(`tp Alvo ${base.x.toFixed(3)} ${(base.y + 10).toFixed(3)} ${base.z.toFixed(3)}`)
+  await espera(500)
+  A.entity.onGround = true
+  await espera(2300) // passa a isenção do teleporte
+  desdeAc = marca('Robo')
+  let vy = 0
+  for (let i = 0; i < 60 && A.entity.position.y > base.y; i++) {
+    vy = (vy - 0.08) * 0.98
+    A.entity.position.y = Math.max(base.y, A.entity.position.y + vy)
+    A.entity.onGround = true
+    await espera(50)
+  }
+  checar(await alertaDe(/queda/i, desdeAc), 'anti-cheat pega quem cai de alto sem levar dano (NoFall)')
+  checar(await aguardar(() => A.health <= vidaQueda - 4, 4000), `quem engana o dano de queda leva o dano mesmo assim (vida ${vidaQueda} → ${A.health})`)
+  await comFisica()
+  await rcon.comando('effect give Alvo minecraft:instant_health 1 5')
+
+  // alcance: bate numa vaca a quase 5 blocos
+  const vacaPerto = () => A.nearestEntity((e) => e.name === 'cow')
+  await A.look(A.entity.yaw, 0, true) // olhando reto: a vaca nasce na frente, na altura do chão
+  await espera(500)
+  await rcon.comando('execute at Alvo run summon minecraft:cow ^ ^ ^4.8 {NoAI:1b,Invulnerable:1b,Silent:1b}')
+  await aguardar(() => !!vacaPerto(), 4000)
+  let vaca = vacaPerto()
+  desdeAc = marca('Robo')
+  if (vaca) {
+    await A.lookAt(vaca.position.offset(0, 0.7, 0), true)
+    await espera(400)
+    for (let i = 0; i < 3; i++) { A.attack(vaca); await espera(600) }
+  }
+  checar(!!vaca && await alertaDe(/Alcance/, desdeAc), 'anti-cheat pega golpe de longe demais (Reach)')
+  await rcon.comando('kill @e[type=minecraft:cow]')
+
+  // autoclicker: 50 cliques por segundo
+  await rcon.comando('execute at Alvo run summon minecraft:cow ^ ^ ^2 {NoAI:1b,Invulnerable:1b,Silent:1b}')
+  await espera(1000)
+  vaca = vacaPerto()
+  desdeAc = marca('Robo')
+  if (vaca) {
+    await A.lookAt(vaca.position.offset(0, 0.7, 0), true)
+    await espera(400)
+    for (let i = 0; i < 70; i++) { A.attack(vaca); await espera(20) }
+  }
+  checar(!!vaca && await alertaDe(/AutoClicker/, desdeAc), 'anti-cheat pega cliques rápidos demais (AutoClicker)')
+
+  // killaura: bate na vaca que está nas costas
+  await espera(1500)
+  desdeAc = marca('Robo')
+  if (vaca) {
+    await A.look(A.entity.yaw + Math.PI, 0, true)
+    await espera(500)
+    for (let i = 0; i < 4; i++) { A.attack(vaca); await espera(300) }
+  }
+  checar(!!vaca && await alertaDe(/KillAura/, desdeAc), 'anti-cheat pega golpe em quem está nas costas (KillAura)')
+  await rcon.comando('kill @e[type=minecraft:cow]')
+
+  // x-ray: três veios de diamante sem quebrar pedra nenhuma
+  await rcon.comando('give Alvo minecraft:diamond_pickaxe')
+  await espera(800)
+  const pe = A.entity.position.floored()
+  const veios = [[2, 0], [-2, 3], [0, -3]].map(([dx, dz]) => pe.offset(dx, 0, dz))
+  for (const v of veios) await rcon.comando(`setblock ${v.x} ${v.y} ${v.z} minecraft:diamond_ore`)
+  await espera(800)
+  const picaretaAc = A.inventory.items().find((i) => i.name === 'diamond_pickaxe')
+  if (picaretaAc) { try { await A.equip(picaretaAc, 'hand') } catch (e) { console.log('  equipar:', e.message) } }
+  desdeAc = marca('Robo')
+  for (const v of veios) {
+    const b = A.blockAt(v)
+    if (b && b.name === 'diamond_ore') { try { await A.dig(b, true) } catch (e) { console.log('  cavar:', e.message) } }
+  }
+  checar(await alertaDe(/X-Ray/, desdeAc), 'anti-cheat avisa quem acha vários veios de diamante quebrando pouca pedra (X-Ray)')
+  checar(!msgs.Robo.slice(desdeAc).some((m) => ehAlerta(m) && /Nuker/.test(m)), 'minerar normal não conta como Nuker')
+
+  // congelar (/ss) e liberar
+  desde = marca('Alvo')
+  checar(await comando('Robo', '/ss Alvo', /Alvo .*foi congelado/), '/ss congela o jogador')
+  checar(await esperarMsg('Alvo', /congelado pela staff/, desde), 'quem foi congelado é avisado')
+  const pc0 = await posServidor('Alvo')
+  A.setControlState('forward', true)
+  await espera(1500)
+  A.clearControlStates()
+  await espera(600)
+  const pc1 = await posServidor('Alvo')
+  checar(!!pc0 && !!pc1 && Math.hypot(pc1.x - pc0.x, pc1.z - pc0.z) < 0.5, 'congelado não consegue andar')
+  checar(await comando('Alvo', '/spawn', /congelado e não pode/), 'congelado não usa comandos')
+  checar(await comando('Robo', '/liberar Alvo', /descongelado/), '/liberar descongela')
+
+  // menu da staff
+  const wac = await janela(bots.Robo, () => bots.Robo.chat('/ac'))
+  checar(/Anti-Cheat/.test(tituloDe(wac)) && ['Jogadores', 'Alertas recentes', 'Verificações', 'Mineração'].every((t) => temItem(wac, t)), '/ac abre o menu do anti-cheat')
+  const sJog = slotCom(wac, 'Jogadores')
+  const wjog = sJog >= 0 ? await janela(bots.Robo, () => clicar(bots.Robo, sJog)) : null
+  checar(temItem(wjog, 'Alvo'), 'o menu de jogadores mostra o suspeito')
+  const sAlvo = slotCom(wjog, 'Alvo')
+  const wpl = sAlvo >= 0 ? await janela(bots.Robo, () => clicar(bots.Robo, sAlvo)) : null
+  checar(/Alvo/.test(tituloDe(wpl)) && ['Voo', 'Velocidade', 'Congelar', 'Espiar', 'Expulsar'].every((t) => temItem(wpl, t)), 'o menu do jogador mostra as violações e as ações')
+  desde = marca('Alvo')
+  const sCong = slotCom(wpl, 'Congelar')
+  if (sCong >= 0) await clicar(bots.Robo, sCong)
+  checar(await esperarMsg('Alvo', /congelado pela staff/, desde), 'o botão Congelar do menu funciona')
+  await comando('Robo', '/liberar Alvo', /descongelado/)
+  fechar(bots.Robo)
+  const wac2 = await janela(bots.Robo, () => bots.Robo.chat('/ac'))
+  const sAl = slotCom(wac2, 'Alertas recentes')
+  const walist = sAl >= 0 ? await janela(bots.Robo, () => clicar(bots.Robo, sAl)) : null
+  checar(temItem(walist, 'Voo') && temItem(walist, 'Alvo'), 'o menu de alertas lista os flagras')
+  fechar(bots.Robo)
+  const wac3 = await janela(bots.Robo, () => bots.Robo.chat('/ac'))
+  const sVer = slotCom(wac3, 'Verificações')
+  const wver = sVer >= 0 ? await janela(bots.Robo, () => clicar(bots.Robo, sVer)) : null
+  checar(['Voo', 'KillAura', 'X-Ray'].every((t) => temItem(wver, t)), 'o menu de verificações lista os hacks')
+  fechar(bots.Robo)
+  const info = semCor(await rcon.comando('ac info Alvo'))
+  checar(/Voo/.test(info) && /VL/.test(info), '/ac info pelo console mostra as violações')
+  const doRobo = msgs.Robo.filter((m) => ehAlerta(m) && /\] Robo /.test(m))
+  checar(doRobo.length === 0, 'o OP, que jogou normal o teste todo, não recebeu nenhum alerta' + (doRobo.length ? ': ' + doRobo.slice(0, 4).join(' | ') : ''))
+
   // ---------- mensagens "cruas" ----------
   const cruas = [...msgs.Robo, ...msgs.Alvo, ...barra.Robo, ...barra.Alvo].filter((m) => /^(\[UltraCore\]\s*)?[a-z]+(\.[a-z0-9-]+)+$/.test(m.trim()))
   checar(cruas.length === 0, 'nenhuma mensagem apareceu como código (ex: fun.target)' + (cruas.length ? ': ' + cruas.join(' | ') : ''))

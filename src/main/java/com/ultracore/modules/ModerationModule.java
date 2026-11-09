@@ -200,6 +200,11 @@ public class ModerationModule extends Module {
                 "time", TimeUtil.format(duration), "reason", reason));
     }
 
+    /** Para outros módulos (ex: Anti-Cheat): bane com tela de ban, histórico e aviso. duration em ms, -1 = permanente. */
+    public void banFromModule(UUID id, String reason, String by, long duration) {
+        applyBan(id, reason, by, duration);
+    }
+
     private void unban(CommandSender s, String[] a) {
         if (a.length == 0) {
             msg(s, "common.usage", "usage", "/unban <jogador>");

@@ -4,6 +4,10 @@ Plugin para **Paper 1.21 até 26.x** (e forks como Purpur) que junta num só lug
 
 Cada recurso é um **módulo** que pode ser **ligado, desligado e configurado dentro do jogo** pelo comando `/painel`, sem mexer em arquivos nem reiniciar o servidor. Todas as mensagens podem ser editadas no `messages.yml`.
 
+## ✨ Novidades da 3.3
+
+- **Anti-Cheat** (módulo `anticheat`): pega **voo** (voar, flutuar, subir parede, pulo alto, andar na água), **velocidade**, **sem dano de queda**, **timer** (jogo acelerado), **alcance (Reach)**, **KillAura** (golpe fora da mira, atrás da parede ou em dois alvos ao mesmo tempo), **AutoClicker**, **Nuker**, **Scaffold/FastPlace**, **inventário andando** e **X-Ray** (acha diamante/detrito rápido demais quebrando pouca pedra). Além de avisar, ele **corrige na hora** (puxa de volta, cancela o golpe ou o bloco, aplica o dano de queda). A staff recebe **alertas clicáveis** no chat e tem um **menu completo** em `/ac`: jogadores do mais suspeito para o menos, alertas recentes, espiar pela câmera do jogador, **congelar** (`/ss`), ver inventário, zerar, expulsar, banir, ligar/desligar cada verificação e punição automática por VL. Veja [Anti-Cheat](#anti-cheat).
+
 ## ✨ Novidades da 3.2
 
 - **3.2.1 (correções de duplicação):**
@@ -158,6 +162,7 @@ Ficam em `plugins/UltraCore/`:
 | `kits.yml` | Kits (crie pelo jogo com `/createkit`) |
 | `warps.yml`, `spawn.yml` | Warps e spawn |
 | `bans.yml` | Banimentos e bans de IP |
+| `anticheat.yml` | Quem está congelado, quem é ignorado pelo anti-cheat e quem desligou os alertas |
 | `players/` | Dados de cada jogador (saldo, homes, histórico...) |
 
 Textos aceitam cores `&a`, `&l`... e hex `&#FF8800`.
@@ -195,6 +200,7 @@ Textos aceitam cores `&a`, `&l`... e hex `&#FF8800`.
 | Tablist | Cabeçalho e rodapé da TAB | — |
 | MOTD | Descrição na lista de servidores (desligado por padrão) | — |
 | Moderação | Ban, tempban, ban por IP, kick, mute com tempo, **avisos com punição automática**, **histórico**, **denúncias** | `/ban`, `/tempban`, `/unban`, `/banip`, `/unbanip`, `/kick`, `/mute`, `/unmute`, `/warn`, `/limparavisos`, `/historico`, `/report` |
+| **Anti-Cheat** 🆕 | Voo, velocidade, sem queda, timer, Reach, KillAura, AutoClicker, Nuker, Scaffold, inventário andando e X-Ray, com alertas e menu da staff | `/ac`, `/ac <jogador>`, `/ac alertas`, `/ss <jogador>`, `/liberar <jogador>`, `/ac voltar` |
 | Ferramentas da Staff | Voo, cura, gamemode, deus, vanish, invsee... | `/fly`, `/heal`, `/feed`, `/gm`, `/god`, `/vanish`, `/esconder`, `/escondernick`, `/invsee`, `/ecsee`, `/clearinv`, `/speed`, `/tphere` |
 | Utilidades | Bancada, enderchest, chapéu, ping, lixeira, regras, luz (visão noturna que continua ao morrer, beber leite e relogar) | `/craft`, `/ec`, `/hat`, `/ping`, `/lixo`, `/regras`, `/luz` |
 | Proteção do Mundo | Creeper/TNT sem quebrar blocos, fogo, enderman, phantoms, keep inventory, clima, queda, plantações, **desligar o Nether e o The End** 🆕 | — |
@@ -386,6 +392,38 @@ Some o **nome que aparece em cima da sua cabeça**: os outros veem o personagem,
 - A staff com `ultracore.silentjoin.see` recebe um aviso discreto (`[Silencioso] Fulano entrou`); dá para desligar isso no `/painel` → Entrada e Saída.
 - Para sumir também da TAB e do mundo, use o `/vanish`. 🆕 O **vanish continua ligado** quando você sai e entra de novo (entra invisível e sem mensagem de entrada/saída, nem no Discord/WhatsApp). `/vanish` de novo para aparecer.
 
+### Anti-Cheat
+
+Funciona sozinho, sem precisar de outro plugin (nem ProtocolLib). Cada verificação soma pontos de violação (**VL**) quando pega algo e esse VL **cai 1 a cada 30 segundos**. Para não acusar quem joga normal, os limites têm folga, cada hack precisa se repetir antes de virar alerta e tudo **pausa quando o servidor está com lag** (TPS baixo ou travadas).
+
+| Verificação | O que pega | O que a correção faz |
+|---|---|---|
+| Voo | voar, flutuar parado, subir parede, pulo alto, andar sobre a água | puxa de volta para o chão |
+| Velocidade | andar/correr mais rápido que o jogo (conta poção, gelo, pulo com teto, Velocidade das Almas) | puxa de volta |
+| Sem dano de queda | cair de alto sem dano, mentindo que estava no chão | aplica o dano |
+| Timer | jogo acelerado (mais de 20 movimentos por segundo) | puxa de volta |
+| Alcance (Reach) | bater de longe (com folga pelo ping e pelo movimento do alvo) | cancela o golpe |
+| KillAura | golpe fora da mira, atrás de parede ou em dois alvos de uma vez | cancela o golpe |
+| AutoClicker | mais cliques por segundo que o limite (padrão 20) | cancela os golpes extras |
+| Nuker | muitos blocos de uma vez, longe demais ou fora da mira | cancela a quebra |
+| Scaffold / FastPlace | blocos rápido demais, fora da mira ou numa face que não dá para ver | cancela o bloco |
+| Inventário andando | mexer no inventário enquanto anda | cancela o clique |
+| X-Ray | vários veios de diamante/detrito em 15 minutos quebrando pouca pedra | só avisa (nunca pune sozinho) |
+
+**Menu `/ac` (staff):**
+- **Jogadores**: todos online, do mais suspeito para o menos, com o VL de cada hack, ping, modo e local. Clique para abrir o jogador.
+- **Jogador**: VL e último flagra de cada hack, **ir até**, **espiar** (vira espectador e vê pela câmera dele; `/ac voltar` volta), **congelar/descongelar**, ver inventário e baú do fim, alertas dele, zerar, ignorar, expulsar e banir (com confirmação).
+- **Alertas recentes**: os últimos 500, com detalhe, VL, ping, local e hora.
+- **Verificações**: liga/desliga cada uma (esquerdo) e a correção (direito).
+- **Mineração (X-Ray)**: diamantes, detritos, veios e pedras por veio de cada jogador; direito leva até o último veio.
+- **Punição automática**: expulsar e/ou banir quando um hack chega num VL (padrão: desligado; comece só com os alertas e veja se tem falso alarme).
+
+**Alertas:** quem tem `ultracore.anticheat` (staff) recebe no chat; passe o mouse para ver os detalhes e clique para abrir o jogador. `/ac alertas` liga/desliga só para você. Também podem ir para o Discord/WhatsApp (categoria *Anti-Cheat*).
+
+**Congelar (`/ss <jogador>`, `/liberar <jogador>`):** o jogador não anda, não quebra, não bate, não toma dano e só usa os comandos liberados (mensagem e login). Se sair do servidor congelado, a staff é avisada (e pode ser banido, se ligar a opção). Continua congelado ao voltar e depois de reiniciar o servidor.
+
+Quem tem `ultracore.anticheat.bypass` não é verificado (ninguém tem por padrão, nem OP). Criativo, espectador, voo liberado (`/fly`), élitro, tridente e montaria também não contam.
+
 ### Avisos e punição automática
 
 Cada `/warn` soma um aviso. Com as opções padrão (ajustáveis no `/painel` → Moderação):
@@ -424,7 +462,7 @@ O passo a passo está no [README da ponte](integracoes/whatsapp-bot/README.md).
 | `ultracore.staff` | OP | kick, mute, ban, warn, histórico, ver denúncias, staffchat, vanish, invsee, gm, heal, feed, tphere... |
 | `ultracore.admin` | OP | tudo + `/painel`, setspawn, setwarp, eco, createkit, banip, editar a loja, gerenciar tags, god, speed... |
 
-Outras úteis: `ultracore.homes.unlimited`, `ultracore.bypass.delay`, `ultracore.bypass.cooldown`, `ultracore.kit.<nome>`, `ultracore.warp.<nome>`, `ultracore.tag.<id>` (cada tag), `ultracore.tags.admin` (/tag dar, tirar, criar, apagar), `ultracore.nick.others`, `ultracore.report.see`, `ultracore.silentjoin` e `ultracore.silentjoin.see` (staff), `ultracore.msg.bypass` (staff: manda mensagem privada mesmo para quem desligou), `ultracore.loja.vip` (bônus de venda), `ultracore.empregos.max.<n>` (mais empregos), `ultracore.empregos.semlimite` (sem limite por hora), `ultracore.empregos.admin`, `ultracore.missoes.admin`, `ultracore.mercado.admin`, `ultracore.mercado.limite.<n>`, `ultracore.lojinha.admin`, `ultracore.quiz.admin`.
+Outras úteis: `ultracore.homes.unlimited`, `ultracore.bypass.delay`, `ultracore.bypass.cooldown`, `ultracore.kit.<nome>`, `ultracore.warp.<nome>`, `ultracore.tag.<id>` (cada tag), `ultracore.tags.admin` (/tag dar, tirar, criar, apagar), `ultracore.nick.others`, `ultracore.report.see`, `ultracore.silentjoin` e `ultracore.silentjoin.see` (staff), `ultracore.msg.bypass` (staff: manda mensagem privada mesmo para quem desligou), `ultracore.loja.vip` (bônus de venda), `ultracore.empregos.max.<n>` (mais empregos), `ultracore.empregos.semlimite` (sem limite por hora), `ultracore.empregos.admin`, `ultracore.missoes.admin`, `ultracore.mercado.admin`, `ultracore.mercado.limite.<n>`, `ultracore.lojinha.admin`, `ultracore.quiz.admin`, `ultracore.anticheat` (staff: menu, alertas, congelar, espiar), `ultracore.anticheat.admin` (admin: mudar verificações e punições, banir e ignorar pelo menu), `ultracore.anticheat.bypass` (não é verificado; ninguém tem por padrão).
 
 ## Para desenvolvedores
 
