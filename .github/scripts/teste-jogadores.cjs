@@ -1021,6 +1021,8 @@ async function main () {
   fechar(bots.Robo)
   const info = semCor(await rcon.comando('ac info Alvo'))
   checar(/Voo/.test(info) && /VL/.test(info), '/ac info pelo console mostra as violações')
+  const todosAc = msgs.Robo.filter(ehAlerta)
+  anotar('notice', `Alertas do anti-cheat no teste (${todosAc.length}): ${todosAc.join(' | ').slice(0, 3000)}`)
   const doRobo = msgs.Robo.filter((m) => ehAlerta(m) && /\] Robo /.test(m))
   checar(doRobo.length === 0, 'o OP, que jogou normal o teste todo, não recebeu nenhum alerta' + (doRobo.length ? ': ' + doRobo.slice(0, 4).join(' | ') : ''))
 

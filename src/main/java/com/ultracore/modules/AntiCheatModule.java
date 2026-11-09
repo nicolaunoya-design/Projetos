@@ -810,8 +810,7 @@ public class AntiCheatModule extends Module {
     }
 
     /** Conferência completa (só antes de acusar): tudo em volta, entidades e o que tem embaixo. */
-    private int envAround(Player p) {
-        BoundingBox box = p.getBoundingBox();
+    private int envAround(Player p, BoundingBox box) {
         World w = p.getWorld();
         int env = 0;
         int x0 = (int) Math.floor(box.getMinX() - 0.3), x1 = (int) Math.floor(box.getMaxX() + 0.3);
@@ -837,7 +836,8 @@ public class AntiCheatModule extends Module {
             }
         }
         try {
-            for (Entity e : p.getNearbyEntities(1.5, 2.5, 1.5)) {
+            for (Entity e : w.getNearbyEntities(box.clone().expand(1.5, 2.5, 1.5))) {
+                if (e == p) continue;
                 if (e instanceof Boat || e instanceof Shulker || e instanceof Minecart) env |= ENTITY;
                 else {
                     String type = e.getType().name();
@@ -848,7 +848,7 @@ public class AntiCheatModule extends Module {
         }
         // pulou de um bloco de slime ou cama lá embaixo
         if ((env & BOUNCE) == 0) {
-            int cx = p.getLocation().getBlockX(), cz = p.getLocation().getBlockZ();
+            int cx = (int) Math.floor(box.getCenterX()), cz = (int) Math.floor(box.getCenterZ());
             int start = (int) Math.floor(box.getMinY()) - 1;
             for (int y = start; y >= start - 14 && y >= w.getMinHeight(); y--) {
                 Material m = w.getBlockAt(cx, y, cz).getType();
@@ -937,7 +937,9 @@ public class AntiCheatModule extends Module {
         double dz = to.getZ() - from.getZ();
         double h = Math.sqrt(dx * dx + dz * dz);
 
-        BoundingBox box = p.getBoundingBox();
+        // durante o evento o Paper ainda deixa o jogador na posição antiga: a caixa vai para o destino
+        Location cur = p.getLocation();
+        BoundingBox box = p.getBoundingBox().shift(to.getX() - cur.getX(), to.getY() - cur.getY(), to.getZ() - cur.getZ());
         boolean ground = solidBelow(p, box);
         int env = ground ? 0 : quickEnv(to);
         if (ground) {
@@ -974,9 +976,9 @@ public class AntiCheatModule extends Module {
             else t.fastGroundStreak = 0;
             t.lastMoveAt = now;
             boolean grace = tick - t.envTick <= 6;
-            if (on(Check.FLY)) flagged = checkFly(e, p, t, ground, dy, h, env, grace, now);
-            if (!flagged && on(Check.SPEED)) flagged = checkSpeed(e, p, t, ground, h, env, grace, now);
-            if (!flagged) trackFall(p, t, from, to, ground, dy, now, tick);
+            if (on(Check.FLY)) flagged = checkFly(e, p, t, box, ground, dy, h, env, grace, now);
+            if (!flagged && on(Check.SPEED)) flagged = checkSpeed(e, p, t, box, h, env, grace, now);
+            if (!flagged) trackFall(p, t, box, from, to, ground, dy, now, tick);
         }
         if (flagged) return;
         // o lugar seguro só anda enquanto não tem suspeita pendente (senão puxaria de volta só 1 bloco)
@@ -1007,7 +1009,7 @@ public class AntiCheatModule extends Module {
         t.clearHist();
     }
 
-    private boolean checkFly(PlayerMoveEvent e, Player p, Track t, boolean ground, double dy, double h, int env,
+    private boolean checkFly(PlayerMoveEvent e, Player p, Track t, BoundingBox box, boolean ground, double dy, double h, int env,
                              boolean grace, long now) {
         if (ground) {
             t.flyBuffer = Math.max(0, t.flyBuffer - 0.5);
@@ -1039,8 +1041,8 @@ public class AntiCheatModule extends Module {
                 if (diff > 0.035) {
                     t.flyBuffer += diff > 0.3 ? 2 : 1;
                     if (t.flyBuffer >= 3) {
-                        if (Math.abs(dy) < 0.03 && waterBelow(p)) why = "andando sobre a água";
-                        else why = dy > 0 ? "subindo no ar (+" + num(dy) + ")" : "caindo devagar (" + num(dy) + ")";
+                        if (Math.abs(dy) < 0.03 && waterBelow(p.getWorld(), box)) why = "andando sobre a água";
+                        else why = (dy > 0 ? "subindo no ar (" : "caindo devagar (") + num(dy) + ", devia " + num(pred) + ")";
                     }
                 } else {
                     t.flyBuffer = Math.max(0, t.flyBuffer - 0.25);
@@ -1048,7 +1050,7 @@ public class AntiCheatModule extends Module {
             }
         }
         if (why == null) return false;
-        if (envAround(p) != 0) {
+        if (envAround(p, box) != 0) {
             t.flyBuffer = 0;
             t.hoverMoves = 0;
             t.exemptFly = now + 1000;
@@ -1065,15 +1067,14 @@ public class AntiCheatModule extends Module {
         return false;
     }
 
-    private static boolean waterBelow(Player p) {
-        BoundingBox box = p.getBoundingBox();
-        Block b = p.getWorld().getBlockAt((int) Math.floor(box.getCenterX()), (int) Math.floor(box.getMinY() - 0.2),
+    private static boolean waterBelow(World w, BoundingBox box) {
+        Block b = w.getBlockAt((int) Math.floor(box.getCenterX()), (int) Math.floor(box.getMinY() - 0.2),
                 (int) Math.floor(box.getCenterZ()));
         Material m = b.getType();
         return liquid(m) || waterlogged(b);
     }
 
-    private boolean checkSpeed(PlayerMoveEvent e, Player p, Track t, boolean ground, double h, int env, boolean grace, long now) {
+    private boolean checkSpeed(PlayerMoveEvent e, Player p, Track t, BoundingBox box, double h, int env, boolean grace, long now) {
         if (now < t.exemptSpeed || (env & LIQUID) != 0 || grace || t.bounce) {
             t.clearHist();
             t.speedBuffer = 0;
@@ -1090,7 +1091,6 @@ public class AntiCheatModule extends Module {
         }
         // confere de novo com tudo atualizado: efeitos, gelo embaixo, teto (pulo com a cabeça batendo)
         refreshAttrs(p, t, now, true);
-        BoundingBox box = p.getBoundingBox();
         try {
             if (p.wouldCollideUsing(box.clone().shift(0, 0.45, 0))) t.ceilUntil = now + 1500;
         } catch (Throwable ignored) {
@@ -1103,7 +1103,7 @@ public class AntiCheatModule extends Module {
         overTick = h > tickLimit;
         overAvg = t.histN >= t.hist.length && t.avg() > avgLimit;
         if (!overTick && !overAvg) return false;
-        if (envAround(p) != 0) {
+        if (envAround(p, box) != 0) {
             t.exemptSpeed = now + 1000;
             t.clearHist();
             return false;
@@ -1145,7 +1145,7 @@ public class AntiCheatModule extends Module {
 
     // ---------- queda sem dano ----------
 
-    private void trackFall(Player p, Track t, Location from, Location to, boolean ground, double dy, long now, int tick) {
+    private void trackFall(Player p, Track t, BoundingBox box, Location from, Location to, boolean ground, double dy, long now, int tick) {
         if (amplifier(p, PotionEffectType.SLOW_FALLING) >= 0) {
             t.fallTop = Double.NaN; // queda lenta: o jogo não dá dano
             t.spoofTicks = 0;
@@ -1167,7 +1167,7 @@ public class AntiCheatModule extends Module {
         t.spoofTicks = 0;
         // sem o jogo dele ter mentido que estava no chão, a falta de dano veio de outra coisa (plugin, efeito...)
         if (!on(Check.NOFALL) || spoofs == 0 || fell < 4 || now < t.noFallSkipUntil || t.groundAir) return;
-        Material landed = groundMaterial(to.getWorld(), p.getBoundingBox());
+        Material landed = groundMaterial(to.getWorld(), box);
         double mult = attr(p, attrFallMult, 1.0);
         if (landed == Material.SLIME_BLOCK || landed == Material.POWDER_SNOW || landed == Material.COBWEB
                 || landed == Material.SCAFFOLDING || landed == Material.SWEET_BERRY_BUSH || liquid(landed)) return;
@@ -1185,7 +1185,7 @@ public class AntiCheatModule extends Module {
         } catch (Throwable ignored) {
         }
         if (p.isInvulnerable() || p.getNoDamageTicks() > 10) return;
-        if (envAround(p) != 0) return;
+        if (envAround(p, box) != 0) return;
         final double damage = dmg;
         final double fallen = fell;
         Bukkit.getScheduler().runTaskLater(plugin, () -> {
@@ -1648,7 +1648,7 @@ public class AntiCheatModule extends Module {
         // andou no chão em todos os últimos 10 movimentos e ainda está andando agora
         if (t.fastGroundStreak < 10 || now - t.lastMoveAt > 150) return;
         if (skipMovement(p, t, now) || p.isInsideVehicle()) return;
-        if (envAround(p) != 0) return;
+        if (envAround(p, p.getBoundingBox()) != 0) return;
         // mods de "repor a barra" clicam sozinhos de vez em quando: só acusa com vários cliques seguidos
         t.invBuffer = Math.max(0, t.invBuffer - (now - t.invBufferAt) / 5000.0) + 1;
         t.invBufferAt = now;
@@ -2216,7 +2216,7 @@ public class AntiCheatModule extends Module {
             for (Alert al : alerts) if (al.time() >= hourAgo) lastHour++;
             List<Track> sus = suspects();
             set(4, new ItemBuilder(Material.SHIELD).name("&c&lAnti-Cheat").glow(true).lore(
-                    "&7Verificações ligadas: &a" + activeChecks() + "&7/&f" + Check.values().length,
+                    "&7Hacks vigiados: &a" + activeChecks() + "&7/&f" + Check.values().length,
                     "&7Alertas na última hora: &e" + lastHour,
                     "&7Suspeitos online agora: &c" + sus.size(),
                     "&7Congelados: &b" + frozen.size(),
