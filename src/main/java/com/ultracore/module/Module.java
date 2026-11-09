@@ -1,0 +1,288 @@
+package com.ultracore.module;
+
+import com.ultracore.UltraCore;
+import com.ultracore.util.Msg;
+import com.ultracore.util.TimeUtil;
+import org.bukkit.Bukkit;
+import org.bukkit.Material;
+import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
+import org.bukkit.event.HandlerList;
+import org.bukkit.event.Listener;
+import org.bukkit.scheduler.BukkitTask;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.logging.Level;
+
+/**
+ * Base de todos os módulos. Cada módulo declara suas configurações e comandos no construtor
+ * e pode ser ligado/desligado a qualquer momento pelo painel (/painel).
+ */
+public abstract class Module implements Listener {
+
+    protected final UltraCore plugin;
+    private final String id;
+    private final String name;
+    private final Material icon;
+    private final boolean defaultEnabled;
+    private final String description;
+    private final Map<String, Setting> settings = new LinkedHashMap<>();
+    private final Map<String, ModuleCommand> commands = new LinkedHashMap<>();
+    private final List<BukkitTask> tasks = new ArrayList<>();
+    /** "uuid:chave" -> horário em que o cooldown acaba. Fica na memória (zera ao reiniciar o servidor). */
+    private final Map<String, Long> cooldowns = new ConcurrentHashMap<>();
+    private boolean enabled;
+
+    protected Module(UltraCore plugin, String id, String name, Material icon, boolean defaultEnabled, String description) {
+        this.plugin = plugin;
+        this.id = id;
+        this.name = name;
+        this.icon = icon;
+        this.defaultEnabled = defaultEnabled;
+        this.description = description;
+    }
+
+    // ---------- ciclo de vida ----------
+
+    protected void onEnable() {
+    }
+
+    protected void onDisable() {
+    }
+
+    public final void enable() {
+        if (enabled) return;
+        enabled = true;
+        Bukkit.getPluginManager().registerEvents(this, plugin);
+        try {
+            onEnable();
+        } catch (Throwable e) {
+            plugin.getLogger().log(Level.SEVERE, "Erro ao ativar o módulo " + id
+                    + " (pode ser incompatível com esta versão do servidor). O módulo foi desligado.", e);
+            disable();
+        }
+    }
+
+    public final void disable() {
+        if (!enabled) return;
+        enabled = false;
+        HandlerList.unregisterAll(this);
+        tasks.forEach(BukkitTask::cancel);
+        tasks.clear();
+        try {
+            onDisable();
+        } catch (Throwable e) {
+            plugin.getLogger().log(Level.SEVERE, "Erro ao desativar o módulo " + id, e);
+        }
+    }
+
+    /** Liga/desliga e salva no config.yml. */
+    public void setEnabledPersist(boolean value) {
+        plugin.getConfig().set(path("enabled"), value);
+        plugin.saveConfig();
+        if (value) enable();
+        else disable();
+    }
+
+    /** Reinicia o módulo para aplicar novas configurações. */
+    public void restart() {
+        if (!enabled) return;
+        disable();
+        enable();
+    }
+
+    protected BukkitTask timer(long delayTicks, long periodTicks, Runnable r) {
+        BukkitTask t = Bukkit.getScheduler().runTaskTimer(plugin, r, delayTicks, periodTicks);
+        tasks.add(t);
+        return t;
+    }
+
+    /** Tarefa repetida fora da thread principal (para rede); cancelada ao desativar o módulo. */
+    protected BukkitTask asyncTimer(long delayTicks, long periodTicks, Runnable r) {
+        BukkitTask t = Bukkit.getScheduler().runTaskTimerAsynchronously(plugin, r, delayTicks, periodTicks);
+        tasks.add(t);
+        return t;
+    }
+
+    // ---------- declaração de configurações ----------
+
+    private Setting add(Setting s) {
+        settings.put(s.getKey(), s);
+        return s;
+    }
+
+    protected Setting bool(String key, boolean def, Material icon, String name, String desc) {
+        return add(new Setting(key, Setting.Type.BOOLEAN, def, icon, name, desc, 0, 0, 0));
+    }
+
+    protected Setting integer(String key, int def, int min, int max, int step, Material icon, String name, String desc) {
+        return add(new Setting(key, Setting.Type.INTEGER, def, icon, name, desc, min, max, step));
+    }
+
+    protected Setting decimal(String key, double def, double min, double max, double step, Material icon, String name, String desc) {
+        return add(new Setting(key, Setting.Type.DOUBLE, def, icon, name, desc, min, max, step));
+    }
+
+    protected Setting text(String key, String def, Material icon, String name, String desc) {
+        return add(new Setting(key, Setting.Type.TEXT, def, icon, name, desc, 0, 0, 0));
+    }
+
+    protected Setting list(String key, List<String> def, Material icon, String name, String desc) {
+        return add(new Setting(key, Setting.Type.LIST, def, icon, name, desc, 0, 0, 0));
+    }
+
+    protected ModuleCommand command(String name, String permission, ModuleCommand.Handler handler) {
+        ModuleCommand c = new ModuleCommand(this, name, permission, handler);
+        commands.put(name, c);
+        return c;
+    }
+
+    // ---------- leitura/escrita de valores ----------
+
+    public String path(String key) {
+        return "modules." + id + "." + key;
+    }
+
+    public boolean getBool(String key) {
+        return plugin.getConfig().getBoolean(path(key));
+    }
+
+    public int getInt(String key) {
+        return plugin.getConfig().getInt(path(key));
+    }
+
+    public double getDouble(String key) {
+        return plugin.getConfig().getDouble(path(key));
+    }
+
+    public String getString(String key) {
+        String v = plugin.getConfig().getString(path(key));
+        return v == null ? "" : v;
+    }
+
+    public List<String> getList(String key) {
+        return plugin.getConfig().getStringList(path(key));
+    }
+
+    /** Volta todas as configurações deste módulo para o padrão (não muda se ele está ligado ou desligado). */
+    public void resetDefaults() {
+        for (Setting s : settings.values()) plugin.getConfig().set(path(s.getKey()), s.getDefaultValue());
+        for (String c : commands.keySet()) plugin.getConfig().set(commandPath(c), true);
+        plugin.saveConfig();
+        restart();
+    }
+
+    // ---------- comandos individuais ----------
+
+    public String commandPath(String command) {
+        return path("commands." + command);
+    }
+
+    /** Se o comando está ligado (cada comando de um módulo pode ser desligado sozinho no /painel). */
+    public boolean isCommandEnabled(String command) {
+        return plugin.getConfig().getBoolean(commandPath(command), true);
+    }
+
+    public void setCommandEnabled(String command, boolean value) {
+        plugin.getConfig().set(commandPath(command), value);
+        plugin.saveConfig();
+    }
+
+    /**
+     * Menu extra de edição do módulo (ex: editor da loja), mostrado como botão nas configurações do /painel.
+     * Módulos que têm editor sobrescrevem este método e {@link #hasEditor()}.
+     */
+    public com.ultracore.gui.Menu editor(Player p, com.ultracore.gui.Menu parent) {
+        return null;
+    }
+
+    public boolean hasEditor() {
+        return false;
+    }
+
+    public void setValue(String key, Object value) {
+        plugin.getConfig().set(path(key), value);
+        plugin.saveConfig();
+        restart();
+    }
+
+    // ---------- cooldowns ----------
+
+    /** Milissegundos que faltam para o jogador poder usar de novo (0 = liberado). */
+    public long cooldownLeft(Player p, String key) {
+        Long until = cooldowns.get(p.getUniqueId() + ":" + key);
+        if (until == null) return 0;
+        long left = until - System.currentTimeMillis();
+        if (left <= 0) cooldowns.remove(p.getUniqueId() + ":" + key);
+        return Math.max(0, left);
+    }
+
+    /** Começa um cooldown de "seconds" segundos (0 ou menos = nenhum). */
+    protected void startCooldown(Player p, String key, int seconds) {
+        if (seconds <= 0 || p.hasPermission("ultracore.bypass.cooldown")) return;
+        cooldowns.put(p.getUniqueId() + ":" + key, System.currentTimeMillis() + seconds * 1000L);
+    }
+
+    /** Se ainda estiver em cooldown, avisa o jogador e retorna false. */
+    protected boolean cooldownReady(Player p, String key, String command) {
+        if (p.hasPermission("ultracore.bypass.cooldown")) return true;
+        long left = cooldownLeft(p, key);
+        if (left <= 0) return true;
+        msg(p, "common.cooldown", "time", TimeUtil.format(left + 999), "command", command);
+        return false;
+    }
+
+    // ---------- ajudantes para comandos ----------
+
+    protected void send(CommandSender to, String msg) {
+        Msg.send(to, msg);
+    }
+
+    /** Envia uma mensagem do messages.yml. */
+    protected void msg(CommandSender to, String key, Object... placeholders) {
+        Msg.tell(to, key, placeholders);
+    }
+
+    /** O jogador do argumento (se tiver permissão para outros) ou quem usou o comando. */
+    protected Player self(CommandSender s, String[] a, int index, String othersPerm) {
+        if (a.length > index) {
+            if (!s.hasPermission(othersPerm)) {
+                msg(s, "common.others-no-permission");
+                return null;
+            }
+            return online(s, a[index]);
+        }
+        if (s instanceof Player p) return p;
+        msg(s, "common.specify-player");
+        return null;
+    }
+
+    /** Procura um jogador online; envia erro se não encontrar. */
+    protected Player online(CommandSender sender, String name) {
+        Player p = Bukkit.getPlayer(name);
+        if (p == null) Msg.tell(sender, "common.player-offline", "player", name);
+        return p;
+    }
+
+    protected static List<String> onlineNames(String typed) {
+        List<String> names = new ArrayList<>();
+        Bukkit.getOnlinePlayers().forEach(p -> names.add(p.getName()));
+        return Msg.filter(names, typed);
+    }
+
+    // ---------- getters ----------
+
+    public String getId() { return id; }
+    public String getName() { return name; }
+    public Material getIcon() { return icon; }
+    public boolean isDefaultEnabled() { return defaultEnabled; }
+    public String getDescription() { return description; }
+    public boolean isEnabled() { return enabled; }
+    public Collection<Setting> getSettings() { return settings.values(); }
+    public Collection<ModuleCommand> getCommands() { return commands.values(); }
+}
