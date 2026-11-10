@@ -35,7 +35,7 @@ posição certa de impressão: não gire.
 | `04_garfo_da_roldana.stl` | 2 | garfo com gancho que segura a roldana |
 | `05_roldana.stl` | 2 | a roda da polia, com sulco para o barbante |
 | `06_balde.stl` | 2 | baldinho para as moedas (cabe até moeda de R$ 1) |
-| `mesa_completa.stl` | 1 | **tudo acima já arrumado numa mesa só** (150 × 168 mm) |
+| `polia_mesa_completa.stl` | 1 | **tudo acima já arrumado numa mesa só** (150 × 168 mm) |
 | `01_portico_alto.stl` | (1) | opcional, no lugar do 01: pórtico de 210 mm para mesa de 220 mm ou mais. A carga sobe 8 cm em vez de 4 cm |
 
 ![Mesa de impressão da polia](imagens/09_mesa_polia.png)
@@ -105,7 +105,7 @@ No dia a dia: guindaste, elevador, varal de teto, aparelhos de academia, talha d
 |---|---|---|
 | `01_base.stl` | 1 | base com as duas lâminas (o ponto de apoio) |
 | `02_barra.stl` | 1 | barra de 17 cm com fendas numeradas de 3 a 10 de cada lado |
-| `mesa_completa.stl` | 1 | as duas peças arrumadas numa mesa só (170 × 114 mm) |
+| `alavanca_mesa_completa.stl` | 1 | as duas peças arrumadas numa mesa só (170 × 114 mm) |
 
 ### Montagem
 

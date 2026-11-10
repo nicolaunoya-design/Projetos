@@ -77,7 +77,7 @@
     "obs": ""
   },
   {
-    "arquivo": "polia/mesa_completa.stl",
+    "arquivo": "polia/polia_mesa_completa.stl",
     "quantidade": 1,
     "tamanho_mm": [
       150.0,
@@ -110,7 +110,7 @@
     "obs": ""
   },
   {
-    "arquivo": "alavanca/mesa_completa.stl",
+    "arquivo": "alavanca/alavanca_mesa_completa.stl",
     "quantidade": 1,
     "tamanho_mm": [
       170.0,

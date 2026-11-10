@@ -11,7 +11,7 @@ Todas as peças saem já deitadas na posição de impressão, sem suporte.
 
 Saída (pasta stl/):
   polia/NN_<peça>.stl      peças soltas (quantidades no README e em pecas.json)
-  polia/mesa_completa.stl  tudo arrumado numa mesa só (cabe em 180 x 180 mm)
+  polia/polia_mesa_completa.stl  tudo arrumado numa mesa só (cabe em 180 x 180 mm)
   alavanca/...             idem
 
 Uso:  python3 gerar_modelos.py              gera os STL
@@ -629,12 +629,12 @@ def main():
     salvar(p, "04_garfo_da_roldana.stl", moitao(), resumo, 2)
     salvar(p, "05_roldana.stl", roldana(), resumo, 2)
     salvar(p, "06_balde.stl", balde(), resumo, 2)
-    salvar(p, "mesa_completa.stl", mesa_polia(), resumo, 1, "todas as peças (com o pórtico 01)")
+    salvar(p, "polia_mesa_completa.stl", mesa_polia(), resumo, 1, "todas as peças (com o pórtico 01)")
     print("Alavanca")
     a = os.path.join(args.saida, "alavanca")
     salvar(a, "01_base.stl", base_alavanca(), resumo, 1)
     salvar(a, "02_barra.stl", barra(), resumo, 1)
-    salvar(a, "mesa_completa.stl", mesa_alavanca(), resumo, 1, "as duas peças")
+    salvar(a, "alavanca_mesa_completa.stl", mesa_alavanca(), resumo, 1, "as duas peças")
     with open(os.path.join(args.saida, "pecas.json"), "w", encoding="utf-8") as f:
         json.dump(resumo, f, ensure_ascii=False, indent=2)
     print("Verificação")
