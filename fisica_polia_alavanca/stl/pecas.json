@@ -1,0 +1,123 @@
+[
+  {
+    "arquivo": "polia/01_portico.stl",
+    "quantidade": 1,
+    "tamanho_mm": [
+      150.0,
+      168.0,
+      7.6
+    ],
+    "volume_cm3": 37.66,
+    "obs": "cabe em mesa de 180 mm"
+  },
+  {
+    "arquivo": "polia/01_portico_alto.stl",
+    "quantidade": 1,
+    "tamanho_mm": [
+      150.0,
+      210.0,
+      7.6
+    ],
+    "volume_cm3": 45.95,
+    "obs": "opcional, no lugar do 01: mesa de 220 mm ou mais"
+  },
+  {
+    "arquivo": "polia/02_pe.stl",
+    "quantidade": 2,
+    "tamanho_mm": [
+      104.0,
+      18.0,
+      6.0
+    ],
+    "volume_cm3": 10.12,
+    "obs": ""
+  },
+  {
+    "arquivo": "polia/03_placa_titulo.stl",
+    "quantidade": 1,
+    "tamanho_mm": [
+      150.0,
+      18.0,
+      4.6
+    ],
+    "volume_cm3": 10.51,
+    "obs": ""
+  },
+  {
+    "arquivo": "polia/04_garfo_da_roldana.stl",
+    "quantidade": 2,
+    "tamanho_mm": [
+      14.2,
+      43.8,
+      10.0
+    ],
+    "volume_cm3": 2.3,
+    "obs": ""
+  },
+  {
+    "arquivo": "polia/05_roldana.stl",
+    "quantidade": 2,
+    "tamanho_mm": [
+      30.0,
+      30.0,
+      7.0
+    ],
+    "volume_cm3": 3.37,
+    "obs": ""
+  },
+  {
+    "arquivo": "polia/06_balde.stl",
+    "quantidade": 2,
+    "tamanho_mm": [
+      35.0,
+      32.6,
+      28.9
+    ],
+    "volume_cm3": 4.67,
+    "obs": ""
+  },
+  {
+    "arquivo": "polia/mesa_completa.stl",
+    "quantidade": 1,
+    "tamanho_mm": [
+      150.0,
+      168.0,
+      28.9
+    ],
+    "volume_cm3": 89.11,
+    "obs": "todas as peças (com o pórtico 01)"
+  },
+  {
+    "arquivo": "alavanca/01_base.stl",
+    "quantidade": 1,
+    "tamanho_mm": [
+      90.0,
+      70.0,
+      41.0
+    ],
+    "volume_cm3": 23.99,
+    "obs": ""
+  },
+  {
+    "arquivo": "alavanca/02_barra.stl",
+    "quantidade": 1,
+    "tamanho_mm": [
+      170.0,
+      38.0,
+      27.5
+    ],
+    "volume_cm3": 34.44,
+    "obs": ""
+  },
+  {
+    "arquivo": "alavanca/mesa_completa.stl",
+    "quantidade": 1,
+    "tamanho_mm": [
+      170.0,
+      114.0,
+      41.0
+    ],
+    "volume_cm3": 58.43,
+    "obs": "as duas peças"
+  }
+]
