@@ -40,6 +40,8 @@
   #playMP{font-size:24px;font-weight:900;padding:12px 26px;border:none;border-radius:18px;background:linear-gradient(#82b1ff,#2962ff);color:#fff;box-shadow:0 6px 0 #0d47a1;cursor:pointer;font-family:inherit}
   #playMP:active{transform:translateY(3px);box-shadow:0 3px 0 #0d47a1}
   #nickRow{margin-top:10px;font-weight:700;font-size:14px}
+  #codeRow{white-space:nowrap;display:inline-block;margin-top:6px}
+  #roomCode{font-family:inherit;font-size:15px;font-weight:700;padding:5px 10px;border-radius:10px;border:2px solid #ffd54f;width:110px;background:#fff;color:#111}
   #nick{font-family:inherit;font-size:15px;font-weight:700;padding:5px 10px;border-radius:10px;border:2px solid #82b1ff;width:150px;background:#fff;color:#111}
   #mpStatus{margin-top:8px;font-weight:700;color:#ffe082;max-width:520px;min-height:1em}
   #toasts{position:absolute;top:12px;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:6px;width:min(560px,52vw)}
@@ -127,7 +129,8 @@
   <div style="font-weight:700;margin:10px 0 6px">Escolha o mapa:</div>
   <div id="maps"></div>
   <div class="btnrow"><button id="play">JOGAR SOZINHO</button><button id="playMP">🌐 MULTIPLAYER</button></div>
-  <div id="nickRow">Seu apelido no multiplayer: <input id="nick" maxlength="14" placeholder="Jogador"></div>
+  <div id="nickRow">Seu apelido: <input id="nick" maxlength="14" placeholder="Jogador">
+    <span id="codeRow"> &nbsp;Código da sala: <input id="roomCode" maxlength="20" placeholder="geral"></span></div>
   <div id="mpStatus"></div>
   <button id="reset">Recomeçar do zero</button>
   <div class="how">
@@ -139,7 +142,7 @@
     🦹 <b>Rivais:</b> Zé Ruela, Dona Creusa, Tio Juca, Mestre Kiko e Vovó Zuleica.<br>
     📖 <b>Coleção:</b> são 25 Adelaides pra descobrir, até as secretas! (tecla <b>C</b>)<br>
     🗺️ <b>Mapas:</b> cada mapa tem Adelaides que aparecem mais (no Pátio do Colégio aparece a Colégio Adventista!).<br>
-    🌐 <b>Multiplayer:</b> seus amigos abrem o mesmo link e clicam em Multiplayer (quem entra depois vai pro mapa de quem já está jogando). Cada um ganha uma base e todo mundo pode roubar de todo mundo!
+    🌐 <b>Multiplayer:</b> seus amigos abrem o mesmo link, digitam o mesmo <b>código da sala</b> e clicam em Multiplayer (quem entra depois vai pro mapa de quem já está jogando). Cada um ganha uma base e todo mundo pode roubar de todo mundo!
   </div>
 </div>
 
@@ -368,7 +371,7 @@ function initWorld(sv, mpBase = -1) {
 
 // ======================= MULTIPLAYER =======================
 const SP_MS = 1900;
-const MP = { on: false, room: null, peer: null, remotes: new Map(), bt: [], dl: [], ev: [], evDone: new Set(), consumed: new Set(), caughtAds: new Map(), suppress: new Map(), pubT: 0, lastPub: '', nick: '', seqN: 0, conn: null, inRoom: 0, otherMap: 0, lastErr: '', roomKind: '' };
+const MP = { on: false, room: null, peer: null, remotes: new Map(), bt: [], dl: [], ev: [], evDone: new Set(), consumed: new Set(), caughtAds: new Map(), suppress: new Map(), pubT: 0, lastPub: '', nick: '', seqN: 0, conn: null, inRoom: 0, otherMap: 0, lastErr: '', roomKind: '', code: '' };
 function hash32(n) { n = (n ^ 61) ^ (n >>> 16); n = Math.imul(n, 9); n ^= n >>> 4; n = Math.imul(n, 0x27d4eb2d); n ^= n >>> 15; return n >>> 0; }
 function mulberry32(a) { return () => { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
 const cleanNick = v => String(v || '').replace(/[\u0000-\u001f\u007f-\u009f\u00ad\u200b-\u200f\u202a-\u202e\u2060-\u206f\ufeff]/g, '').trim().slice(0, 14) || 'Jogador';
@@ -405,6 +408,140 @@ async function getRoomNS() {
   } catch (e) { return { ns: null, why: 'erro ' + ((e && (e.code || e.message)) || '') }; }
 }
 const MP_ROOM = 'roube-adelaide';
+async function waitClaude(ms) {
+  for (let t = 0; t < ms && !(window.claude && typeof window.claude.use === 'function'); t += 100) await new Promise(r => setTimeout(r, 100));
+  return !!(window.claude && typeof window.claude.use === 'function');
+}
+const cleanCode = v => (String(v || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9-]/g, '').slice(0, 20)) || 'geral';
+
+// ---------- PeerJS transport: used outside Claude (Vercel, GitHub Pages...) ----------
+// Same small API as the Claude room: presence(), peers(), onPeers(), onConnection(), leave().
+// One browser holds the id "roube-adelaide-v1-<code>" and relays everyone's state (star).
+// If that browser leaves, the others race to take the id over.
+function loadScript(src) {
+  return new Promise((res, rej) => { const el = document.createElement('script'); el.src = src; el.onload = res; el.onerror = rej; document.head.appendChild(el); });
+}
+async function loadPeerJS() {
+  if (window.Peer) return true;
+  for (const src of ['peerjs.min.js', 'https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js']) {
+    try { await loadScript(src); if (window.Peer) return true; } catch (e) { }
+  }
+  return false;
+}
+function peerOpts() {
+  const q = new URLSearchParams(location.search), o = { debug: 0 };
+  if (q.get('peerhost')) { o.host = q.get('peerhost'); o.port = +q.get('peerport') || 9000; o.path = q.get('peerpath') || '/'; o.secure = q.get('peersecure') === '1'; }
+  return o;
+}
+function makePeerRoom(code) {
+  const hostId = 'roube-adelaide-v1-' + code;
+  let peer = null, myId = null, isHost = false, hostConn = null, alive = true, connected = false;
+  let mine = Object.freeze({}), cached = Object.freeze([]);
+  const conns = new Map(), pres = new Map(), seenAt = new Map(), peerSubs = [], connSubs = [];
+  let hostSeen = 0;
+  const dropClient = id => {
+    const c = conns.get(id); conns.delete(id); seenAt.delete(id);
+    try { c && c.close(); } catch (e) { }
+    if (pres.delete(id)) { sendAll({ t: 'bye', id }); notify(); }
+  };
+  // heartbeat: a closed tab can take a long time to show up as a closed WebRTC link
+  const hb = setInterval(() => {
+    if (!alive) { clearInterval(hb); return; }
+    const now = Date.now();
+    if (isHost) {
+      sendAll({ t: 'hb' });
+      for (const id of [...conns.keys()]) if (now - (seenAt.get(id) || now) > 5000) dropClient(id);
+    } else if (hostConn) {
+      try { hostConn.send({ t: 'hb' }); } catch (e) { }
+      if (now - hostSeen > 4500) lostHost();
+    }
+  }, 1000);
+  const snap = () => {
+    cached = Object.freeze([
+      ...(myId ? [{ peer: myId, presence: mine, sameTab: true, isMe: true, kind: 'viewer', guest: false, by: null }] : []),
+      ...[...pres].map(([id, v]) => ({ peer: id, presence: v, sameTab: false, isMe: false, kind: 'viewer', guest: false, by: null }))]);
+  };
+  const notify = () => { snap(); for (const f of peerSubs) { try { f({ peers: cached }); } catch (e) { console.error(e); } } };
+  const setConn = c => { if (c !== connected) { connected = c; for (const f of connSubs) f(c); } };
+  const sendAll = (msg, except) => { for (const [id, c] of conns) if (id !== except && c.open) { try { c.send(msg); } catch (e) { } } };
+  const okPres = v => v && typeof v === 'object' && !Array.isArray(v);
+  function onMsg(from, m) {
+    if (!m || typeof m !== 'object') return;
+    if (isHost) seenAt.set(from, Date.now()); else hostSeen = Date.now();
+    if (m.t === 'hb') return;
+    if (m.t === 'leave') { if (isHost) dropClient(from); return; }
+    if (isHost) {
+      if (m.t === 'p' && okPres(m.pres)) { pres.set(from, Object.freeze(m.pres)); sendAll({ t: 'p', id: from, pres: m.pres }, from); notify(); }
+    } else if (m.t === 'p' && typeof m.id === 'string' && m.id !== myId && okPres(m.pres)) { pres.set(m.id, Object.freeze(m.pres)); notify(); }
+    else if (m.t === 'bye' && typeof m.id === 'string') { pres.delete(m.id); notify(); }
+    else if (m.t === 'all' && Array.isArray(m.list)) { for (const e of m.list) if (Array.isArray(e) && typeof e[0] === 'string' && e[0] !== myId && okPres(e[1])) pres.set(e[0], Object.freeze(e[1])); notify(); }
+  }
+  function becomeHost() {
+    return new Promise(resolve => {
+      let done = false; const fin = v => { if (!done) { done = true; resolve(v); } };
+      const p = new Peer(hostId, peerOpts());
+      p.on('open', id => { peer = p; myId = id; isHost = true; setConn(true); notify(); fin(true); });
+      p.on('error', e => { if (!done) { try { p.destroy(); } catch (x) { } fin(e && e.type === 'unavailable-id' ? false : null); } });
+      p.on('connection', c => {
+        c.on('open', () => { conns.set(c.peer, c); seenAt.set(c.peer, Date.now()); try { c.send({ t: 'all', list: [[myId, mine], ...[...pres]] }); } catch (e) { } });
+        c.on('data', d => onMsg(c.peer, d));
+        c.on('close', () => { if (conns.get(c.peer) === c) dropClient(c.peer); });
+        c.on('error', () => { });
+      });
+      p.on('disconnected', () => { if (alive) { try { p.reconnect(); } catch (e) { } } });
+      setTimeout(() => { if (!done) { try { p.destroy(); } catch (x) { } fin(null); } }, 10000);
+    });
+  }
+  function becomeClient() {
+    return new Promise(resolve => {
+      let done = false; const fin = v => { if (!done) { done = true; resolve(v); } };
+      const p = new Peer(peerOpts());
+      p.on('open', id => {
+        const c = p.connect(hostId, { reliable: true });
+        c.on('open', () => { peer = p; myId = id; isHost = false; hostConn = c; hostSeen = Date.now(); setConn(true); try { c.send({ t: 'p', pres: mine }); } catch (e) { } notify(); fin(true); });
+        c.on('data', d => onMsg(hostId, d));
+        c.on('close', () => { if (hostConn === c) lostHost(); });
+        c.on('error', () => { });
+      });
+      p.on('error', e => { if (!done) { try { p.destroy(); } catch (x) { } fin(e && e.type === 'peer-unavailable' ? false : null); } });
+      setTimeout(() => { if (!done) { try { p.destroy(); } catch (x) { } fin(null); } }, 10000);
+    });
+  }
+  async function start() {
+    let fails = 0;
+    while (alive && fails < 6) {
+      const h = await becomeHost(); if (h) return true;
+      if (!alive) return false;
+      const c = await becomeClient(); if (c) return true;
+      if (h === null && c === null) fails++;
+      await new Promise(r => setTimeout(r, 400 + Math.random() * 1200));
+    }
+    return false;
+  }
+  function lostHost() {
+    if (!alive) return;
+    setConn(false); hostConn = null;
+    try { peer && peer.destroy(); } catch (e) { }
+    peer = null; myId = null; pres.clear(); notify();
+    setTimeout(() => { if (alive) start(); }, 300 + Math.random() * 1500);
+  }
+  return {
+    ready: start(),
+    presence(patch) {
+      const n = { ...mine };
+      for (const k in patch) { if (patch[k] === null) delete n[k]; else n[k] = patch[k]; }
+      mine = Object.freeze(n); snap();
+      if (isHost) sendAll({ t: 'p', id: myId, pres: mine });
+      else if (hostConn && hostConn.open) { try { hostConn.send({ t: 'p', pres: mine }); } catch (e) { } }
+      return Promise.resolve();
+    },
+    peers: () => cached,
+    onPeers(f) { peerSubs.push(f); setTimeout(() => f({ peers: cached }), 0); return () => { }; },
+    onConnection(f) { connSubs.push(f); setTimeout(() => f(connected), 0); return () => { }; },
+    connected: () => connected,
+    leave() { alive = false; clearInterval(hb); try { if (hostConn && hostConn.open) hostConn.send({ t: 'leave' }); } catch (e) { } try { peer && peer.destroy(); } catch (e) { } return Promise.resolve(); },
+  };
+}
 const NO_ACCESS = 'Quem abre pelo link público não entra no multiplayer. O dono do jogo precisa te convidar pelo nome (botão Compartilhar → adicionar pessoa) e você precisa estar logado no Claude.';
 const mpErrText = code => code === 'not_granted' || code === 'revoked' ? '🔒 Sem acesso à sala. ' + NO_ACCESS : '🌐 A conexão com a sala caiu (' + code + '). Recarregue a página.';
 const mpPlayers = peers => peers.filter(pp => !pp.sameTab && pp.kind !== 'agent' && pp.presence && pp.presence.v === 2);
@@ -415,16 +552,23 @@ async function startMP() {
   const st = $('mpStatus'); st.textContent = '🌐 Conectando...';
   MP.nick = cleanNick($('nick').value); $('nick').value = MP.nick;
   try { localStorage.setItem(SAVE_KEY + '-nick', MP.nick); } catch (e) { }
-  const { ns: lobby, why } = await getRoomNS();
-  if (!lobby) {
-    st.textContent = why === 'sem-claude'
-      ? '❌ Esta página não está aberta dentro do Claude (o multiplayer não existe fora do link do claude.ai). Jogue sozinho por enquanto!'
-      : '❌ O Claude não liberou a sala de multiplayer aqui (' + why + '). ' + NO_ACCESS;
-    mpBusy = false; return;
-  }
   let room = null;
-  try { room = await lobby.join(MP_ROOM); MP.roomKind = 'sala'; }
-  catch (e) { room = lobby; MP.roomKind = 'principal'; }
+  if (await waitClaude(2500)) {
+    // inside claude.ai: use the page's own room
+    const { ns: lobby, why } = await getRoomNS();
+    if (!lobby) { st.textContent = '❌ O Claude não liberou a sala de multiplayer aqui (' + why + '). ' + NO_ACCESS; mpBusy = false; return; }
+    try { room = await lobby.join(MP_ROOM); MP.roomKind = 'sala'; }
+    catch (e) { room = lobby; MP.roomKind = 'principal'; }
+  } else {
+    // anywhere else (Vercel, GitHub Pages...): PeerJS with a room code
+    MP.code = cleanCode($('roomCode').value); $('roomCode').value = MP.code;
+    try { localStorage.setItem(SAVE_KEY + '-code', MP.code); } catch (e) { }
+    st.textContent = '🌐 Conectando à sala "' + MP.code + '"...';
+    if (!(await loadPeerJS())) { st.textContent = '❌ Não consegui carregar o multiplayer. Confira a internet e tente de novo.'; mpBusy = false; return; }
+    room = makePeerRoom(MP.code);
+    if (!(await room.ready)) { room.leave(); st.textContent = '❌ Não consegui conectar ao servidor do multiplayer. Confira a internet (algumas redes de escola bloqueiam) e tente de novo.'; mpBusy = false; return; }
+    MP.roomKind = 'código ' + MP.code;
+  }
   MP.room = room;
   let denied = '';
   try { room.onConnection(c => { MP.conn = c; }, e => { MP.conn = false; MP.lastErr = 'conexão: ' + e.code; if (e.code === 'not_granted' || e.code === 'revoked') denied = e.code; }); } catch (e) { }
@@ -1480,10 +1624,12 @@ function updateHUD() {
   setHTML(bBook, `📖 Coleção (${seen.size}/${TYPES.length})`);
   if (MP.on) {
     const names = [`<span style="color:#7CFF7C">● Você</span>`, ...[...MP.remotes.values()].map(r => `<span style="color:#fff59d">● ${esc(r.name)}</span>`)];
-    const conn = MP.conn === false ? '⚠️ sem conexão' : MP.conn ? '✅ conectado' : '⏳ conectando';
-    let h = `🌐 ${esc(MAPS[mapIdx].name)} — ${names.length} jogando<br>${names.join('<br>')}<br><small>${conn} · ${MP.inRoom} na sala${MP.roomKind === 'principal' ? ' (principal)' : ''}</small>`;
+    const conn = MP.conn === false ? '⚠️ sem conexão (tentando de novo...)' : MP.conn ? '✅ conectado' : '⏳ conectando';
+    let h = `🌐 ${esc(MAPS[mapIdx].name)} — ${names.length} jogando<br>${names.join('<br>')}<br><small>${conn} · ${MP.code ? 'sala ' + esc(MP.code) : MP.inRoom + ' na sala'}${MP.roomKind === 'principal' ? ' (principal)' : ''}</small>`;
     if (MP.otherMap) h += `<br><small>👀 ${MP.otherMap} em outro mapa</small>`;
-    if (names.length === 1) h += `<br><small>Chame amigos: botão Compartilhar da página. Eles abrem o link e clicam em Multiplayer.</small>`;
+    if (names.length === 1) h += MP.code
+      ? `<br><small>Chame amigos: mande o link do jogo e o código <b>${esc(MP.code)}</b>. Eles digitam o mesmo código e clicam em Multiplayer.</small>`
+      : `<br><small>Chame amigos: botão Compartilhar da página. Eles abrem o link e clicam em Multiplayer.</small>`;
     if (MP.lastErr) h += `<br><small style="color:#ff8a80">${esc(MP.lastErr)}</small>`;
     setHTML($('mpBox'), h);
   }
@@ -1608,7 +1754,7 @@ function startGame() {
     if (MP.mapMsg) { toast(MP.mapMsg, 'good'); MP.mapMsg = ''; }
     setTimeout(() => toast(`🌐 Você está online no mapa ${MAPS[mapIdx].name}! Sua base é a amarela-brilhante no minimapa.`), 600);
     setTimeout(() => toast('😈 Roube as Adelaides dos outros jogadores e defenda as suas!'), 5500);
-    setTimeout(() => toast('👥 Pra jogar junto, seu amigo abre o mesmo link e clica em Multiplayer.'), 10500);
+    setTimeout(() => toast(MP.code ? `👥 Pra jogar junto, seu amigo abre o mesmo link, digita o código "${MP.code}" e clica em Multiplayer.` : '👥 Pra jogar junto, seu amigo abre o mesmo link e clica em Multiplayer.'), 10500);
     save(); return;
   }
   setTimeout(() => toast('👋 Bem-vindo! Vá até a passarela vermelha e compre uma Adelaide.'), 600);
@@ -1619,7 +1765,9 @@ function startGame() {
 }
 $('play').addEventListener('click', startGame);
 $('playMP').addEventListener('click', startMP);
-try { $('nick').value = localStorage.getItem(SAVE_KEY + '-nick') || ''; } catch (e) { }
+try { $('nick').value = localStorage.getItem(SAVE_KEY + '-nick') || ''; $('roomCode').value = localStorage.getItem(SAVE_KEY + '-code') || ''; } catch (e) { }
+// inside claude.ai the room code is not used: hide it once we know
+waitClaude(4000).then(inClaude => { if (inClaude) $('codeRow').style.display = 'none'; });
 function buildMaps() {
   const el = $('maps'); el.innerHTML = '';
   MAPS.forEach((m, i) => {
@@ -1644,7 +1792,7 @@ $('reset').addEventListener('click', e => {
 });
 setInterval(() => { if (playing) save(); }, 5000);
 document.addEventListener('visibilitychange', () => { if (document.hidden && playing) save(); });
-addEventListener('pagehide', () => { if (playing) save(); });
+addEventListener('pagehide', () => { if (playing) save(); if (MP.room && MP.code) MP.room.leave(); });
 
 // ======================= LOOP =======================
 initWorld(loadSave());
