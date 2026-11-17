@@ -1065,10 +1065,18 @@ function startGame() {
   save();
 }
 $('play').addEventListener('click', startGame);
-$('reset').addEventListener('click', () => {
-  if (!confirm('Apagar seu progresso e começar do zero?')) return;
-  try { localStorage.removeItem(SAVE_KEY); } catch (e) { }
-  initWorld(null); buildLooks(); toast('Progresso apagado.');
+let resetArmed = 0;
+$('reset').addEventListener('click', e => {
+  const btn = e.currentTarget;
+  if (Date.now() - resetArmed > 4000) {
+    resetArmed = Date.now(); btn.textContent = 'Tem certeza? Clique de novo pra apagar tudo';
+    setTimeout(() => { if (Date.now() - resetArmed >= 4000) btn.textContent = 'Recomeçar do zero'; }, 4100);
+    return;
+  }
+  resetArmed = 0;
+  try { localStorage.removeItem(SAVE_KEY); } catch (err) { }
+  initWorld(null); buildLooks(); btn.textContent = 'Progresso apagado ✔';
+  setTimeout(() => { btn.textContent = 'Recomeçar do zero'; }, 2000);
 });
 setInterval(() => { if (playing) save(); }, 5000);
 document.addEventListener('visibilitychange', () => { if (document.hidden && playing) save(); });
