@@ -32,6 +32,16 @@
   .sbtn.max{background:linear-gradient(#bdbdbd,#8d8d8d);box-shadow:0 3px 0 #555;color:#222}
   .sbtn:active{transform:translateY(2px);box-shadow:0 1px 0 #a35b00}
   #bMute{background:rgba(0,0,0,.55);border:none;border-radius:10px;font-size:18px;padding:4px 10px;color:#fff}
+  #mpBox{position:absolute;right:12px;top:98px;background:rgba(0,0,0,.6);border-radius:10px;padding:6px 10px;font-size:13px;font-weight:700;display:none;max-width:200px;line-height:1.45}
+  #maps{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;max-width:620px}
+  .mapb{font-family:inherit;font-weight:800;font-size:14px;border-radius:12px;border:3px solid transparent;padding:6px 10px;background:rgba(255,255,255,.1);color:#fff;cursor:pointer}
+  .mapb.sel{border-color:#ffd54f;background:rgba(255,213,79,.2)}
+  .btnrow{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin-top:12px}
+  #playMP{font-size:24px;font-weight:900;padding:12px 26px;border:none;border-radius:18px;background:linear-gradient(#82b1ff,#2962ff);color:#fff;box-shadow:0 6px 0 #0d47a1;cursor:pointer;font-family:inherit}
+  #playMP:active{transform:translateY(3px);box-shadow:0 3px 0 #0d47a1}
+  #nickRow{margin-top:10px;font-weight:700;font-size:14px}
+  #nick{font-family:inherit;font-size:15px;font-weight:700;padding:5px 10px;border-radius:10px;border:2px solid #82b1ff;width:150px;background:#fff;color:#111}
+  #mpStatus{margin-top:8px;font-weight:700;color:#ffe082;max-width:520px;min-height:1em}
   #toasts{position:absolute;top:12px;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:6px;width:min(560px,52vw)}
   .toast{background:rgba(0,0,0,.78);padding:8px 14px;border-radius:12px;font-weight:700;font-size:15px;text-align:center;animation:pop .25s ease-out;transition:opacity .5s}
   .toast.out{opacity:0}
@@ -62,7 +72,7 @@
   .look{background:rgba(255,255,255,.08);border:3px solid transparent;border-radius:16px;padding:6px 6px 4px;cursor:pointer;font-weight:700;font-size:13px}
   .look.sel{border-color:#ffd54f;background:rgba(255,213,79,.18)}
   .look canvas{display:block;margin:0 auto}
-  #play{margin-top:12px;font-size:28px;font-weight:900;padding:12px 56px;border:none;border-radius:18px;background:linear-gradient(#69f0ae,#00c853);color:#003d1a;box-shadow:0 6px 0 #00792f;cursor:pointer;font-family:inherit}
+  #play{font-size:24px;font-weight:900;padding:12px 56px;border:none;border-radius:18px;background:linear-gradient(#69f0ae,#00c853);color:#003d1a;box-shadow:0 6px 0 #00792f;cursor:pointer;font-family:inherit}
   #play:active{transform:translateY(3px);box-shadow:0 3px 0 #00792f}
   #reset{margin-top:10px;background:none;border:none;color:#bbb;text-decoration:underline;cursor:pointer;font-family:inherit;font-size:13px}
   .how{max-width:560px;margin-top:14px;font-size:14px;line-height:1.5;background:rgba(0,0,0,.35);border-radius:14px;padding:10px 16px;text-align:left}
@@ -93,6 +103,7 @@
   </div>
   </div>
   <div id="toasts"></div>
+  <div id="mpBox"></div>
   <div id="help">WASD / Setas: andar • E / Espaço: comprar ou roubar • Q: vender • Pise no botão vermelho da sua base pra trancar</div>
   <div id="actions">
     <button id="bSell"></button>
@@ -113,7 +124,11 @@
   <div class="sub">Compre, colecione e... roube Adelaides! 😈</div>
   <div style="font-weight:700;margin-bottom:6px">Escolha seu visual:</div>
   <div id="looks"></div>
-  <button id="play">JOGAR</button>
+  <div style="font-weight:700;margin:10px 0 6px">Escolha o mapa:</div>
+  <div id="maps"></div>
+  <div class="btnrow"><button id="play">JOGAR SOZINHO</button><button id="playMP">🌐 MULTIPLAYER</button></div>
+  <div id="nickRow">Seu apelido no multiplayer: <input id="nick" maxlength="14" placeholder="Jogador"></div>
+  <div id="mpStatus"></div>
   <button id="reset">Recomeçar do zero</button>
   <div class="how">
     🟥 <b>Passarela:</b> Adelaides desfilam pela passarela vermelha. Chegue perto e aperte <b>E</b> pra comprar.<br>
@@ -122,7 +137,9 @@
     🔒 <b>Defesa:</b> pise no botão vermelho da sua base pra trancar a porta. Se alguém roubar você, encoste no ladrão pra recuperar.<br>
     💤 <b>Dica:</b> roube quando o dono estiver dormindo ou fora da base!<br>
     🦹 <b>Rivais:</b> Zé Ruela, Dona Creusa, Tio Juca, Mestre Kiko e Vovó Zuleica.<br>
-    📖 <b>Coleção:</b> são 24 Adelaides pra descobrir, até as secretas! (tecla <b>C</b>)
+    📖 <b>Coleção:</b> são 25 Adelaides pra descobrir, até as secretas! (tecla <b>C</b>)<br>
+    🗺️ <b>Mapas:</b> cada mapa tem Adelaides que aparecem mais (no Pátio do Colégio aparece a Colégio Adventista!).<br>
+    🌐 <b>Multiplayer:</b> seus amigos abrem o mesmo link, escolhem o mesmo mapa e clicam em Multiplayer. Cada um ganha uma base e todo mundo pode roubar de todo mundo!
   </div>
 </div>
 
@@ -225,6 +242,7 @@ const TYPES = [
   { name: 'Adelaide Super-Heroína', rar: 'mitica', price: 600000, inc: 7400, w: 3.5, outfit: '#3949ab', acc: 'hero', hair: 'puffs' },
   { name: 'Adelaide Arco-Íris', rar: 'secreta', price: 1800000, inc: 21000, w: 1.5, outfit: '#ffffff', acc: 'rainbow', hair: 'afroBig' },
   { name: 'Adelaide Diamante', rar: 'secreta', price: 8000000, inc: 90000, w: 0.5, outfit: '#b3e5fc', acc: 'diamond', hair: 'afroBig' },
+  { name: 'Adelaide Colégio Adventista', rar: 'lendaria', price: 100000, inc: 1350, w: 12, outfit: '#f5f5f5', acc: 'adventista', hair: 'puffs' },
 ];
 TYPES.forEach((t, i) => { t.id = i; t.tier = RAR[t.rar].t; });
 const SORTED = [...TYPES].sort((a, b) => a.price - b.price);
@@ -249,6 +267,16 @@ const BASECOL = [
   { color: '#43a047', floor: '#e0f2e0' },
   { color: '#00897b', floor: '#d7f0ed' },
 ];
+
+const tid = n => TYPES.findIndex(t => t.name === 'Adelaide ' + n);
+const MAPS = [
+  { id: 'cidade', name: 'Cidade Verde', emoji: '🌳', seed: 11, g1: '#5cb85c', g2: '#56ad56', speck: 'rgba(255,255,255,.13)', bg: '#2f5e36', border: '#795548', run: '#b71c1c', edge: '#ffc107', deco: 'tree', boost: {} },
+  { id: 'praia', name: 'Praia do Sol', emoji: '🏖️', seed: 23, g1: '#f3dfa2', g2: '#eed592', speck: 'rgba(255,255,255,.55)', bg: '#1e88e5', border: '#d7ccc8', run: '#8d6e63', edge: '#5d4037', deco: 'palm', boost: { [tid('Sereia')]: 5, [tid('Skatista')]: 2, [tid('DJ')]: 2 } },
+  { id: 'neve', name: 'Montanha Gelada', emoji: '❄️', seed: 37, g1: '#f1f6fb', g2: '#e4eef7', speck: 'rgba(120,160,200,.3)', bg: '#9fb7cf', border: '#607d8b', run: '#1565c0', edge: '#e3f2fd', deco: 'pine', boost: { [tid('Fada')]: 3, [tid('Diamante')]: 4, [tid('Ninja')]: 2 } },
+  { id: 'escola', name: 'Pátio do Colégio', emoji: '🏫', seed: 41, g1: '#d2d2d2', g2: '#c6c6c6', speck: 'rgba(0,0,0,.06)', bg: '#6d8b5a', border: '#1a237e', run: '#1a237e', edge: '#ffffff', deco: 'tree', tiles: true, boost: { [tid('Colégio Adventista')]: 6, [tid('Estudante')]: 3, [tid('Médica')]: 2 } },
+  { id: 'lua', name: 'Base Lunar', emoji: '🌙', seed: 59, g1: '#4a4a5c', g2: '#444456', speck: 'rgba(255,255,255,.2)', bg: '#07071a', border: '#00e5ff', run: '#4a148c', edge: '#00e5ff', deco: 'crater', boost: { [tid('Astronauta')]: 5, [tid('Cósmica')]: 5, [tid('Robô')]: 3 } },
+];
+let mapIdx = 0;
 
 // ======================= STATE =======================
 let T = 0, BASES = [], ads = [], chars = [], bots = [], player = null, myBase = null;
@@ -309,20 +337,22 @@ const SAVE_KEY = 'roube-uma-adelaide-v1';
 function loadSave() { try { return JSON.parse(localStorage.getItem(SAVE_KEY)); } catch (e) { return null; } }
 function save() {
   if (!player) return;
-  const d = { money: player.money, unlocked: myBase.unlocked, shoe, look: lookIdx, seen: [...seen], slots: myBase.slots.map(s => ({ t: s.ad ? s.ad.type : -1, s: s.stored })), time: Date.now() };
+  const d = { money: player.money, unlocked: myBase.unlocked, shoe, look: lookIdx, map: mapIdx, seen: [...seen], slots: myBase.slots.map(s => ({ t: s.ad ? s.ad.type : -1, s: s.stored })), time: Date.now() };
   try { localStorage.setItem(SAVE_KEY, JSON.stringify(d)); } catch (e) { }
 }
-function initWorld(sv) {
+function initWorld(sv, mpBase = -1) {
+  const mp = mpBase >= 0;
   seen = new Set(sv && Array.isArray(sv.seen) ? sv.seen.filter(x => TYPES[x]) : []);
   T = 0; ads = []; floaters = []; spawnT = 0; rareT = 45; playerTargetUntil = 50; offlineMsg = '';
   BASES = [makeBase(0, 150, 950, false), makeBase(1, 150, 150, true), makeBase(2, 1450, 150, true), makeBase(3, 1450, 950, false), makeBase(4, 2750, 150, true), makeBase(5, 2750, 950, false)];
-  myBase = BASES[0];
+  myBase = BASES[mp ? mpBase : 0];
   if (sv && typeof sv.look === 'number') lookIdx = sv.look;
+  if (sv && Number.isInteger(sv.map) && MAPS[sv.map]) mapIdx = sv.map;
   player = makeChar('Você', LOOKS[lookIdx], myBase, true);
-  bots = BOTDEFS.map((d, i) => { const b = makeChar(d.name, d.look, BASES[i + 1], false); b.tag = d.tag; return b; });
+  bots = mp ? [] : BOTDEFS.map((d, i) => { const b = makeChar(d.name, d.look, BASES[i + 1], false); b.tag = d.tag; return b; });
   chars = [player, ...bots];
-  BASES.forEach((b, i) => b.owner = chars[i]);
-  bots.forEach((b, i) => { b.money = 150; BOTDEFS[i].start.forEach((tid, k) => placeInSlot(b.base, k, tid)); });
+  myBase.owner = player;
+  bots.forEach((b, i) => { b.base.owner = b; b.money = 150; BOTDEFS[i].start.forEach((tid, k) => placeInSlot(b.base, k, tid)); });
   myBase.unlocked = 4; shoe = 0;
   if (sv) {
     player.money = sv.money || 0; myBase.unlocked = clamp(sv.unlocked || 4, 4, 10); shoe = sv.shoe || 0;
@@ -333,7 +363,223 @@ function initWorld(sv) {
   } else {
     player.money = 50; placeInSlot(myBase, 0, 0);
   }
-  for (let x = 60; x < WORLD.w; x += 115) spawnRunway(x);
+  if (!mp) for (let x = 60; x < WORLD.w; x += 115) spawnRunway(x);
+}
+
+// ======================= MULTIPLAYER =======================
+const SP_MS = 1900;
+const MP = { on: false, room: null, peer: null, remotes: new Map(), bt: [], dl: [], ev: [], evDone: new Set(), consumed: new Set(), caughtAds: new Map(), suppress: new Map(), pubT: 0, lastPub: '', nick: '', seqN: 0 };
+function hash32(n) { n = (n ^ 61) ^ (n >>> 16); n = Math.imul(n, 9); n ^= n >>> 4; n = Math.imul(n, 0x27d4eb2d); n ^= n >>> 15; return n >>> 0; }
+function mulberry32(a) { return () => { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+const cleanNick = v => String(v || '').replace(/[\u0000-\u001f\u007f-\u009f\u00ad\u200b-\u200f\u202a-\u202e\u2060-\u206f\ufeff]/g, '').trim().slice(0, 14) || 'Jogador';
+const esc = v => String(v).replace(/[&<>"']/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch]));
+// the runway is the same for everyone: ad number k appears at time k*SP_MS
+function syncRunway() {
+  const now = Date.now(), kNow = Math.floor(now / SP_MS), span = Math.ceil((WORLD.w + 80) / RUN_SPEED * 1000 / SP_MS);
+  const live = new Set(); for (const a of ads) if (a.k !== undefined && a.state === 'runway') live.add(a.k);
+  for (let k = kNow - span; k <= kNow; k++) {
+    if (live.has(k) || MP.consumed.has(k)) continue;
+    const r = mulberry32(hash32(k) ^ MAPS[mapIdx].seed);
+    if (r() < 0.12) { MP.consumed.add(k); continue; }
+    const a = makeAd(pickType(r() < 0.035 ? 2 : 0, r), -30, RUN.yc);
+    a.lane = (r() - 0.5) * 44; a.skin = SKINS[Math.floor(r() * SKINS.length)]; a.k = k; ads.push(a);
+    const ty = TYPES[a.type];
+    if (playing && now - k * SP_MS < 1500 && ty.tier >= 3) { toast(`✨ Uma ${ty.name} (${RAR[ty.rar].n}) apareceu na passarela!`, 'rare'); SFX.rare(); }
+  }
+  for (const a of ads) if (a.k !== undefined && a.state === 'runway') {
+    a.x = -30 + (now - a.k * SP_MS) / 1000 * RUN_SPEED;
+    if (a.x > WORLD.w + 40) { a.dead = true; MP.consumed.add(a.k); }
+  }
+  if (Math.random() < 0.01) for (const k of MP.consumed) if (k < kNow - span - 5) MP.consumed.delete(k);
+}
+function removeRunwayK(k) {
+  MP.consumed.add(k);
+  for (const a of ads) if (a.k === k && a.state === 'runway') { a.dead = true; float(a.x, a.y - 60, '💨', '#fff', 22); }
+}
+async function getRoomNS() {
+  for (let i = 0; i < 30 && !(window.claude && window.claude.use); i++) await new Promise(r => setTimeout(r, 100));
+  if (!(window.claude && window.claude.use)) return null;
+  try { return await Promise.race([window.claude.use('room'), new Promise(r => setTimeout(() => r(null), 11000))]); } catch (e) { return null; }
+}
+let mpBusy = false;
+async function startMP() {
+  if (playing || mpBusy) return;
+  mpBusy = true; initAudio();
+  const st = $('mpStatus'); st.textContent = '🌐 Conectando...';
+  MP.nick = cleanNick($('nick').value); $('nick').value = MP.nick;
+  try { localStorage.setItem(SAVE_KEY + '-nick', MP.nick); } catch (e) { }
+  const lobby = await getRoomNS();
+  if (!lobby) { st.textContent = '❌ O multiplayer só funciona abrindo o jogo pelo link do Claude, com login feito. Jogue sozinho por enquanto!'; mpBusy = false; return; }
+  let room;
+  try { room = await lobby.join('mp-' + MAPS[mapIdx].id); }
+  catch (e) { st.textContent = '❌ Não deu pra entrar na sala (' + ((e && e.code) || 'erro') + '). Tente de novo.'; mpBusy = false; return; }
+  MP.room = room;
+  st.textContent = '🌐 Procurando outros jogadores no mapa ' + MAPS[mapIdx].name + '...';
+  await new Promise(r => setTimeout(r, 1800));
+  const me = room.peers().find(pp => pp.sameTab);
+  MP.peer = me ? me.peer : 'eu-' + Math.random().toString(36).slice(2);
+  const taken = new Set(room.peers().filter(pp => !pp.sameTab && pp.presence && pp.presence.v === 2).map(pp => pp.presence.b));
+  let b = -1; for (let i = 0; i < 6; i++) if (!taken.has(i)) { b = i; break; }
+  if (b < 0) { st.textContent = '😕 Este mapa já tem 6 jogadores. Escolha outro mapa!'; room.leave().catch(() => { }); MP.room = null; mpBusy = false; return; }
+  const lk = lookIdx, mi = mapIdx;
+  MP.on = true;
+  initWorld(loadSave(), b);
+  lookIdx = lk; mapIdx = mi;
+  room.onPeers(ch => mpPeers(ch.peers), e => toast('🌐 A conexão com a sala caiu (' + e.code + '). Recarregue a página.', 'alert'));
+  mpPeers(room.peers());
+  mpBusy = false; st.textContent = '';
+  startGame();
+}
+function mpPeers(peers) {
+  if (!MP.on) return;
+  const alive = new Set();
+  for (const pp of peers) {
+    if (pp.sameTab || pp.kind === 'agent' || !pp.presence || pp.presence.v !== 2) continue;
+    alive.add(pp.peer);
+    let rc = MP.remotes.get(pp.peer);
+    if (!rc) { rc = mpNewRemote(pp); if (playing) { toast(`🌐 ${rc.name} entrou no jogo!`, 'good'); SFX.buy(); } }
+    if (rc.pres !== pp.presence) { rc.pres = pp.presence; mpSync(rc, pp.presence); }
+  }
+  for (const [peer, rc] of [...MP.remotes]) if (!alive.has(peer)) mpRemove(rc);
+  for (const rc of MP.remotes.values()) if (rc.baseIdx === myBase.idx && rc.peer < MP.peer) { mpMoveBase(); break; }
+}
+function mpNewRemote(pp) {
+  const pr = pp.presence;
+  const rc = { isChar: true, isRemote: true, peer: pp.peer, name: cleanNick(pr.n), look: LOOKS[pr.lk] || LOOKS[0], base: null, baseIdx: -1,
+    x: +pr.x || 0, y: +pr.y || 0, tx: +pr.x || 0, ty: +pr.y || 0, r: 17, face: 1, t: Math.random() * 10, moving: false,
+    carrying: null, carryAd: null, carryKey: null, stunUntil: 0, tag: '#fff59d', bubble: null, path: [], pres: null };
+  MP.remotes.set(pp.peer, rc); chars.push(rc);
+  return rc;
+}
+function mpSync(rc, pr) {
+  rc.name = cleanNick(pr.n); rc.look = LOOKS[pr.lk] || LOOKS[0];
+  rc.tx = clamp(+pr.x || 0, 0, WORLD.w); rc.ty = clamp(+pr.y || 0, 0, WORLD.h); rc.face = pr.f < 0 ? -1 : 1; rc.moving = !!pr.m;
+  rc.stunUntil = pr.st > Date.now() ? T + (pr.st - Date.now()) / 1000 : 0;
+  const bi = Number.isInteger(pr.b) && pr.b >= 0 && pr.b < 6 ? pr.b : -1;
+  const nb = bi >= 0 && BASES[bi] !== myBase ? BASES[bi] : null;
+  if (rc.base !== nb) { if (rc.base) mpClearBase(rc.base); rc.base = nb; if (nb) { if (nb.owner && nb.owner !== rc && nb.owner.isRemote) mpClearBase(nb); nb.owner = rc; } }
+  rc.baseIdx = bi;
+  if (nb) {
+    nb.unlocked = clamp(pr.ul | 0, 4, 10);
+    nb.lockUntil = pr.lu > Date.now() ? T + (pr.lu - Date.now()) / 1000 : -1;
+    const sl = Array.isArray(pr.s) ? pr.s : [];
+    for (let i = 0; i < 10; i++) {
+      const sl0 = nb.slots[i], t = Number.isInteger(sl[i]) && TYPES[sl[i]] ? sl[i] : -1;
+      if (sl0.ad && sl0.ad.state === 'carried') continue;
+      if (t < 0 || (MP.suppress.get(rc.peer + ':' + i) || 0) > Date.now()) { if (sl0.ad) { sl0.ad.dead = true; sl0.ad = null; } continue; }
+      if (!sl0.ad || sl0.ad.type !== t) { if (sl0.ad) sl0.ad.dead = true; sl0.ad = null; placeInSlot(nb, i, t); }
+    }
+  }
+  if (Array.isArray(pr.bt)) for (const k of pr.bt) if (Number.isInteger(k) && !MP.consumed.has(k)) removeRunwayK(k);
+  const key = Number.isInteger(pr.c) && TYPES[pr.c] && Array.isArray(pr.cf) && pr.cf.length === 3 ? pr.c + '|' + pr.cf.join('|') : null;
+  if (key !== rc.carryKey) {
+    if (rc.carryAd) mpEndCarry(rc, pr);
+    rc.carryKey = key;
+    if (key) mpBeginCarry(rc, pr);
+  }
+  if (Array.isArray(pr.ev)) for (const e of pr.ev) {
+    if (!e || e.to !== MP.peer) continue;
+    const id = rc.peer + '|' + e.s; if (MP.evDone.has(id)) continue; MP.evDone.add(id);
+    if (player.carrying && player.carrying.mpSeq === e.s) mpGotCaught(rc);
+  }
+  if (Array.isArray(pr.dl)) for (const seq of pr.dl) {
+    const id = rc.peer + '|' + seq, ad = MP.caughtAds.get(id);
+    if (ad) { MP.caughtAds.delete(id); mpLoseMine(ad, rc); }
+  }
+}
+function mpLoseMine(ad, rc) {
+  const sl = myBase.slots[ad.slotIdx];
+  if (sl && sl.ad === ad) sl.ad = null;
+  ad.dead = true;
+  toast(`😭 ${rc.name} levou sua ${TYPES[ad.type].name}...`, 'alert'); SFX.fail();
+}
+function mpBeginCarry(rc, pr) {
+  const op = pr.cf[0], idx = pr.cf[1] | 0, seq = pr.cf[2], t = pr.c;
+  const ob = op === MP.peer ? myBase : ((MP.remotes.get(op) || {}).base || null);
+  let ad = ob && ob.slots[idx] ? ob.slots[idx].ad : null;
+  if (ad && ad.type === t && ad.state !== 'carried' && (ob === myBase || ad.state === 'slot')) {
+    ad.state = 'carried'; ad.carrier = rc; ad.origin = { base: ob, idx }; ad.path = [];
+  } else {
+    ad = makeAd(t, rc.x, rc.y); ad.state = 'carried'; ad.carrier = rc; ad.origin = null; ad.pseudo = true; ads.push(ad);
+  }
+  ad.mpSeq = seq; rc.carrying = ad; rc.carryAd = ad;
+  if (ob === myBase && !ad.pseudo) { toast(`🚨 ${rc.name} está roubando sua ${TYPES[t].name}! Encoste nele pra recuperar!`, 'alert'); SFX.alarm(); }
+}
+function mpEndCarry(rc, pr) {
+  const ad = rc.carryAd; rc.carryAd = null; rc.carrying = null;
+  const delivered = !!(pr && Array.isArray(pr.dl) && pr.dl.includes(ad.mpSeq));
+  const id = rc.peer + '|' + ad.mpSeq;
+  if (MP.caughtAds.has(id)) { MP.caughtAds.delete(id); if (delivered) mpLoseMine(ad, rc); return; }
+  if (ad.pseudo || !ad.origin) { ad.dead = true; return; }
+  const o = ad.origin;
+  if (o.base === myBase) {
+    if (delivered) { ad.slotIdx = o.idx; mpLoseMine(ad, rc); }
+    else { returnAd(ad); }
+  } else {
+    const sl = o.base.slots[o.idx];
+    if (delivered) {
+      if (sl.ad === ad) sl.ad = null; ad.dead = true;
+      const ow = o.base.owner; if (ow && ow.peer) MP.suppress.set(ow.peer + ':' + o.idx, Date.now() + 5000);
+    } else { ad.carrier = null; ad.origin = null; ad.state = 'slot'; ad.x = sl.x; ad.y = sl.y; }
+  }
+}
+function mpGotCaught(rc) {
+  const ad = player.carrying; player.carrying = null; ad.carrier = null;
+  if (ad.origin) returnAd(ad); else ad.dead = true;
+  player.stunUntil = T + 1.6;
+  toast(`😱 ${rc.name} te pegou! A Adelaide voltou pra base dele.`, 'alert'); SFX.fail();
+}
+function mpClearBase(b) {
+  for (const sl of b.slots) if (sl.ad) { if (sl.ad.carrier !== player) sl.ad.dead = true; sl.ad = null; }
+  b.owner = null; b.lockUntil = -1;
+}
+function mpRemove(rc) {
+  if (rc.carryAd) mpEndCarry(rc, null);
+  if (rc.base) mpClearBase(rc.base);
+  MP.remotes.delete(rc.peer); chars = chars.filter(c => c !== rc);
+  if (playing) toast(`🌐 ${rc.name} saiu do jogo.`);
+}
+function mpMoveBase() {
+  const taken = new Set([...MP.remotes.values()].map(r => r.baseIdx));
+  let nb = -1; for (let i = 0; i < 6; i++) if (!taken.has(i)) { nb = i; break; }
+  if (nb < 0 || BASES[nb] === myBase) return;
+  const old = myBase, items = old.slots.map(sl => sl.ad && sl.ad.state !== 'carried' ? sl.ad.type : -1), stored = old.slots.map(sl => sl.stored);
+  for (const sl of old.slots) { if (sl.ad && sl.ad.state !== 'carried') sl.ad.dead = true; sl.ad = null; sl.stored = 0; }
+  old.owner = null;
+  const nbb = BASES[nb]; if (nbb.owner) mpClearBase(nbb);
+  nbb.unlocked = old.unlocked; myBase = nbb; nbb.owner = player; player.base = nbb; player.x = nbb.doorIn.x; player.y = nbb.doorIn.y;
+  items.forEach((t, i) => { if (t >= 0) placeInSlot(nbb, i, t); nbb.slots[i].stored = stored[i]; });
+  for (const rc of MP.remotes.values()) if (rc.pres) { rc.base = null; mpSync(rc, rc.pres); }
+}
+function mpTick(dt) {
+  const k = Math.min(1, dt * 10);
+  for (const rc of MP.remotes.values()) {
+    if (Math.hypot(rc.tx - rc.x, rc.ty - rc.y) > 400) { rc.x = rc.tx; rc.y = rc.ty; }
+    else { rc.x += (rc.tx - rc.x) * k; rc.y += (rc.ty - rc.y) * k; }
+    const ad = rc.carrying;
+    if (!ad || !ad.origin || ad.origin.base !== myBase || T < player.stunUntil || dist(player, rc) > 40) continue;
+    MP.ev.push({ to: rc.peer, s: ad.mpSeq }); if (MP.ev.length > 8) MP.ev.shift();
+    MP.caughtAds.set(rc.peer + '|' + ad.mpSeq, ad);
+    rc.carrying = null; ad.carrier = null; returnAd(ad);
+    toast(`💪 Você recuperou sua ${TYPES[ad.type].name}!`, 'good'); SFX.win();
+  }
+  MP.pubT -= dt;
+  if (MP.pubT <= 0) { MP.pubT = 0.1; mpPublish(); }
+}
+function mpPublish() {
+  if (!MP.room) return;
+  const now = Date.now(), cr = player.carrying, o = cr && cr.origin, ow = o && o.base.owner;
+  const carryOk = !!(cr && ow && ow.peer);
+  const pr = {
+    v: 2, n: MP.nick, lk: lookIdx, b: myBase.idx, x: Math.round(player.x), y: Math.round(player.y), f: player.face, m: player.moving ? 1 : 0,
+    c: carryOk ? cr.type : -1, cf: carryOk ? [ow.peer, o.idx, cr.mpSeq] : null,
+    s: myBase.slots.map(sl => sl.ad ? sl.ad.type : -1), ul: myBase.unlocked,
+    lu: myBase.lockUntil > T ? Math.round(now + (myBase.lockUntil - T) * 1000) : 0,
+    st: player.stunUntil > T ? Math.round(now + (player.stunUntil - T) * 1000) : 0,
+    bt: MP.bt, dl: MP.dl, ev: MP.ev,
+  };
+  const j = JSON.stringify(pr); if (j === MP.lastPub) return; MP.lastPub = j;
+  MP.room.presence(pr).catch(() => { });
 }
 
 // ======================= NAVIGATION / PHYSICS =======================
@@ -401,10 +647,11 @@ function myIncome() { let s = 0; for (const sl of myBase.slots) if (sl.ad && sl.
 function slotCost() { return Math.round(250 * Math.pow(3.2, myBase.unlocked - 4)); }
 function shoeCost() { return Math.round(500 * Math.pow(4, shoe)); }
 function playerSpeed() { return 260 + shoe * 28; }
-function pickType(minTier = 0) {
-  let tot = 0; for (const t of TYPES) if (t.tier >= minTier) tot += t.w;
-  let r = Math.random() * tot;
-  for (const t of TYPES) { if (t.tier < minTier) continue; r -= t.w; if (r <= 0) return t.id; }
+function pickType(minTier = 0, rnd = Math.random) {
+  const bo = MAPS[mapIdx].boost, wt = t => t.w * (bo[t.id] || 1);
+  let tot = 0; for (const t of TYPES) if (t.tier >= minTier) tot += wt(t);
+  let r = rnd() * tot;
+  for (const t of TYPES) { if (t.tier < minTier) continue; r -= wt(t); if (r <= 0) return t.id; }
   return TYPES.find(t => t.tier >= minTier).id;
 }
 function spawnRunway(x = -30, minTier = 0) {
@@ -423,13 +670,15 @@ function lockBase(b, dur, cd) { b.lockUntil = T + dur; b.lockReadyAt = T + dur +
 function buy(c, a, i) {
   const ty = TYPES[a.type];
   c.money -= ty.price; assignToSlot(a, c.base, i);
+  if (MP.on && a.k !== undefined) { MP.consumed.add(a.k); MP.bt.push(a.k); if (MP.bt.length > 20) MP.bt.shift(); }
   if (c.isPlayer) { toast(`✅ Você comprou a ${ty.name}!`, 'good'); SFX.buy(); float(a.x, a.y - 90, '-' + fmt(ty.price), '#ff8a80'); }
   else if (ty.tier >= 3 && playing) toast(`👀 ${c.name} comprou a ${ty.name}! Que tal roubar? 😏`);
 }
 function doSteal(c, base, idx) {
   const ad = base.slots[idx].ad, ty = TYPES[ad.type], ow = base.owner;
   ad.state = 'carried'; ad.carrier = c; ad.origin = { base, idx }; c.carrying = ad;
-  if (!ow.isPlayer) ow.ai.alarmAt = T + rand(0.9, 1.4);
+  if (MP.on && c.isPlayer) { MP.seqN = (MP.seqN || (Date.now() % 1e8)) + 1; ad.mpSeq = MP.seqN; }
+  if (ow.ai) ow.ai.alarmAt = T + rand(0.9, 1.4);
   if (c.isPlayer) { toast(`😈 Você pegou a ${ty.name}! Corre pra sua base!`, 'steal'); SFX.steal(); }
   else {
     say(c, pick(['Hehehe 😈', 'É minha agora!', 'Sai da frente!']), 2);
@@ -444,11 +693,16 @@ function deliver(c) {
   const ad = c.carrying, ty = TYPES[ad.type], i = freeSlot(c.base), from = ad.origin.base.owner;
   c.carrying = null;
   if (i < 0) { returnAd(ad); return; }
-  ad.origin.base.slots[ad.origin.idx].ad = null;
+  const ob = ad.origin.base, oi = ad.origin.idx;
+  if (ob.slots[oi].ad === ad) ob.slots[oi].ad = null;
+  if (MP.on && c.isPlayer) {
+    MP.dl.push(ad.mpSeq); if (MP.dl.length > 10) MP.dl.shift();
+    if (from && from.peer) MP.suppress.set(from.peer + ':' + oi, Date.now() + 5000);
+  }
   ad.x = c.x; ad.y = c.y; ad.carrier = null; ad.origin = null;
   assignToSlot(ad, c.base, i);
   if (c.isPlayer) { toast(`🎉 Roubo concluído! A ${ty.name} agora é sua!`, 'good'); SFX.win(); float(c.x, c.y - 100, 'ROUBADA! 😎', '#ffd54f', 26); }
-  else if (from.isPlayer) { toast(`😭 ${c.name} levou sua ${ty.name}...`, 'alert'); SFX.fail(); }
+  else if (from && from.isPlayer) { toast(`😭 ${c.name} levou sua ${ty.name}...`, 'alert'); SFX.fail(); }
 }
 function caught(thief, owner) {
   const ad = thief.carrying; thief.carrying = null; returnAd(ad);
@@ -504,7 +758,7 @@ function computeContext() {
   if (!ctxA) {
     bd = 62;
     for (const b of BASES) {
-      if (b === myBase) continue;
+      if (b === myBase || !b.owner) continue;
       b.slots.forEach((s, i) => {
         if (s.ad && s.ad.state === 'slot') { const d = Math.hypot(s.x - p.x, s.y - p.y); if (d < bd) { bd = d; ctxA = { type: 'steal', base: b, idx: i }; } }
       });
@@ -645,7 +899,8 @@ function updateAd(a, dt) {
   a.t += dt;
   switch (a.state) {
     case 'runway':
-      a.x += RUN_SPEED * dt; a.y = RUN.yc + a.lane; a.moving = true; a.face = 1;
+      if (a.k === undefined) a.x += RUN_SPEED * dt;
+      a.y = RUN.yc + a.lane; a.moving = true; a.face = 1;
       if (a.x > WORLD.w + 40) a.dead = true; break;
     case 'toBase': {
       if (!a.path.length) { a.state = 'slot'; const s = a.base.slots[a.slotIdx]; a.x = s.x; a.y = s.y; a.moving = false; break; }
@@ -662,22 +917,30 @@ function updateAd(a, dt) {
 // ---------- main update ----------
 function update(dt) {
   T += dt;
-  spawnT -= dt;
-  if (spawnT <= 0) { spawnRunway(); spawnT = rand(1.5, 2.3); }
-  rareT -= dt;
-  if (rareT <= 0) { spawnRunway(-30, 2); rareT = rand(45, 70); }
+  if (MP.on) syncRunway();
+  else {
+    spawnT -= dt;
+    if (spawnT <= 0) { spawnRunway(); spawnT = rand(1.5, 2.3); }
+    rareT -= dt;
+    if (rareT <= 0) { spawnRunway(-30, 2); rareT = rand(45, 70); }
+  }
   for (const a of ads) updateAd(a, dt);
   if (ads.some(a => a.dead)) ads = ads.filter(a => !a.dead);
-  for (const b of BASES) for (const s of b.slots) if (s.ad && s.ad.state === 'slot') {
-    const v = TYPES[s.ad.type].inc * dt;
-    if (b.owner.isPlayer) s.stored += v; else b.owner.money += v;
+  for (const b of BASES) {
+    const ow = b.owner; if (!ow || ow.isRemote) continue;
+    for (const s of b.slots) if (s.ad && s.ad.state === 'slot') {
+      const v = TYPES[s.ad.type].inc * dt;
+      if (ow.isPlayer) s.stored += v; else ow.money += v;
+    }
   }
   for (const c of chars) c.t += dt;
   updatePlayer(dt);
   for (const b of bots) updateBot(b, dt);
+  if (MP.on) mpTick(dt);
   for (const c of chars) {
-    if (!c.carrying) continue;
+    if (!c.carrying || c.isRemote || !c.carrying.origin) continue;
     const ow = c.carrying.origin.base.owner;
+    if (!ow || ow.isRemote) continue;
     if (ow !== c && T > ow.stunUntil && !(ow.ai && T < ow.ai.napUntil) && dist(ow, c) < 40) caught(c, ow);
   }
   floaters = floaters.filter(f => T - f.t0 < 1.3);
@@ -691,6 +954,41 @@ function idleUpdate(dt) {
 }
 
 // ======================= DRAWING =======================
+const patCache = {};
+function groundPat() {
+  const m = MAPS[mapIdx]; if (patCache[m.id]) return patCache[m.id];
+  const c = document.createElement('canvas'); c.width = c.height = 96; const g = c.getContext('2d');
+  g.fillStyle = m.g1; g.fillRect(0, 0, 96, 96);
+  g.fillStyle = m.g2; g.fillRect(0, 0, 48, 48); g.fillRect(48, 48, 48, 48);
+  if (m.tiles) { g.strokeStyle = 'rgba(0,0,0,.12)'; g.lineWidth = 2; for (const [a, b] of [[0, 0], [48, 0], [0, 48], [48, 48]]) g.strokeRect(a + 1, b + 1, 46, 46); }
+  if (m.id === 'lua') { g.fillStyle = 'rgba(0,0,0,.18)'; circle(g, 30, 60, 9); circle(g, 75, 20, 5); }
+  g.fillStyle = m.speck;
+  for (let i = 0; i < 12; i++) g.fillRect(Math.random() * 94, Math.random() * 90, 2, m.id === 'praia' || m.id === 'neve' ? 2 : 5);
+  return patCache[m.id] = ctx.createPattern(c, 'repeat');
+}
+function drawDeco(kind, x, y, sc) {
+  if (kind === 'palm') {
+    ctx.fillStyle = 'rgba(0,0,0,.18)'; ctx.beginPath(); ctx.ellipse(x + 10, y + 4, 34 * sc, 10 * sc, 0, 0, TAU); ctx.fill();
+    ctx.strokeStyle = '#8d6e63'; ctx.lineWidth = 10 * sc; ctx.lineCap = 'round';
+    ctx.beginPath(); ctx.moveTo(x, y); ctx.quadraticCurveTo(x - 12 * sc, y - 40 * sc, x + 8 * sc, y - 80 * sc); ctx.stroke();
+    const tx = x + 8 * sc, ty = y - 82 * sc;
+    ctx.fillStyle = '#2e7d32';
+    for (let k = 0; k < 6; k++) { const a = k / 6 * TAU + 0.3; ctx.beginPath(); ctx.ellipse(tx + Math.cos(a) * 22 * sc, ty + Math.sin(a) * 12 * sc, 26 * sc, 7 * sc, a, 0, TAU); ctx.fill(); }
+    ctx.fillStyle = '#6d4c41'; circle(ctx, tx - 4 * sc, ty + 5 * sc, 5 * sc); circle(ctx, tx + 5 * sc, ty + 6 * sc, 5 * sc);
+  } else if (kind === 'pine') {
+    ctx.fillStyle = 'rgba(0,0,0,.15)'; ctx.beginPath(); ctx.ellipse(x, y + 4, 30 * sc, 10 * sc, 0, 0, TAU); ctx.fill();
+    ctx.fillStyle = '#5d4037'; ctx.fillRect(x - 5 * sc, y - 16 * sc, 10 * sc, 18 * sc);
+    for (let k = 0; k < 3; k++) {
+      const w = (34 - k * 8) * sc, yy = y - 14 * sc - k * 22 * sc;
+      ctx.fillStyle = '#1b5e20'; ctx.beginPath(); ctx.moveTo(x - w, yy); ctx.lineTo(x + w, yy); ctx.lineTo(x, yy - 34 * sc); ctx.closePath(); ctx.fill();
+      ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.moveTo(x - w * 0.35, yy - 22 * sc); ctx.lineTo(x + w * 0.35, yy - 22 * sc); ctx.lineTo(x, yy - 34 * sc); ctx.closePath(); ctx.fill();
+    }
+  } else if (kind === 'crater') {
+    ctx.fillStyle = 'rgba(0,0,0,.35)'; ctx.beginPath(); ctx.ellipse(x, y - 10, 46 * sc, 20 * sc, 0, 0, TAU); ctx.fill();
+    ctx.strokeStyle = 'rgba(255,255,255,.2)'; ctx.lineWidth = 4 * sc; ctx.beginPath(); ctx.ellipse(x, y - 10, 46 * sc, 20 * sc, 0, Math.PI, TAU); ctx.stroke();
+    ctx.fillStyle = '#6d6d80'; circle(ctx, x + 40 * sc, y + 6, 9 * sc); circle(ctx, x - 44 * sc, y - 2, 6 * sc);
+  } else drawTree(x, y, sc);
+}
 const grassPat = (() => {
   const c = document.createElement('canvas'); c.width = c.height = 96; const g = c.getContext('2d');
   g.fillStyle = '#5cb85c'; g.fillRect(0, 0, 96, 96);
@@ -737,6 +1035,7 @@ function drawChar(g, x, y, L, t, moving, s = 1, face = 1) {
       g.beginPath(); g.ellipse(sd * 14, -23, fw * 0.65, 6, sd * 0.5, 0, TAU); g.fill(); g.stroke();
     }
   }
+  if (L.acc === 'adventista') { g.fillStyle = '#1565c0'; rr(g, -14, -39, 28, 24, 6); g.fill(); }
   if (L.acc === 'hero') {
     g.fillStyle = '#e53935'; g.beginPath(); g.moveTo(-10, -37); g.lineTo(10, -37);
     g.lineTo(17 + sw * 3, -3); g.quadraticCurveTo(0, 3, -17 + sw * 3, -3); g.closePath(); g.fill();
@@ -771,6 +1070,13 @@ function drawChar(g, x, y, L, t, moving, s = 1, face = 1) {
   if (L.acc === 'ball') { g.fillStyle = '#1b5e20'; g.font = 'bold 11px sans-serif'; g.textAlign = 'center'; g.fillText('10', 0, -20); }
   if (L.acc === 'chef') { g.fillStyle = '#e53935'; g.fillRect(-10, -36, 20, 3); }
   switch (L.acc) {
+    case 'adventista':
+      g.save(); g.beginPath(); g.moveTo(-10, -37); g.lineTo(10, -37); g.lineTo(16, -11); g.lineTo(-16, -11); g.closePath(); g.clip();
+      g.fillStyle = '#1a237e'; g.fillRect(-16, -23, 32, 12); g.restore();
+      g.fillStyle = '#1a237e'; g.beginPath(); g.moveTo(-7, -37); g.lineTo(0, -32); g.lineTo(7, -37); g.closePath(); g.fill();
+      g.fillStyle = '#1e88e5'; g.fillRect(-1.3, -33, 2.6, 8);
+      g.fillStyle = '#1565c0'; circle(g, -6, -29, 2.4); g.fillStyle = '#fff'; circle(g, -6, -29, 1);
+      g.strokeStyle = '#0d47a1'; g.lineWidth = 2.5; line(g, -8, -37, -10, -24); line(g, 8, -37, 10, -24); break;
     case 'tutu': g.fillStyle = '#f48fb1'; g.beginPath(); g.ellipse(0, -15, 21, 6, 0, 0, TAU); g.fill(); g.fillStyle = '#fce4ec'; g.beginPath(); g.ellipse(0, -17, 16, 4, 0, 0, TAU); g.fill(); break;
     case 'doctor':
       g.fillStyle = '#e53935'; g.fillRect(-2, -27, 4, 10); g.fillRect(-5, -24, 10, 4);
@@ -854,6 +1160,9 @@ function drawChar(g, x, y, L, t, moving, s = 1, face = 1) {
       g.strokeStyle = '#3e2723'; g.lineWidth = 1.6; g.beginPath(); g.arc(-5, hy + 1, 4.6, 0, TAU); g.stroke(); g.beginPath(); g.arc(5, hy + 1, 4.6, 0, TAU); g.stroke(); line(g, -0.5, hy + 1, 0.5, hy + 1);
       if (L.dress && L.outfit === '#5c6bc0') { g.fillStyle = '#c62828'; rr(g, -21, -27 + sw * 4, 8, 11, 1); g.fill(); g.fillStyle = '#fff'; g.fillRect(-20, -25 + sw * 4, 1.5, 7); }
       break;
+    case 'adventista':
+      g.fillStyle = '#0d47a1'; rr(g, -22, -28 + sw * 4, 9, 12, 1.5); g.fill();
+      g.fillStyle = '#ffd54f'; g.fillRect(-18.2, -26 + sw * 4, 1.4, 7); g.fillRect(-20, -23.5 + sw * 4, 5, 1.4); break;
     case 'dj': {
       const r = hy - hairTop(L, hy) - 2;
       g.strokeStyle = '#212121'; g.lineWidth = 4; g.beginPath(); g.arc(0, hy, r, Math.PI * 1.08, Math.PI * 1.92); g.stroke();
@@ -925,16 +1234,23 @@ function drawStatue(x, look, name) {
   drawChar(ctx, x, 385, look, 0, false, 2.1, 1);
   label(name, x, 448, '#ffe082', 15);
 }
+const STATUE3 = { skin: '#c9a227', hair: 'puffs', hairColor: '#a8841a', outfit: '#e6bc2f', legs: '#c9a227', shoes: '#a8841a', dress: true, acc: 'adventista', earrings: true, lips: '#8a6a10' };
 const STATUE = { skin: '#c9a227', hair: 'afroBig', hairColor: '#a8841a', outfit: '#e6bc2f', legs: '#c9a227', shoes: '#a8841a', dress: true, acc: 'crown', earrings: true, lips: '#8a6a10' };
 function drawGround() {
-  ctx.fillStyle = grassPat; ctx.fillRect(0, 0, WORLD.w, WORLD.h);
-  ctx.strokeStyle = '#795548'; ctx.lineWidth = 10; ctx.strokeRect(5, 5, WORLD.w - 10, WORLD.h - 10);
-  ctx.strokeStyle = '#a1887f'; ctx.lineWidth = 3; ctx.strokeRect(5, 5, WORLD.w - 10, WORLD.h - 10);
+  const M = MAPS[mapIdx];
+  if (M.id === 'praia') {
+    ctx.strokeStyle = 'rgba(255,255,255,.55)'; ctx.lineWidth = 8; ctx.setLineDash([40, 30]); ctx.lineDashOffset = -T * 20;
+    ctx.strokeRect(-14, -14, WORLD.w + 28, WORLD.h + 28); ctx.setLineDash([]);
+  }
+  ctx.fillStyle = groundPat(); ctx.fillRect(0, 0, WORLD.w, WORLD.h);
+  ctx.strokeStyle = M.border; ctx.lineWidth = 10; ctx.strokeRect(5, 5, WORLD.w - 10, WORLD.h - 10);
+  ctx.strokeStyle = 'rgba(255,255,255,.3)'; ctx.lineWidth = 3; ctx.strokeRect(5, 5, WORLD.w - 10, WORLD.h - 10);
   // runway
-  ctx.fillStyle = '#ffc107'; ctx.fillRect(0, RUN.y1 - 7, WORLD.w, RUN.y2 - RUN.y1 + 14);
-  ctx.fillStyle = '#b71c1c'; ctx.fillRect(0, RUN.y1, WORLD.w, RUN.y2 - RUN.y1);
+  ctx.fillStyle = M.edge; ctx.fillRect(0, RUN.y1 - 7, WORLD.w, RUN.y2 - RUN.y1 + 14);
+  ctx.fillStyle = M.run; ctx.fillRect(0, RUN.y1, WORLD.w, RUN.y2 - RUN.y1);
+  if (M.id === 'praia') { ctx.fillStyle = 'rgba(0,0,0,.12)'; for (let x = 0; x < WORLD.w; x += 30) ctx.fillRect(x, RUN.y1, 3, RUN.y2 - RUN.y1); }
   ctx.fillStyle = 'rgba(255,255,255,.09)';
-  const off = (T * RUN_SPEED) % 80;
+  const off = ((MP.on ? Date.now() / 1000 : T) * RUN_SPEED) % 80;
   for (let x = -80 + off; x < WORLD.w + 80; x += 80) {
     ctx.beginPath(); ctx.moveTo(x, RUN.y1); ctx.lineTo(x + 22, RUN.y1); ctx.lineTo(x + 46, RUN.yc); ctx.lineTo(x + 22, RUN.y2); ctx.lineTo(x, RUN.y2); ctx.lineTo(x + 24, RUN.yc); ctx.closePath(); ctx.fill();
   }
@@ -946,7 +1262,8 @@ function drawGround() {
   }
   // statue & decor
   drawStatue(1200, STATUE, 'ADELAIDE SUPREMA');
-  drawStatue(2500, STATUE2, 'ADELAIDE DIAMANTE');
+  if (M.id === 'escola') drawStatue(2500, STATUE3, 'ADELAIDE COLÉGIO ADVENTISTA');
+  else drawStatue(2500, STATUE2, 'ADELAIDE DIAMANTE');
   ctx.fillStyle = '#6d4c41'; ctx.fillRect(2494, 1170, 12, 50);
   ctx.fillStyle = '#ffcdd2'; rr(ctx, 2395, 1105, 210, 70, 10); ctx.fill(); ctx.strokeStyle = '#6d4c41'; ctx.lineWidth = 4; ctx.stroke();
   ctx.fillStyle = '#b71c1c'; ctx.font = 'bold 19px "Trebuchet MS"'; ctx.textAlign = 'center';
@@ -955,7 +1272,7 @@ function drawGround() {
   ctx.fillStyle = '#ffecb3'; rr(ctx, 1095, 1105, 210, 70, 10); ctx.fill(); ctx.strokeStyle = '#6d4c41'; ctx.lineWidth = 4; ctx.stroke();
   ctx.fillStyle = '#4e342e'; ctx.font = 'bold 19px "Trebuchet MS"'; ctx.textAlign = 'center';
   ctx.fillText('ROUBE UMA', 1200, 1133); ctx.fillText('ADELAIDE 😈', 1200, 1158);
-  for (const [x, y, s] of [[75, 320, 1], [75, 1320, 1], [3625, 320, 1], [3625, 1320, 1], [1040, 230, .8], [1360, 600, .8], [1040, 1480, .9], [1360, 1050, .8], [1050, 1350, .7], [1360, 1460, .8], [1355, 230, .7], [2340, 230, .8], [2660, 600, .8], [2340, 1480, .9], [2660, 1050, .8], [2350, 1350, .7], [2660, 1460, .8], [2655, 230, .7], [2340, 600, .7]]) drawTree(x, y, s);
+  for (const [x, y, s] of [[75, 320, 1], [75, 1320, 1], [3625, 320, 1], [3625, 1320, 1], [1040, 230, .8], [1360, 600, .8], [1040, 1480, .9], [1360, 1050, .8], [1050, 1350, .7], [1360, 1460, .8], [1355, 230, .7], [2340, 230, .8], [2660, 600, .8], [2340, 1480, .9], [2660, 1050, .8], [2350, 1350, .7], [2660, 1460, .8], [2655, 230, .7], [2340, 600, .7]]) drawDeco(M.deco, x, y, s);
 }
 function drawBase(b) {
   ctx.fillStyle = b.floor; ctx.fillRect(b.x, b.y, b.w, b.h);
@@ -963,7 +1280,7 @@ function drawBase(b) {
   for (let x = b.x + 50; x < b.x + b.w; x += 50) line(ctx, x, b.y, x, b.y + b.h);
   for (let y = b.y + 50; y < b.y + b.h; y += 50) line(ctx, b.x, y, b.x + b.w, y);
   ctx.save(); ctx.globalAlpha = .16; ctx.fillStyle = b.color; ctx.font = '900 64px "Trebuchet MS"'; ctx.textAlign = 'center';
-  ctx.fillText(b === myBase ? 'SUA BASE' : b.owner.name.toUpperCase(), b.x + b.w / 2, b.y + b.h / 2 + 22); ctx.restore();
+  ctx.fillText(b === myBase ? 'SUA BASE' : b.owner ? b.owner.name.toUpperCase() : 'LIVRE', b.x + b.w / 2, b.y + b.h / 2 + 22); ctx.restore();
   b.slots.forEach((s, i) => {
     const locked = i >= b.unlocked;
     ctx.fillStyle = 'rgba(0,0,0,.15)'; ctx.beginPath(); ctx.ellipse(s.x, s.y + 6, 38, 17, 0, 0, TAU); ctx.fill();
@@ -986,7 +1303,7 @@ function drawBase(b) {
   ctx.fillStyle = 'rgba(0,0,0,.3)';
   ctx.fillRect(b.door.x - 8, b.door.y - 4, 8, WT + 8); ctx.fillRect(b.door.x + b.door.w, b.door.y - 4, 8, WT + 8);
   const sy = b.top ? b.y + b.h + 32 : b.y - 20;
-  label(b === myBase ? '⭐ SUA BASE ⭐' : 'Base de ' + b.owner.name, b.x + b.w / 2, sy, b === myBase ? '#ffe082' : '#fff', 16);
+  label(b === myBase ? '⭐ SUA BASE ⭐' : b.owner ? (b.owner.isRemote ? '🌐 Base de ' : 'Base de ') + b.owner.name : 'Base livre', b.x + b.w / 2, sy, b === myBase ? '#ffe082' : b.owner && b.owner.isRemote ? '#fff59d' : '#fff', 16);
 }
 function drawBarrier(b) {
   if (b.lockUntil <= T) return;
@@ -1007,7 +1324,7 @@ function drawCharTag(c) {
   if (T < c.stunUntil) {
     for (let k = 0; k < 3; k++) { const a = T * 6 + k * TAU / 3; label('⭐', c.x + Math.cos(a) * 16, c.y - 70 + Math.sin(a) * 5, '#ffeb3b', 11); }
   }
-  if (!c.isPlayer) {
+  if (c.ai) {
     if (T < c.ai.napUntil) label('💤', c.x + 18 + Math.sin(T * 2) * 3, top - 14 - (T * 8 % 8), '#fff', 18);
     else if (c.ai.state === 'chase') label('❗', c.x, top - 18, '#ff1744', 20);
   }
@@ -1073,13 +1390,18 @@ function drawMinimap() {
   }
   for (const a of ads) if (a.state === 'runway' && TYPES[a.type].tier >= 2) { ctx.fillStyle = rarColor(TYPES[a.type].rar); circle(ctx, mx + a.x * s, my + a.y * s, 2.5); }
   for (const c of chars) {
-    ctx.fillStyle = c.isPlayer ? '#fff' : '#111'; circle(ctx, mx + c.x * s, my + c.y * s, c.isPlayer ? 4 : 3);
+    ctx.fillStyle = c.isPlayer ? '#fff' : c.isRemote ? '#ffeb3b' : '#111'; circle(ctx, mx + c.x * s, my + c.y * s, c.isPlayer ? 4 : 3);
     if (c.carrying) { ctx.strokeStyle = '#ffeb3b'; ctx.lineWidth = 1.5; ctx.beginPath(); ctx.arc(mx + c.x * s, my + c.y * s, 6, 0, TAU); ctx.stroke(); }
   }
 }
 function render() {
   ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
-  ctx.fillStyle = '#2f5e36'; ctx.fillRect(0, 0, W, H);
+  ctx.fillStyle = MAPS[mapIdx].bg; ctx.fillRect(0, 0, W, H);
+  if (MAPS[mapIdx].id === 'lua') {
+    ctx.fillStyle = '#fff';
+    for (let i = 0; i < 90; i++) { ctx.globalAlpha = 0.35 + 0.6 * Math.abs(Math.sin(T * 1.3 + i)); ctx.fillRect((i * 7919) % 997 / 997 * W, (i * 104729) % 991 / 991 * H, 2, 2); }
+    ctx.globalAlpha = 1;
+  }
   const vw = W / zoom, vh = H / zoom;
   const tx = playing ? player.x : WORLD.w / 2 + Math.sin(T * 0.15) * 500, ty = playing ? player.y : RUN.yc;
   camX = vw >= WORLD.w ? (WORLD.w - vw) / 2 : clamp(tx - vw / 2, 0, WORLD.w - vw);
@@ -1100,6 +1422,13 @@ function render() {
     drawFloaters();
   }
   ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+  if (MAPS[mapIdx].id === 'neve') {
+    ctx.fillStyle = 'rgba(255,255,255,.85)';
+    for (let i = 0; i < 70; i++) {
+      const sx = ((i * 197.3 + T * (15 + (i % 5) * 6)) % (W + 20)) - 10, sy = ((i * 89.7 + T * (40 + (i % 7) * 8)) % (H + 20)) - 10;
+      circle(ctx, sx + Math.sin(T + i) * 6, sy, 1.5 + (i % 3));
+    }
+  }
   if (playing) drawMinimap();
 }
 
@@ -1121,6 +1450,10 @@ function updateHUD() {
   if (b.unlocked >= 10) { setHTML(bSlot, '🏠 Base no máximo'); bSlot.className = 'sbtn max'; }
   else { setHTML(bSlot, `🏠 Expandir base (${b.unlocked}/10)<br><small>${fmt(slotCost())}</small>`); bSlot.className = 'sbtn' + (player.money < slotCost() ? ' off' : ''); }
   setHTML(bBook, `📖 Coleção (${seen.size}/${TYPES.length})`);
+  if (MP.on) {
+    const names = [`<span style="color:#7CFF7C">● Você</span>`, ...[...MP.remotes.values()].map(r => `<span style="color:#fff59d">● ${esc(r.name)}</span>`)];
+    setHTML($('mpBox'), `🌐 ${esc(MAPS[mapIdx].name)} — ${names.length} online<br>${names.join('<br>')}`);
+  }
   if (shoe >= 5) { setHTML(bShoe, '👟 Tênis no máximo'); bShoe.className = 'sbtn max'; }
   else { setHTML(bShoe, `👟 Tênis veloz (nv ${shoe}/5)<br><small>${fmt(shoeCost())}</small>`); bShoe.className = 'sbtn' + (player.money < shoeCost() ? ' off' : ''); }
   const k = isTouch ? '' : '[E] ';
@@ -1237,6 +1570,13 @@ function startGame() {
   player.look = LOOKS[lookIdx];
   T = Math.max(T, 0);
   if (offlineMsg) { toast(offlineMsg, 'good'); offlineMsg = ''; }
+  if (MP.on) {
+    $('mpBox').style.display = 'block';
+    setTimeout(() => toast(`🌐 Você está online no mapa ${MAPS[mapIdx].name}! Sua base é a amarela-brilhante no minimapa.`), 600);
+    setTimeout(() => toast('😈 Roube as Adelaides dos outros jogadores e defenda as suas!'), 5500);
+    setTimeout(() => toast('👥 Pra jogar junto, seu amigo abre o mesmo link, escolhe o mesmo mapa e clica em Multiplayer.'), 10500);
+    save(); return;
+  }
   setTimeout(() => toast('👋 Bem-vindo! Vá até a passarela vermelha e compre uma Adelaide.'), 600);
   setTimeout(() => toast('💰 As Adelaides da sua base geram dinheiro. Pise nelas pra coletar!'), 5500);
   setTimeout(() => toast('😈 Entre nas bases rivais, pegue uma Adelaide e leve até a SUA base!'), 10500);
@@ -1244,6 +1584,17 @@ function startGame() {
   save();
 }
 $('play').addEventListener('click', startGame);
+$('playMP').addEventListener('click', startMP);
+try { $('nick').value = localStorage.getItem(SAVE_KEY + '-nick') || ''; } catch (e) { }
+function buildMaps() {
+  const el = $('maps'); el.innerHTML = '';
+  MAPS.forEach((m, i) => {
+    const b = document.createElement('button'); b.className = 'mapb' + (i === mapIdx ? ' sel' : '');
+    b.textContent = m.emoji + ' ' + m.name;
+    b.addEventListener('click', () => { mapIdx = i; buildMaps(); try { const sv = loadSave(); if (sv) { sv.map = i; localStorage.setItem(SAVE_KEY, JSON.stringify(sv)); } } catch (e) { } });
+    el.appendChild(b);
+  });
+}
 let resetArmed = 0;
 $('reset').addEventListener('click', e => {
   const btn = e.currentTarget;
@@ -1264,6 +1615,7 @@ addEventListener('pagehide', () => { if (playing) save(); });
 // ======================= LOOP =======================
 initWorld(loadSave());
 buildLooks();
+buildMaps();
 let last = performance.now();
 function frame(now) {
   const dt = Math.min(0.05, (now - last) / 1000); last = now;
@@ -1273,7 +1625,7 @@ function frame(now) {
   requestAnimationFrame(frame);
 }
 requestAnimationFrame(frame);
-window.__game = { get player() { return player; }, get bots() { return bots; }, get BASES() { return BASES; }, get ads() { return ads; }, act, sell, TYPES, get T() { return T; }, get seen() { return seen; }, step(n) { for (let i = 0; i < n; i++) update(1 / 60); } };
+window.__game = { get player() { return player; }, get bots() { return bots; }, get BASES() { return BASES; }, get ads() { return ads; }, act, sell, TYPES, get T() { return T; }, get MP() { return MP; }, get myBase() { return myBase; }, startMP, get seen() { return seen; }, step(n) { for (let i = 0; i < n; i++) update(1 / 60); } };
 </script>
 </body>
 </html>
