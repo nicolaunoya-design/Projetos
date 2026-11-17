@@ -18,6 +18,16 @@
   #shop{display:flex;flex-direction:column;gap:6px;align-items:flex-start}
   .sbtn{background:linear-gradient(#ffd54f,#ff9800);border:none;border-radius:12px;padding:6px 12px;font-weight:800;color:#3b2000;font-size:14px;box-shadow:0 3px 0 #a35b00;text-align:left;line-height:1.15}
   .sbtn small{font-weight:700;font-size:12px}
+  .sbtn.book{background:linear-gradient(#80d8ff,#2979ff);color:#fff;box-shadow:0 3px 0 #0d47a1}
+  #book{position:fixed;inset:0;background:rgba(10,5,25,.94);display:none;flex-direction:column;align-items:center;color:#fff;overflow:auto;padding:14px;box-sizing:border-box;z-index:5}
+  #book h2{margin:4px 0 2px;font-size:28px}
+  #book .bsub{color:#ffe082;font-weight:700;margin-bottom:10px;font-size:14px}
+  #bookGrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(118px,1fr));gap:10px;width:min(920px,100%);padding-bottom:20px}
+  .card{background:rgba(255,255,255,.07);border-radius:14px;padding:6px 4px;text-align:center;font-size:12px;border:3px solid #555;line-height:1.3}
+  .card b{display:block;font-size:13px}
+  .card canvas{display:block;margin:0 auto}
+  .card.no{opacity:.75}
+  #bookClose{font-family:inherit;font-size:18px;font-weight:900;padding:8px 26px;border:none;border-radius:14px;background:linear-gradient(#ff8a80,#e53935);color:#fff;box-shadow:0 4px 0 #8e0000;cursor:pointer;margin-bottom:12px}
   .sbtn.off{filter:grayscale(.75) brightness(.85)}
   .sbtn.max{background:linear-gradient(#bdbdbd,#8d8d8d);box-shadow:0 3px 0 #555;color:#222}
   .sbtn:active{transform:translateY(2px);box-shadow:0 1px 0 #a35b00}
@@ -41,7 +51,10 @@
   #help{position:absolute;bottom:10px;left:50%;transform:translateX(-50%);font-size:13px;background:rgba(0,0,0,.5);padding:5px 12px;border-radius:10px;white-space:nowrap}
   #joy{position:absolute;width:120px;height:120px;border-radius:50%;background:rgba(255,255,255,.14);border:2px solid rgba(255,255,255,.35);display:none;transform:translate(-50%,-50%)}
   #knob{position:absolute;left:50%;top:50%;width:52px;height:52px;margin:-26px;border-radius:50%;background:rgba(255,255,255,.65)}
-  #menu{position:fixed;inset:0;background:radial-gradient(circle at 50% 30%,rgba(60,20,90,.82),rgba(10,5,25,.94));display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;overflow:auto;padding:16px;box-sizing:border-box;text-align:center}
+  #menu{position:fixed;inset:0;background:radial-gradient(circle at 50% 30%,rgba(60,20,90,.82),rgba(10,5,25,.94));display:flex;flex-direction:column;align-items:center;justify-content:flex-start;}
+  #menu > :first-child{margin-top:auto}
+  #menu > :last-child{margin-bottom:auto}
+  #menu{color:#fff;overflow:auto;padding:16px;box-sizing:border-box;text-align:center}
   #menu h1{margin:0;font-size:clamp(34px,8vw,72px);line-height:.95;font-weight:900;letter-spacing:1px;text-shadow:0 5px 0 #000,0 0 30px rgba(255,200,0,.35)}
   #menu h1 span{display:block;background:linear-gradient(#fff176,#ff9800);-webkit-background-clip:text;background-clip:text;color:transparent;text-shadow:none;filter:drop-shadow(0 5px 0 #000)}
   #menu .sub{font-size:17px;margin:12px 0 14px;color:#ffe082;font-weight:700}
@@ -75,6 +88,7 @@
   <div id="shop">
     <button class="sbtn" id="bSlot"></button>
     <button class="sbtn" id="bShoe"></button>
+    <button class="sbtn book" id="bBook"></button>
     <button id="bMute" title="Som">🔊</button>
   </div>
   </div>
@@ -85,6 +99,13 @@
     <button id="bAct"></button>
   </div>
   <div id="joy"><div id="knob"></div></div>
+</div>
+
+<div id="book">
+  <h2>📖 Coleção de Adelaides</h2>
+  <div class="bsub" id="bookSub"></div>
+  <button id="bookClose">Fechar (jogo pausado)</button>
+  <div id="bookGrid"></div>
 </div>
 
 <div id="menu">
@@ -99,7 +120,9 @@
     💰 <b>Dinheiro:</b> elas geram dinheiro na sua base. Pise na Adelaide pra coletar.<br>
     😈 <b>Roubo:</b> entre na base de um rival, pegue uma Adelaide (<b>E</b>) e corra até a SUA base sem ser pego!<br>
     🔒 <b>Defesa:</b> pise no botão vermelho da sua base pra trancar a porta. Se alguém roubar você, encoste no ladrão pra recuperar.<br>
-    💤 <b>Dica:</b> roube quando o dono estiver dormindo ou fora da base!
+    💤 <b>Dica:</b> roube quando o dono estiver dormindo ou fora da base!<br>
+    🦹 <b>Rivais:</b> Zé Ruela, Dona Creusa, Tio Juca, Mestre Kiko e Vovó Zuleica.<br>
+    📖 <b>Coleção:</b> são 24 Adelaides pra descobrir, até as secretas! (tecla <b>C</b>)
   </div>
 </div>
 
@@ -164,17 +187,17 @@ const SFX = {
 };
 
 // ======================= DATA =======================
-const WORLD = { w: 2400, h: 1600 };
+const WORLD = { w: 3700, h: 1600 };
 const RUN = { y1: 755, y2: 845, yc: 800 };
 const RUN_SPEED = 55;
 const RAR = {
-  comum: { n: 'Comum', c: '#cfcfcf' },
-  incomum: { n: 'Incomum', c: '#4cd964' },
-  rara: { n: 'Rara', c: '#3fa9ff' },
-  epica: { n: 'Épica', c: '#c77dff' },
-  lendaria: { n: 'Lendária', c: '#ffb52e' },
-  mitica: { n: 'Mítica', c: '#ff4f7a' },
-  secreta: { n: 'SECRETA', c: 'rainbow' },
+  comum: { t: 0, n: 'Comum', c: '#cfcfcf' },
+  incomum: { t: 1, n: 'Incomum', c: '#4cd964' },
+  rara: { t: 2, n: 'Rara', c: '#3fa9ff' },
+  epica: { t: 3, n: 'Épica', c: '#c77dff' },
+  lendaria: { t: 4, n: 'Lendária', c: '#ffb52e' },
+  mitica: { t: 5, n: 'Mítica', c: '#ff4f7a' },
+  secreta: { t: 6, n: 'SECRETA', c: 'rainbow' },
 };
 const TYPES = [
   { name: 'Adelaide Comum', rar: 'comum', price: 25, inc: 1, w: 400, outfit: '#ef6c3c', acc: null, hair: 'afro' },
@@ -188,8 +211,23 @@ const TYPES = [
   { name: 'Adelaide Rainha', rar: 'mitica', price: 250000, inc: 3200, w: 6, outfit: '#7b1fa2', acc: 'crown', hair: 'afroBig' },
   { name: 'Adelaide Dourada', rar: 'secreta', price: 900000, inc: 11000, w: 2.5, outfit: '#ffcc33', acc: 'gold', hair: 'afroBig' },
   { name: 'Adelaide Cósmica', rar: 'secreta', price: 3500000, inc: 40000, w: 1, outfit: '#1a0f3d', acc: 'cosmic', hair: 'afroBig' },
+  // --- novas ---
+  { name: 'Adelaide Estudante', rar: 'comum', price: 50, inc: 2, w: 350, outfit: '#5c6bc0', acc: 'glasses', hair: 'afro' },
+  { name: 'Adelaide Bailarina', rar: 'incomum', price: 200, inc: 6, w: 240, outfit: '#f8bbd0', acc: 'tutu', hair: 'bun' },
+  { name: 'Adelaide Médica', rar: 'incomum', price: 650, inc: 15, w: 160, outfit: '#f5f5f5', acc: 'doctor', hair: 'braids' },
+  { name: 'Adelaide DJ', rar: 'rara', price: 2000, inc: 40, w: 100, outfit: '#00bcd4', acc: 'dj', hair: 'afro' },
+  { name: 'Adelaide Capoeirista', rar: 'rara', price: 5500, inc: 95, w: 65, outfit: '#fafafa', acc: 'capoeira', hair: 'braids' },
+  { name: 'Adelaide Pirata', rar: 'epica', price: 15000, inc: 240, w: 38, outfit: '#8d6e63', acc: 'pirate', hair: 'afro' },
+  { name: 'Adelaide Robô', rar: 'epica', price: 45000, inc: 650, w: 20, outfit: '#90a4ae', acc: 'robot', hair: 'puffs' },
+  { name: 'Adelaide Fada', rar: 'lendaria', price: 130000, inc: 1700, w: 10, outfit: '#b2ebf2', acc: 'fairy', hair: 'afroBig' },
+  { name: 'Adelaide Sereia', rar: 'lendaria', price: 170000, inc: 2300, w: 8, outfit: '#7e57c2', acc: 'mermaid', hair: 'afroBig' },
+  { name: 'Adelaide Carnavalesca', rar: 'mitica', price: 420000, inc: 5200, w: 4, outfit: '#ff4081', acc: 'carnaval', hair: 'afro' },
+  { name: 'Adelaide Super-Heroína', rar: 'mitica', price: 600000, inc: 7400, w: 3.5, outfit: '#3949ab', acc: 'hero', hair: 'puffs' },
+  { name: 'Adelaide Arco-Íris', rar: 'secreta', price: 1800000, inc: 21000, w: 1.5, outfit: '#ffffff', acc: 'rainbow', hair: 'afroBig' },
+  { name: 'Adelaide Diamante', rar: 'secreta', price: 8000000, inc: 90000, w: 0.5, outfit: '#b3e5fc', acc: 'diamond', hair: 'afroBig' },
 ];
-TYPES.forEach((t, i) => t.id = i);
+TYPES.forEach((t, i) => { t.id = i; t.tier = RAR[t.rar].t; });
+const SORTED = [...TYPES].sort((a, b) => a.price - b.price);
 const SKINS = ['#6b4226', '#5a3825', '#4a2c1d', '#3b2417', '#7a4a2a'];
 const LOOKS = [
   { name: 'Boné', skin: '#5b3a29', hair: 'cap', hairColor: '#111', capColor: '#ffb703', outfit: '#e63946', legs: '#1d3557', shoes: '#fafafa' },
@@ -197,20 +235,25 @@ const LOOKS = [
   { name: 'Tranças', skin: '#3d2416', hair: 'braids', hairColor: '#0d0805', outfit: '#ffb703', legs: '#3a3a3a', shoes: '#111', beads: true },
 ];
 const BOTDEFS = [
-  { name: 'Zé Ruela', look: { skin: '#8d5524', hair: 'cap', hairColor: '#2a1a0e', capColor: '#4a148c', outfit: '#ab47bc', legs: '#37474f', shoes: '#111' }, start: [0, 0, 1, 2] },
-  { name: 'Dona Creusa', look: { skin: '#c68642', hair: 'bun', hairColor: '#9e9e9e', outfit: '#1e88e5', dress: true, legs: '#c68642', shoes: '#5d4037', lips: '#8e3b3b' }, start: [0, 1, 1, 3] },
-  { name: 'Tio Juca', look: { skin: '#e0ac69', hair: 'short', hairColor: '#4e342e', outfit: '#e53935', legs: '#455a64', shoes: '#222', stache: true }, start: [0, 2, 3, 4] },
+  { name: 'Zé Ruela', tag: '#e1bee7', look: { skin: '#8d5524', hair: 'cap', hairColor: '#2a1a0e', capColor: '#4a148c', outfit: '#ab47bc', legs: '#37474f', shoes: '#111' }, start: [0, 0, 1, 2] },
+  { name: 'Dona Creusa', tag: '#90caf9', look: { skin: '#c68642', hair: 'bun', hairColor: '#9e9e9e', outfit: '#1e88e5', dress: true, legs: '#c68642', shoes: '#5d4037', lips: '#8e3b3b' }, start: [0, 1, 1, 3] },
+  { name: 'Tio Juca', tag: '#ff8a80', look: { skin: '#e0ac69', hair: 'short', hairColor: '#4e342e', outfit: '#e53935', legs: '#455a64', shoes: '#222', stache: true }, start: [0, 2, 3, 4] },
+  { name: 'Mestre Kiko', tag: '#a5d6a7', look: { skin: '#3e2723', hair: 'afroM', hairColor: '#1b1b1b', outfit: '#43a047', legs: '#fafafa', shoes: '#111', stache: true }, start: [11, 12, 13, 14] },
+  { name: 'Vovó Zuleica', tag: '#80cbc4', look: { skin: '#6d4c41', hair: 'bun', hairColor: '#eeeeee', outfit: '#00897b', dress: true, legs: '#6d4c41', shoes: '#4e342e', lips: '#6d2b2b', acc: 'glasses' }, start: [0, 2, 15, 3] },
 ];
 const BASECOL = [
   { color: '#f9a825', floor: '#fff3cf' },
   { color: '#8e24aa', floor: '#efdcf5' },
   { color: '#1e88e5', floor: '#d9eafa' },
   { color: '#e53935', floor: '#fadcdb' },
+  { color: '#43a047', floor: '#e0f2e0' },
+  { color: '#00897b', floor: '#d7f0ed' },
 ];
 
 // ======================= STATE =======================
 let T = 0, BASES = [], ads = [], chars = [], bots = [], player = null, myBase = null;
 let floaters = [], playing = false, spawnT = 0, rareT = 45, playerTargetUntil = 50;
+let seen = new Set(), bookOpen = false;
 let lookIdx = 0, shoe = 0, ctxA = null, sellIdx = -1, offlineMsg = '';
 const isTouch = matchMedia('(pointer:coarse)').matches || 'ontouchstart' in window;
 
@@ -250,7 +293,7 @@ function makeAd(type, x, y) {
 function adLook(a) {
   if (a.look) return a.look;
   const ty = TYPES[a.type];
-  const aura = { lendaria: 'rgba(255,181,46,.5)', mitica: 'rgba(255,79,122,.5)' }[ty.rar] || (ty.acc === 'gold' ? 'rgba(255,215,0,.65)' : ty.acc === 'cosmic' ? 'rgba(150,80,255,.7)' : null);
+  const aura = { lendaria: 'rgba(255,181,46,.5)', mitica: 'rgba(255,79,122,.5)' }[ty.rar] || { gold: 'rgba(255,215,0,.65)', cosmic: 'rgba(150,80,255,.7)', diamond: 'rgba(120,230,255,.7)', rainbow: 'rainbow' }[ty.acc] || null;
   a.look = {
     skin: a.skin, hair: ty.hair, hairColor: ty.acc === 'cosmic' ? '#1a0b3a' : '#140d09', outfit: ty.outfit, legs: a.skin,
     shoes: ty.acc === 'gold' ? '#ffd54f' : '#2b1b14', dress: true, acc: ty.acc, aura, lips: '#7a1f2b', earrings: true
@@ -260,21 +303,23 @@ function adLook(a) {
 function placeInSlot(b, i, tid) {
   const s = b.slots[i]; const a = makeAd(tid, s.x, s.y);
   a.state = 'slot'; a.base = b; a.slotIdx = i; a.moving = false; s.ad = a; ads.push(a);
+  if (b === myBase) seen.add(tid);
 }
 const SAVE_KEY = 'roube-uma-adelaide-v1';
 function loadSave() { try { return JSON.parse(localStorage.getItem(SAVE_KEY)); } catch (e) { return null; } }
 function save() {
   if (!player) return;
-  const d = { money: player.money, unlocked: myBase.unlocked, shoe, look: lookIdx, slots: myBase.slots.map(s => ({ t: s.ad ? s.ad.type : -1, s: s.stored })), time: Date.now() };
+  const d = { money: player.money, unlocked: myBase.unlocked, shoe, look: lookIdx, seen: [...seen], slots: myBase.slots.map(s => ({ t: s.ad ? s.ad.type : -1, s: s.stored })), time: Date.now() };
   try { localStorage.setItem(SAVE_KEY, JSON.stringify(d)); } catch (e) { }
 }
 function initWorld(sv) {
+  seen = new Set(sv && Array.isArray(sv.seen) ? sv.seen.filter(x => TYPES[x]) : []);
   T = 0; ads = []; floaters = []; spawnT = 0; rareT = 45; playerTargetUntil = 50; offlineMsg = '';
-  BASES = [makeBase(0, 150, 950, false), makeBase(1, 150, 150, true), makeBase(2, 1450, 150, true), makeBase(3, 1450, 950, false)];
+  BASES = [makeBase(0, 150, 950, false), makeBase(1, 150, 150, true), makeBase(2, 1450, 150, true), makeBase(3, 1450, 950, false), makeBase(4, 2750, 150, true), makeBase(5, 2750, 950, false)];
   myBase = BASES[0];
   if (sv && typeof sv.look === 'number') lookIdx = sv.look;
   player = makeChar('Você', LOOKS[lookIdx], myBase, true);
-  bots = BOTDEFS.map((d, i) => makeChar(d.name, d.look, BASES[i + 1], false));
+  bots = BOTDEFS.map((d, i) => { const b = makeChar(d.name, d.look, BASES[i + 1], false); b.tag = d.tag; return b; });
   chars = [player, ...bots];
   BASES.forEach((b, i) => b.owner = chars[i]);
   bots.forEach((b, i) => { b.money = 150; BOTDEFS[i].start.forEach((tid, k) => placeInSlot(b.base, k, tid)); });
@@ -313,7 +358,7 @@ function navPath(f, t) {
   const out = []; let prev = { x: f.x, y: f.y };
   for (const p of pts) {
     if (!baseAt(prev.x, prev.y) && !baseAt(p.x, p.y) && segBlocked(prev, p)) {
-      const cols = [75, 1200, 2325];
+      const cols = [75, 1200, 2500, 3625];
       let cx = cols[0], best = 1e9;
       for (const c of cols) { const s = Math.abs(prev.x - c) + Math.abs(p.x - c); if (s < best) { best = s; cx = c; } }
       out.push({ x: cx, y: prev.y }, { x: cx, y: p.y });
@@ -356,19 +401,20 @@ function myIncome() { let s = 0; for (const sl of myBase.slots) if (sl.ad && sl.
 function slotCost() { return Math.round(250 * Math.pow(3.2, myBase.unlocked - 4)); }
 function shoeCost() { return Math.round(500 * Math.pow(4, shoe)); }
 function playerSpeed() { return 260 + shoe * 28; }
-function pickType(minId = 0) {
-  let tot = 0; for (const t of TYPES) if (t.id >= minId) tot += t.w;
+function pickType(minTier = 0) {
+  let tot = 0; for (const t of TYPES) if (t.tier >= minTier) tot += t.w;
   let r = Math.random() * tot;
-  for (const t of TYPES) { if (t.id < minId) continue; r -= t.w; if (r <= 0) return t.id; }
-  return minId;
+  for (const t of TYPES) { if (t.tier < minTier) continue; r -= t.w; if (r <= 0) return t.id; }
+  return TYPES.find(t => t.tier >= minTier).id;
 }
-function spawnRunway(x = -30, minId = 0) {
-  const a = makeAd(pickType(minId), x, RUN.yc); a.y = RUN.yc + a.lane; ads.push(a);
+function spawnRunway(x = -30, minTier = 0) {
+  const a = makeAd(pickType(minTier), x, RUN.yc); a.y = RUN.yc + a.lane; ads.push(a);
   const ty = TYPES[a.type];
-  if (playing && x < 0 && ty.id >= 6) { toast(`✨ Uma ${ty.name} (${RAR[ty.rar].n}) apareceu na passarela!`, 'rare'); SFX.rare(); }
+  if (playing && x < 0 && ty.tier >= 3) { toast(`✨ Uma ${ty.name} (${RAR[ty.rar].n}) apareceu na passarela!`, 'rare'); SFX.rare(); }
 }
 function assignToSlot(ad, base, i) {
   base.slots[i].ad = ad; ad.base = base; ad.slotIdx = i; ad.state = 'toBase'; ad.path = navPath(ad, base.slots[i]);
+  if (base === myBase && !seen.has(ad.type)) { seen.add(ad.type); if (playing) setTimeout(() => toast(`📖 Nova Adelaide na sua coleção: ${TYPES[ad.type].name}! (${seen.size}/${TYPES.length})`, 'rare'), 900); }
 }
 function float(x, y, text, col = '#7CFF7C', size = 20) { floaters.push({ x, y, text, col, size, t0: T }); }
 function say(c, text, dur = 2) { c.bubble = { text, until: T + dur }; }
@@ -378,7 +424,7 @@ function buy(c, a, i) {
   const ty = TYPES[a.type];
   c.money -= ty.price; assignToSlot(a, c.base, i);
   if (c.isPlayer) { toast(`✅ Você comprou a ${ty.name}!`, 'good'); SFX.buy(); float(a.x, a.y - 90, '-' + fmt(ty.price), '#ff8a80'); }
-  else if (ty.id >= 5 && playing) toast(`👀 ${c.name} comprou a ${ty.name}! Que tal roubar? 😏`);
+  else if (ty.tier >= 3 && playing) toast(`👀 ${c.name} comprou a ${ty.name}! Que tal roubar? 😏`);
 }
 function doSteal(c, base, idx) {
   const ad = base.slots[idx].ad, ty = TYPES[ad.type], ow = base.owner;
@@ -617,9 +663,9 @@ function updateAd(a, dt) {
 function update(dt) {
   T += dt;
   spawnT -= dt;
-  if (spawnT <= 0) { spawnRunway(); spawnT = rand(1.9, 2.8); }
+  if (spawnT <= 0) { spawnRunway(); spawnT = rand(1.5, 2.3); }
   rareT -= dt;
-  if (rareT <= 0) { spawnRunway(-30, 4); rareT = rand(45, 70); }
+  if (rareT <= 0) { spawnRunway(-30, 2); rareT = rand(45, 70); }
   for (const a of ads) updateAd(a, dt);
   if (ads.some(a => a.dead)) ads = ads.filter(a => !a.dead);
   for (const b of BASES) for (const s of b.slots) if (s.ad && s.ad.state === 'slot') {
@@ -638,7 +684,7 @@ function update(dt) {
 }
 function idleUpdate(dt) {
   T += dt; spawnT -= dt;
-  if (spawnT <= 0) { spawnRunway(); spawnT = rand(1.9, 2.8); }
+  if (spawnT <= 0) { spawnRunway(); spawnT = rand(1.5, 2.3); }
   for (const a of ads) if (a.state === 'runway') updateAd(a, dt);
   if (ads.some(a => a.dead)) ads = ads.filter(a => !a.dead);
   for (const c of chars) c.t += dt;
@@ -660,6 +706,11 @@ function blob(g, x, y, r) {
   circle(g, x, y, r);
   for (let i = 0; i < 9; i++) { const a = i / 9 * TAU; circle(g, x + Math.cos(a) * r * 0.85, y + Math.sin(a) * r * 0.85, r * 0.32); }
 }
+function star(g, x, y, R, r) {
+  g.beginPath();
+  for (let i = 0; i < 10; i++) { const a = -Math.PI / 2 + i * Math.PI / 5, q = i % 2 ? r : R; g.lineTo(x + Math.cos(a) * q, y + Math.sin(a) * q); }
+  g.closePath(); g.fill();
+}
 function hairTop(L, hy) {
   return { afroBig: hy - 37, afro: hy - 29, afroM: hy - 28, puffs: hy - 22, bun: hy - 26 }[L.hair] ?? (hy - 15);
 }
@@ -674,16 +725,38 @@ function drawChar(g, x, y, L, t, moving, s = 1, face = 1) {
   if (L.aura) {
     const pr = 1 + Math.sin(t * 3) * 0.08;
     const gr = g.createRadialGradient(0, -34, 4, 0, -34, 52 * pr);
-    gr.addColorStop(0, L.aura); gr.addColorStop(1, 'rgba(0,0,0,0)');
+    gr.addColorStop(0, L.aura === 'rainbow' ? `hsla(${(t * 140) % 360},95%,60%,.65)` : L.aura); gr.addColorStop(1, 'rgba(0,0,0,0)');
     g.fillStyle = gr; g.beginPath(); g.arc(0, -34, 52 * pr, 0, TAU); g.fill();
+  }
+  // back accessories
+  if (L.acc === 'fairy') {
+    g.fillStyle = 'rgba(200,240,255,.7)'; g.strokeStyle = 'rgba(255,255,255,.95)'; g.lineWidth = 1.5;
+    const fw = 15 + Math.sin(t * 14) * 3;
+    for (const sd of [-1, 1]) {
+      g.beginPath(); g.ellipse(sd * 16, -40, fw, 9, sd * -0.5, 0, TAU); g.fill(); g.stroke();
+      g.beginPath(); g.ellipse(sd * 14, -23, fw * 0.65, 6, sd * 0.5, 0, TAU); g.fill(); g.stroke();
+    }
+  }
+  if (L.acc === 'hero') {
+    g.fillStyle = '#e53935'; g.beginPath(); g.moveTo(-10, -37); g.lineTo(10, -37);
+    g.lineTo(17 + sw * 3, -3); g.quadraticCurveTo(0, 3, -17 + sw * 3, -3); g.closePath(); g.fill();
+  }
+  if (L.acc === 'carnaval') {
+    const cols = ['#ff4081', '#ffd600', '#00e676', '#2979ff', '#d500f9'];
+    for (let k = -4; k <= 4; k++) {
+      const a = -Math.PI / 2 + k * 0.3 + Math.sin(t * 3) * 0.04;
+      g.fillStyle = cols[(k + 4) % 5]; g.beginPath(); g.ellipse(Math.cos(a) * 26, hy - 8 + Math.sin(a) * 26, 15, 5, a, 0, TAU); g.fill();
+    }
   }
   if (L.acc === 'skate') { g.fillStyle = '#ff6b35'; rr(g, -19, -4, 38, 6, 3); g.fill(); g.fillStyle = '#222'; circle(g, -12, 4, 3); circle(g, 12, 4, 3); }
   // legs
   const lh1 = 13 - Math.max(0, sw) * 4, lh2 = 13 - Math.max(0, -sw) * 4;
-  g.fillStyle = L.legs || skin;
-  g.fillRect(-8, -13, 6, lh1); g.fillRect(2, -13, 6, lh2);
-  g.fillStyle = L.shoes || '#222';
-  rr(g, -10, -13 + lh1 - 4, 9, 5, 2); g.fill(); rr(g, 1, -13 + lh2 - 4, 9, 5, 2); g.fill();
+  if (L.acc !== 'mermaid') {
+    g.fillStyle = L.legs || skin;
+    g.fillRect(-8, -13, 6, lh1); g.fillRect(2, -13, 6, lh2);
+    g.fillStyle = L.shoes || '#222';
+    rr(g, -10, -13 + lh1 - 4, 9, 5, 2); g.fill(); rr(g, 1, -13 + lh2 - 4, 9, 5, 2); g.fill();
+  }
   // braids behind
   if (L.hair === 'braids') {
     g.strokeStyle = L.hairColor; g.lineWidth = 3.6; g.lineCap = 'round';
@@ -697,10 +770,39 @@ function drawChar(g, x, y, L, t, moving, s = 1, face = 1) {
   if (L.acc === 'cosmic') { g.fillStyle = '#fff'; [[-5, -30], [4, -24], [-8, -17], [9, -15], [0, -19], [6, -33]].forEach(([a, b], i) => circle(g, a, b, 0.9 + ((i + Math.floor(t * 3)) % 3) * 0.5)); }
   if (L.acc === 'ball') { g.fillStyle = '#1b5e20'; g.font = 'bold 11px sans-serif'; g.textAlign = 'center'; g.fillText('10', 0, -20); }
   if (L.acc === 'chef') { g.fillStyle = '#e53935'; g.fillRect(-10, -36, 20, 3); }
+  switch (L.acc) {
+    case 'tutu': g.fillStyle = '#f48fb1'; g.beginPath(); g.ellipse(0, -15, 21, 6, 0, 0, TAU); g.fill(); g.fillStyle = '#fce4ec'; g.beginPath(); g.ellipse(0, -17, 16, 4, 0, 0, TAU); g.fill(); break;
+    case 'doctor':
+      g.fillStyle = '#e53935'; g.fillRect(-2, -27, 4, 10); g.fillRect(-5, -24, 10, 4);
+      g.strokeStyle = '#37474f'; g.lineWidth = 2; g.beginPath(); g.moveTo(-7, -37); g.quadraticCurveTo(-9, -27, -5, -22); g.stroke();
+      g.beginPath(); g.moveTo(7, -37); g.quadraticCurveTo(9, -27, -3, -22); g.stroke(); g.fillStyle = '#90a4ae'; circle(g, -4, -21, 2.6); break;
+    case 'capoeira': g.fillStyle = '#ffd600'; g.fillRect(-15, -19, 30, 3); g.fillStyle = '#00c853'; g.fillRect(-15, -16, 30, 2); g.fillRect(10, -16, 3, 9); break;
+    case 'glasses': g.strokeStyle = '#5d4037'; g.lineWidth = 2.5; line(g, -7, -37, -9, -20); line(g, 7, -37, 9, -20); break;
+    case 'pirate': g.fillStyle = '#212121'; g.fillRect(-14, -20, 28, 4); g.fillStyle = '#ffd600'; g.fillRect(-3, -21, 6, 6); break;
+    case 'robot':
+      g.fillStyle = '#455a64'; rr(g, -7, -32, 14, 10, 2); g.fill();
+      ['#ff1744', '#00e676', '#2979ff'].forEach((c, i) => { g.fillStyle = Math.floor(t * 4 + i) % 3 === 0 ? '#fff' : c; circle(g, -4 + i * 4, -27, 1.6); });
+      g.fillStyle = '#cfd8dc'; circle(g, -12, -16, 1.5); circle(g, 12, -16, 1.5); break;
+    case 'hero': g.fillStyle = '#ffd600'; star(g, 0, -25, 6, 2.6); break;
+    case 'carnaval': g.fillStyle = '#ffd600'; [[-6, -30], [5, -27], [-3, -20], [8, -17], [-9, -15], [2, -14]].forEach(([a, b], i) => circle(g, a, b, 1 + ((i + Math.floor(t * 4)) % 2) * 0.7)); break;
+    case 'mermaid': {
+      g.fillStyle = '#26a69a'; g.beginPath(); g.moveTo(-15, -14); g.lineTo(15, -14); g.quadraticCurveTo(8, -4, 3, -3); g.lineTo(-3, -3); g.quadraticCurveTo(-8, -4, -15, -14); g.fill();
+      g.strokeStyle = 'rgba(255,255,255,.35)'; g.lineWidth = 1;
+      for (let k = 0; k < 3; k++) { g.beginPath(); g.arc(-6 + k * 6, -11, 3, 0, Math.PI); g.stroke(); }
+      const fw = Math.sin(t * 5) * 2; g.fillStyle = '#4db6ac';
+      g.beginPath(); g.moveTo(0, -4); g.lineTo(-12 + fw, 3); g.lineTo(-3, 1); g.lineTo(0, 4); g.lineTo(3, 1); g.lineTo(12 + fw, 3); g.closePath(); g.fill(); break;
+    }
+    case 'rainbow': case 'diamond': {
+      g.save(); g.beginPath(); g.moveTo(-10, -37); g.lineTo(10, -37); g.lineTo(16, -11); g.lineTo(-16, -11); g.closePath(); g.clip();
+      if (L.acc === 'rainbow') ['#ff1744', '#ff9100', '#ffea00', '#00e676', '#2979ff', '#d500f9'].forEach((c, i) => { g.fillStyle = c; g.fillRect(-16, -37 + i * 4.4, 32, 4.6); });
+      else { g.strokeStyle = 'rgba(255,255,255,.8)'; g.lineWidth = 1.5; for (let k = -3; k < 4; k++) line(g, k * 8 - 10, -37, k * 8 + 6, -11); }
+      g.restore(); break;
+    }
+  }
   // arms
-  g.strokeStyle = L.outfit === '#f5f5f5' ? '#e0e0e0' : L.outfit; g.lineWidth = 6; g.lineCap = 'round';
+  g.strokeStyle = L.acc === 'rainbow' ? '#ff9100' : (L.outfit === '#f5f5f5' || L.outfit === '#fafafa') ? '#e0e0e0' : L.outfit; g.lineWidth = 6; g.lineCap = 'round';
   const ay = sw * 4;
-  const raiseR = L.acc === 'phone' || L.acc === 'mic';
+  const raiseR = L.acc === 'phone' || L.acc === 'mic' || L.acc === 'fairy';
   const rhx = 15, rhy = raiseR ? -33 : -19 - ay;
   line(g, -10, -33, -15, -20 + ay); line(g, 10, -33, rhx, rhy);
   g.fillStyle = skin; circle(g, -15, -19 + ay, 3.6); circle(g, rhx, rhy, 3.6);
@@ -748,14 +850,54 @@ function drawChar(g, x, y, L, t, moving, s = 1, face = 1) {
       g.strokeStyle = 'rgba(220,240,255,.95)'; g.lineWidth = 2.5; g.beginPath(); g.arc(0, hy - 4, 27, 0, TAU); g.stroke();
       g.fillStyle = 'rgba(255,255,255,.6)'; g.beginPath(); g.ellipse(-12, hy - 16, 4, 7, -0.6, 0, TAU); g.fill();
       g.strokeStyle = '#bbb'; g.lineWidth = 2; line(g, 0, hy - 31, 0, hy - 39); g.fillStyle = '#ff5252'; circle(g, 0, hy - 40, 3); break;
-    case 'crown': case 'gold': case 'cosmic': {
+    case 'glasses':
+      g.strokeStyle = '#3e2723'; g.lineWidth = 1.6; g.beginPath(); g.arc(-5, hy + 1, 4.6, 0, TAU); g.stroke(); g.beginPath(); g.arc(5, hy + 1, 4.6, 0, TAU); g.stroke(); line(g, -0.5, hy + 1, 0.5, hy + 1);
+      if (L.dress && L.outfit === '#5c6bc0') { g.fillStyle = '#c62828'; rr(g, -21, -27 + sw * 4, 8, 11, 1); g.fill(); g.fillStyle = '#fff'; g.fillRect(-20, -25 + sw * 4, 1.5, 7); }
+      break;
+    case 'dj': {
+      const r = hy - hairTop(L, hy) - 2;
+      g.strokeStyle = '#212121'; g.lineWidth = 4; g.beginPath(); g.arc(0, hy, r, Math.PI * 1.08, Math.PI * 1.92); g.stroke();
+      g.fillStyle = '#e91e63'; rr(g, -19, hy - 7, 7, 14, 3); g.fill(); rr(g, 12, hy - 7, 7, 14, 3); g.fill();
+      g.fillStyle = 'rgba(255,255,255,.85)'; g.font = 'bold 12px sans-serif'; g.fillText('♫', 20 + Math.sin(t * 4) * 2, hy - 20 - (t * 12 % 12)); break;
+    }
+    case 'capoeira':
+      g.strokeStyle = '#8d6e63'; g.lineWidth = 2.5; g.beginPath(); g.moveTo(-17, -4); g.quadraticCurveTo(-25, -40, -14, -72); g.stroke();
+      g.strokeStyle = '#ddd'; g.lineWidth = 0.8; line(g, -17, -4, -14, -72);
+      g.fillStyle = '#a1887f'; circle(g, -18, -14, 5); g.fillStyle = '#6d4c41'; circle(g, -18, -14, 2.5); break;
+    case 'pirate': {
+      g.fillStyle = '#111'; circle(g, 5, hy + 1, 4.3); g.strokeStyle = '#111'; g.lineWidth = 1.3; line(g, -13, hy - 5, 13, hy - 2);
+      const ty = hairTop(L, hy) + 7;
+      g.fillStyle = '#212121'; g.beginPath(); g.moveTo(-24, ty + 2); g.quadraticCurveTo(0, ty - 26, 24, ty + 2); g.quadraticCurveTo(0, ty - 7, -24, ty + 2); g.fill();
+      g.fillStyle = '#fff'; circle(g, 0, ty - 9, 2.6); g.fillRect(-3, ty - 6, 6, 1.4); break;
+    }
+    case 'robot': {
+      const ty = hairTop(L, hy) + 4;
+      g.strokeStyle = '#78909c'; g.lineWidth = 2; line(g, -6, hy - 12, -10, ty - 8); line(g, 6, hy - 12, 10, ty - 8);
+      g.fillStyle = Math.sin(t * 8) > 0 ? '#ff1744' : '#00e5ff'; circle(g, -10, ty - 9, 2.6); circle(g, 10, ty - 9, 2.6);
+      g.fillStyle = '#b0bec5'; circle(g, -14.5, hy + 1, 2.5); circle(g, 14.5, hy + 1, 2.5); break;
+    }
+    case 'fairy':
+      g.strokeStyle = '#fff59d'; g.lineWidth = 2; line(g, 15, -33, 19, -48);
+      g.fillStyle = '#ffeb3b'; star(g, 20, -51, 6, 2.6);
+      g.fillStyle = 'rgba(255,255,255,.9)'; for (let k = 0; k < 3; k++) circle(g, 20 + Math.sin(t * 3 + k * 2) * 8, -48 + ((t * 20 + k * 10) % 30), 1.2); break;
+    case 'mermaid':
+      g.fillStyle = '#ff8a65'; star(g, 11, hairTop(L, hy) + 8, 5.5, 2.3);
+      g.strokeStyle = 'rgba(180,230,255,.8)'; g.lineWidth = 1.2;
+      for (let k = 0; k < 3; k++) { g.beginPath(); g.arc(18 + k * 3, -30 - ((t * 18 + k * 12) % 36), 1.6 + k * 0.6, 0, TAU); g.stroke(); }
+      g.fillStyle = '#f8bbd0'; g.beginPath(); g.arc(-4, -33, 3.5, Math.PI, 0); g.fill(); g.beginPath(); g.arc(4, -33, 3.5, Math.PI, 0); g.fill(); break;
+    case 'carnaval': g.fillStyle = '#ffd600'; g.fillRect(-14, hy - 12, 28, 3); g.fillStyle = '#00e5ff'; circle(g, 0, hy - 11, 2.2); break;
+    case 'hero':
+      g.fillStyle = '#4a148c'; g.beginPath(); g.ellipse(0, hy + 0.5, 13.5, 4.8, 0, 0, TAU); g.fill();
+      g.fillStyle = '#fff'; circle(g, -5, hy + 1, 2.4); circle(g, 5, hy + 1, 2.4);
+      g.fillStyle = '#1a1a1a'; circle(g, -4.4, hy + 1.3, 1.3); circle(g, 5.6, hy + 1.3, 1.3); break;
+    case 'crown': case 'gold': case 'cosmic': case 'rainbow': case 'diamond': {
       const ty = hairTop(L, hy) + 3;
-      g.fillStyle = L.acc === 'cosmic' ? '#e1bee7' : '#ffd700';
+      g.fillStyle = L.acc === 'cosmic' ? '#e1bee7' : L.acc === 'diamond' ? '#e0f7fa' : L.acc === 'rainbow' ? `hsl(${(t * 140) % 360},95%,65%)` : '#ffd700';
       g.beginPath(); g.moveTo(-11, ty); g.lineTo(-13, ty - 12); g.lineTo(-6, ty - 6); g.lineTo(0, ty - 15); g.lineTo(6, ty - 6); g.lineTo(13, ty - 12); g.lineTo(11, ty); g.closePath(); g.fill();
-      g.fillStyle = L.acc === 'cosmic' ? '#7c4dff' : '#e53935'; circle(g, 0, ty - 5, 2.2);
+      g.fillStyle = L.acc === 'cosmic' ? '#7c4dff' : L.acc === 'diamond' ? '#00e5ff' : L.acc === 'rainbow' ? '#fff' : '#e53935'; circle(g, 0, ty - 5, L.acc === 'diamond' ? 3.2 : 2.2);
       if (L.acc !== 'crown') {
-        g.fillStyle = L.acc === 'gold' ? '#fff8c4' : '#d1c4e9';
         for (let k = 0; k < 5; k++) {
+          g.fillStyle = L.acc === 'gold' ? '#fff8c4' : L.acc === 'diamond' ? '#e0f7fa' : L.acc === 'rainbow' ? `hsl(${(t * 140 + k * 72) % 360},95%,70%)` : '#d1c4e9';
           const a = t * 1.6 + k * TAU / 5, sx = Math.cos(a) * 30, sy = -34 + Math.sin(a) * 26, ss = 2 + Math.sin(t * 5 + k) * 1.2;
           g.beginPath(); g.moveTo(sx, sy - ss * 2); g.lineTo(sx + ss * .6, sy); g.lineTo(sx, sy + ss * 2); g.lineTo(sx - ss * .6, sy); g.closePath(); g.fill();
           g.beginPath(); g.moveTo(sx - ss * 2, sy); g.lineTo(sx, sy + ss * .6); g.lineTo(sx + ss * 2, sy); g.lineTo(sx, sy - ss * .6); g.closePath(); g.fill();
@@ -777,6 +919,12 @@ function drawTree(x, y, s = 1) {
   ctx.fillStyle = '#2e7d32'; circle(ctx, x, y - 50 * s, 30 * s); circle(ctx, x - 20 * s, y - 36 * s, 20 * s); circle(ctx, x + 20 * s, y - 36 * s, 20 * s);
   ctx.fillStyle = '#43a047'; circle(ctx, x - 8 * s, y - 58 * s, 14 * s);
 }
+const STATUE2 = { skin: '#81d4fa', hair: 'afroBig', hairColor: '#4fc3f7', outfit: '#b3e5fc', legs: '#81d4fa', shoes: '#4fc3f7', dress: true, acc: 'diamond', earrings: true, lips: '#0277bd' };
+function drawStatue(x, look, name) {
+  ctx.fillStyle = '#9e9e9e'; rr(ctx, x - 55, 385, 110, 40, 8); ctx.fill(); ctx.fillStyle = '#bdbdbd'; rr(ctx, x - 45, 380, 90, 14, 6); ctx.fill();
+  drawChar(ctx, x, 385, look, 0, false, 2.1, 1);
+  label(name, x, 448, '#ffe082', 15);
+}
 const STATUE = { skin: '#c9a227', hair: 'afroBig', hairColor: '#a8841a', outfit: '#e6bc2f', legs: '#c9a227', shoes: '#a8841a', dress: true, acc: 'crown', earrings: true, lips: '#8a6a10' };
 function drawGround() {
   ctx.fillStyle = grassPat; ctx.fillRect(0, 0, WORLD.w, WORLD.h);
@@ -797,14 +945,17 @@ function drawGround() {
     ctx.fillStyle = g; ctx.beginPath(); ctx.ellipse(px, RUN.yc, 30 + Math.sin(T * 4) * 4, 62, 0, 0, TAU); ctx.fill();
   }
   // statue & decor
-  ctx.fillStyle = '#9e9e9e'; rr(ctx, 1145, 385, 110, 40, 8); ctx.fill(); ctx.fillStyle = '#bdbdbd'; rr(ctx, 1155, 380, 90, 14, 6); ctx.fill();
-  drawChar(ctx, 1200, 385, STATUE, 0, false, 2.1, 1);
-  label('ADELAIDE SUPREMA', 1200, 448, '#ffe082', 15);
+  drawStatue(1200, STATUE, 'ADELAIDE SUPREMA');
+  drawStatue(2500, STATUE2, 'ADELAIDE DIAMANTE');
+  ctx.fillStyle = '#6d4c41'; ctx.fillRect(2494, 1170, 12, 50);
+  ctx.fillStyle = '#ffcdd2'; rr(ctx, 2395, 1105, 210, 70, 10); ctx.fill(); ctx.strokeStyle = '#6d4c41'; ctx.lineWidth = 4; ctx.stroke();
+  ctx.fillStyle = '#b71c1c'; ctx.font = 'bold 19px "Trebuchet MS"'; ctx.textAlign = 'center';
+  ctx.fillText('🚨 CUIDADO 🚨', 2500, 1133); ctx.fillText('ÁREA DE LADRÕES', 2500, 1158);
   ctx.fillStyle = '#6d4c41'; ctx.fillRect(1194, 1170, 12, 50);
   ctx.fillStyle = '#ffecb3'; rr(ctx, 1095, 1105, 210, 70, 10); ctx.fill(); ctx.strokeStyle = '#6d4c41'; ctx.lineWidth = 4; ctx.stroke();
   ctx.fillStyle = '#4e342e'; ctx.font = 'bold 19px "Trebuchet MS"'; ctx.textAlign = 'center';
   ctx.fillText('ROUBE UMA', 1200, 1133); ctx.fillText('ADELAIDE 😈', 1200, 1158);
-  for (const [x, y, s] of [[75, 320, 1], [75, 1320, 1], [2325, 320, 1], [2325, 1320, 1], [1040, 230, .8], [1360, 600, .8], [1040, 1480, .9], [1360, 1050, .8], [1050, 1350, .7], [1360, 1460, .8], [1355, 230, .7]]) drawTree(x, y, s);
+  for (const [x, y, s] of [[75, 320, 1], [75, 1320, 1], [3625, 320, 1], [3625, 1320, 1], [1040, 230, .8], [1360, 600, .8], [1040, 1480, .9], [1360, 1050, .8], [1050, 1350, .7], [1360, 1460, .8], [1355, 230, .7], [2340, 230, .8], [2660, 600, .8], [2340, 1480, .9], [2660, 1050, .8], [2350, 1350, .7], [2660, 1460, .8], [2655, 230, .7], [2340, 600, .7]]) drawTree(x, y, s);
 }
 function drawBase(b) {
   ctx.fillStyle = b.floor; ctx.fillRect(b.x, b.y, b.w, b.h);
@@ -852,7 +1003,7 @@ function drawCharEntity(c) {
 }
 function drawCharTag(c) {
   const top = c.carrying ? c.y - 128 : c.y - 82;
-  label(c.isPlayer ? 'VOCÊ' : c.name, c.x, top, c.isPlayer ? '#7CFF7C' : c.base.color === '#1e88e5' ? '#90caf9' : c.base.color === '#8e24aa' ? '#e1bee7' : '#ff8a80', 14);
+  label(c.isPlayer ? 'VOCÊ' : c.name, c.x, top, c.isPlayer ? '#7CFF7C' : c.tag, 14);
   if (T < c.stunUntil) {
     for (let k = 0; k < 3; k++) { const a = T * 6 + k * TAU / 3; label('⭐', c.x + Math.cos(a) * 16, c.y - 70 + Math.sin(a) * 5, '#ffeb3b', 11); }
   }
@@ -870,7 +1021,7 @@ function drawCharTag(c) {
 }
 function drawAd(a) {
   const ty = TYPES[a.type];
-  if (a.state === 'slot' && ty.id >= 4) {
+  if (a.state === 'slot' && ty.tier >= 2) {
     ctx.strokeStyle = rarColor(ty.rar); ctx.globalAlpha = .5 + Math.sin(T * 4) * .2; ctx.lineWidth = 3;
     ctx.beginPath(); ctx.ellipse(a.x, a.y + 2, 30, 13, 0, 0, TAU); ctx.stroke(); ctx.globalAlpha = 1;
   }
@@ -878,10 +1029,10 @@ function drawAd(a) {
 }
 function drawAdLabel(a) {
   const ty = TYPES[a.type], d = dist(a, player), col = rarColor(ty.rar);
-  const top = a.y - (ty.hair === 'afroBig' || ty.acc === 'helmet' || ty.acc === 'crown' ? 96 : 84);
+  const top = a.y - (ty.hair === 'afroBig' || ty.acc === 'helmet' || ty.acc === 'crown' || ty.acc === 'pirate' || ty.acc === 'carnaval' || ty.acc === 'capoeira' || ty.acc === 'robot' ? 98 : 84);
   if (a.state === 'runway') {
-    if (d > 430 && ty.id < 6) return;
-    if (d > 190 && ty.id < 4) { label(fmt(ty.price), a.x, top + 1, player.money >= ty.price ? '#fff' : '#ff8a80', 13); return; }
+    if (d > 430 && ty.tier < 3) return;
+    if (d > 190 && ty.tier < 2) { label(fmt(ty.price), a.x, top + 1, player.money >= ty.price ? '#fff' : '#ff8a80', 13); return; }
     label(RAR[ty.rar].n, a.x, top - 42, col, 11);
     label(ty.name.replace('Adelaide ', ''), a.x, top - 28, col, 14);
     label(fmt(ty.price), a.x, top - 13, player.money >= ty.price ? '#fff' : '#ff8a80', 14);
@@ -920,7 +1071,7 @@ function drawMinimap() {
     ctx.fillStyle = b.color; ctx.fillRect(mx + b.x * s, my + b.y * s, b.w * s, b.h * s);
     if (b.lockUntil > T) { ctx.strokeStyle = '#ff1744'; ctx.lineWidth = 2; ctx.strokeRect(mx + b.x * s, my + b.y * s, b.w * s, b.h * s); }
   }
-  for (const a of ads) if (a.state === 'runway' && TYPES[a.type].id >= 4) { ctx.fillStyle = rarColor(TYPES[a.type].rar); circle(ctx, mx + a.x * s, my + a.y * s, 2.5); }
+  for (const a of ads) if (a.state === 'runway' && TYPES[a.type].tier >= 2) { ctx.fillStyle = rarColor(TYPES[a.type].rar); circle(ctx, mx + a.x * s, my + a.y * s, 2.5); }
   for (const c of chars) {
     ctx.fillStyle = c.isPlayer ? '#fff' : '#111'; circle(ctx, mx + c.x * s, my + c.y * s, c.isPlayer ? 4 : 3);
     if (c.carrying) { ctx.strokeStyle = '#ffeb3b'; ctx.lineWidth = 1.5; ctx.beginPath(); ctx.arc(mx + c.x * s, my + c.y * s, 6, 0, TAU); ctx.stroke(); }
@@ -969,6 +1120,7 @@ function updateHUD() {
   setHTML(lockEl, b.lockUntil > T ? `🔒 Base trancada: ${Math.ceil(b.lockUntil - T)}s` : T < b.lockReadyAt ? `⏳ Trava recarregando: ${Math.ceil(b.lockReadyAt - T)}s` : '🔓 Base aberta — pise no botão vermelho');
   if (b.unlocked >= 10) { setHTML(bSlot, '🏠 Base no máximo'); bSlot.className = 'sbtn max'; }
   else { setHTML(bSlot, `🏠 Expandir base (${b.unlocked}/10)<br><small>${fmt(slotCost())}</small>`); bSlot.className = 'sbtn' + (player.money < slotCost() ? ' off' : ''); }
+  setHTML(bBook, `📖 Coleção (${seen.size}/${TYPES.length})`);
   if (shoe >= 5) { setHTML(bShoe, '👟 Tênis no máximo'); bShoe.className = 'sbtn max'; }
   else { setHTML(bShoe, `👟 Tênis veloz (nv ${shoe}/5)<br><small>${fmt(shoeCost())}</small>`); bShoe.className = 'sbtn' + (player.money < shoeCost() ? ' off' : ''); }
   const k = isTouch ? '' : '[E] ';
@@ -1002,6 +1154,30 @@ bShoe.addEventListener('click', () => {
   if (player.money < c) { toast(`💸 Precisa de ${fmt(c)} pro tênis.`); SFX.fail(); return; }
   player.money -= c; shoe++; toast(`👟 Tênis nível ${shoe}! Você ficou mais rápido.`, 'good'); SFX.buy(); save();
 });
+const bBook = $('bBook'), bookEl = $('book');
+function openBook() {
+  if (!playing) return;
+  bookOpen = true; bookEl.style.display = 'flex';
+  for (const k in keys) keys[k] = false;
+  $('bookSub').textContent = `Você já teve ${seen.size} de ${TYPES.length} Adelaides`;
+  const grid = $('bookGrid'); grid.innerHTML = '';
+  for (const ty of SORTED) {
+    const has = seen.has(ty.id), rc = ty.rar === 'secreta' ? '#ff4fd8' : RAR[ty.rar].c;
+    const card = document.createElement('div'); card.className = 'card' + (has ? '' : ' no'); card.style.borderColor = rc;
+    const c = document.createElement('canvas'); c.width = 200; c.height = 230; c.style.width = '100px'; c.style.height = '115px';
+    const g = c.getContext('2d'); g.scale(2, 2);
+    const fake = makeAd(ty.id, 0, 0); fake.skin = SKINS[2];
+    drawChar(g, 50, 100, adLook(fake), 0.6, false, 1.15, 1);
+    if (!has) { g.setTransform(1, 0, 0, 1, 0, 0); g.globalCompositeOperation = 'source-atop'; g.fillStyle = '#1d1d2b'; g.fillRect(0, 0, 200, 230); }
+    card.appendChild(c);
+    const info = document.createElement('div');
+    info.innerHTML = `<span style="color:${rc};font-weight:800">${RAR[ty.rar].n}</span><b>${has ? ty.name.replace('Adelaide ', '') : '???'}</b>${fmt(ty.price)} • <span style="color:#7CFF7C">+${fmt(ty.inc)}/s</span>`;
+    card.appendChild(info); grid.appendChild(card);
+  }
+}
+function closeBook() { bookOpen = false; bookEl.style.display = 'none'; last = performance.now(); }
+bBook.addEventListener('click', openBook);
+$('bookClose').addEventListener('click', closeBook);
 $('bMute').addEventListener('click', e => { muted = !muted; e.currentTarget.textContent = muted ? '🔇' : '🔊'; });
 bAct.addEventListener('pointerdown', e => { e.preventDefault(); act(); });
 bSell.addEventListener('pointerdown', e => { e.preventDefault(); sell(); });
@@ -1010,7 +1186,10 @@ if (isTouch) $('help').style.display = 'none';
 addEventListener('keydown', e => {
   keys[e.code] = true;
   if (!playing) { if (e.code === 'Enter') startGame(); return; }
-  if ((e.code === 'KeyE' || e.code === 'Space') && !e.repeat) act();
+  if ((e.code === 'KeyE' || e.code === 'Space') && !e.repeat && !bookOpen) act();
+  if (e.code === 'KeyC' && !e.repeat) { bookOpen ? closeBook() : openBook(); return; }
+  if (e.code === 'Escape' && bookOpen) { closeBook(); return; }
+  if (bookOpen) return;
   if (e.code === 'KeyQ' && !e.repeat) sell();
   if (e.code.startsWith('Arrow') || e.code === 'Space') e.preventDefault();
 });
@@ -1088,13 +1267,13 @@ buildLooks();
 let last = performance.now();
 function frame(now) {
   const dt = Math.min(0.05, (now - last) / 1000); last = now;
-  if (playing) update(dt); else idleUpdate(dt);
+  if (playing && !bookOpen) update(dt); else if (!playing) idleUpdate(dt);
   render();
   if (playing) updateHUD();
   requestAnimationFrame(frame);
 }
 requestAnimationFrame(frame);
-window.__game = { get player() { return player; }, get bots() { return bots; }, get BASES() { return BASES; }, get ads() { return ads; }, act, sell, TYPES, get T() { return T; }, step(n) { for (let i = 0; i < n; i++) update(1 / 60); } };
+window.__game = { get player() { return player; }, get bots() { return bots; }, get BASES() { return BASES; }, get ads() { return ads; }, act, sell, TYPES, get T() { return T; }, get seen() { return seen; }, step(n) { for (let i = 0; i < n; i++) update(1 / 60); } };
 </script>
 </body>
 </html>
