@@ -405,6 +405,8 @@ async function getRoomNS() {
   } catch (e) { return { ns: null, why: 'erro ' + ((e && (e.code || e.message)) || '') }; }
 }
 const MP_ROOM = 'roube-adelaide';
+const NO_ACCESS = 'Quem abre pelo link público não entra no multiplayer. O dono do jogo precisa te convidar pelo nome (botão Compartilhar → adicionar pessoa) e você precisa estar logado no Claude.';
+const mpErrText = code => code === 'not_granted' || code === 'revoked' ? '🔒 Sem acesso à sala. ' + NO_ACCESS : '🌐 A conexão com a sala caiu (' + code + '). Recarregue a página.';
 const mpPlayers = peers => peers.filter(pp => !pp.sameTab && pp.kind !== 'agent' && pp.presence && pp.presence.v === 2);
 let mpBusy = false;
 async function startMP() {
@@ -417,20 +419,22 @@ async function startMP() {
   if (!lobby) {
     st.textContent = why === 'sem-claude'
       ? '❌ Esta página não está aberta dentro do Claude (o multiplayer não existe fora do link do claude.ai). Jogue sozinho por enquanto!'
-      : '❌ O Claude não liberou a sala de multiplayer pra esta conta/visualização (' + why + '). Confira se você está logado e se a página foi compartilhada com você.';
+      : '❌ O Claude não liberou a sala de multiplayer aqui (' + why + '). ' + NO_ACCESS;
     mpBusy = false; return;
   }
   let room = null;
   try { room = await lobby.join(MP_ROOM); MP.roomKind = 'sala'; }
   catch (e) { room = lobby; MP.roomKind = 'principal'; }
   MP.room = room;
-  try { room.onConnection(c => { MP.conn = c; }, e => { MP.conn = false; MP.lastErr = 'conexão: ' + e.code; }); } catch (e) { }
+  let denied = '';
+  try { room.onConnection(c => { MP.conn = c; }, e => { MP.conn = false; MP.lastErr = 'conexão: ' + e.code; if (e.code === 'not_granted' || e.code === 'revoked') denied = e.code; }); } catch (e) { }
   st.textContent = '🌐 Conectado! Procurando outros jogadores...';
   // wait until we know who we are and give others time to answer
   for (let i = 0; i < 30; i++) {
     await new Promise(r => setTimeout(r, 100));
     if (i >= 18 && room.peers().some(pp => pp.sameTab)) break;
   }
+  if (denied) { st.textContent = mpErrText(denied); MP.room = null; mpBusy = false; return; }
   const me = room.peers().find(pp => pp.sameTab);
   MP.peer = me ? me.peer : 'eu-' + Math.random().toString(36).slice(2);
   const others = mpPlayers(room.peers()).sort((a, b) => a.peer < b.peer ? -1 : 1);
@@ -444,7 +448,7 @@ async function startMP() {
   MP.on = true;
   initWorld(loadSave(), b);
   lookIdx = lk; mapIdx = mi;
-  room.onPeers(ch => mpPeers(ch.peers), e => { MP.lastErr = 'sala: ' + e.code; toast('🌐 A conexão com a sala caiu (' + e.code + '). Recarregue a página.', 'alert'); });
+  room.onPeers(ch => mpPeers(ch.peers), e => { MP.lastErr = 'sala: ' + e.code; toast(mpErrText(e.code), 'alert'); });
   mpPeers(room.peers());
   mpBusy = false; st.textContent = '';
   startGame();
@@ -603,7 +607,7 @@ function mpPublish() {
     bt: MP.bt, dl: MP.dl, ev: MP.ev,
   };
   const j = JSON.stringify(pr); if (j === MP.lastPub) return; MP.lastPub = j;
-  MP.room.presence(pr).then(() => { if (MP.lastErr.startsWith('presença')) MP.lastErr = ''; }, e => { MP.lastErr = 'presença: ' + ((e && (e.code || e.message)) || 'erro'); MP.lastPub = ''; });
+  MP.room.presence(pr).then(() => { if (MP.lastErr.startsWith('presença')) MP.lastErr = ''; }, e => { const c = (e && (e.code || e.message)) || 'erro'; MP.lastErr = c === 'not_granted' || c === 'revoked' ? '🔒 sem acesso: peça pro dono te convidar pelo nome' : 'presença: ' + c; MP.lastPub = ''; });
 }
 
 // ======================= NAVIGATION / PHYSICS =======================
