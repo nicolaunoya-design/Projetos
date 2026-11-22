@@ -1,0 +1,15 @@
+newmtl branco
+Kd 0.9333 0.9412 0.9490
+
+newmtl marca
+Kd 0.1333 0.1922 0.3098
+
+newmtl azul
+Kd 0.1451 0.3882 0.7882
+
+newmtl vermelho
+Kd 0.8471 0.2510 0.1843
+
+newmtl amarelo
+Kd 0.9569 0.7059 0.0000
+

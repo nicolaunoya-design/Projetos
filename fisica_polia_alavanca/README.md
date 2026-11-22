@@ -40,6 +40,14 @@ posição certa de impressão: não gire.
 
 ![Mesa de impressão da polia](imagens/09_mesa_polia.png)
 
+### Versão colorida (`stl/polia/cores/`)
+
+![Polia colorida na mesa](imagens/polia_colorida_mesa.png)
+
+- **Impressora multicor:** abra `polia_colorida.3mf` (ou `polia_colorida.obj`). Cada peça já vem com a cor.
+- **Impressora de uma cor:** imprima uma mesa por cor, trocando o filamento: `polia_1_branco.stl`, `polia_2_azul.stl`, `polia_3_vermelho.stl` e `polia_4_amarelo.stl`.
+- Gerados por `python3 gerar_cores.py`.
+
 ### Montagem
 
 1. **Pés:** encaixe cada perna do pórtico na fenda do meio de um pé, empurrando até o fim. A régua fica virada para a frente e a fenda menor dos pés também fica na frente.

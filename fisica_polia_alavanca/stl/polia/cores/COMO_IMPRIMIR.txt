@@ -1,0 +1,31 @@
+POLIA FIXA + POLIA MÓVEL - ARQUIVOS COLORIDOS
+=============================================
+
+Escolha UM dos jeitos abaixo, conforme a impressora:
+
+1) IMPRESSORA MULTICOR (Bambu com AMS, Prusa MMU, etc.)
+   -> abra  polia_colorida.3mf   (ou polia_colorida.obj, se o fatiador
+      pedir OBJ colorido). Cada peça já vem com a sua cor:
+        branco ...... pórtico, pés e placa
+        azul-escuro . números da régua e o título da placa
+        azul ........ 2 garfos
+        vermelho .... 2 roldanas
+        amarelo ..... 2 baldes
+      No fatiador, confira se cada cor ficou com o filamento certo.
+
+2) IMPRESSORA DE UMA COR SÓ (a maioria)
+   -> imprima uma mesa por vez, trocando o filamento entre elas:
+        polia_1_branco.stl    (pórtico, pés e placa)
+        polia_2_azul.stl      (2 garfos)
+        polia_3_vermelho.stl  (2 roldanas)
+        polia_4_amarelo.stl   (2 baldes)
+      A régua e o título saem em relevo, da cor da peça:
+      passe canetinha permanente por cima para destacar.
+
+CONFIGURAÇÃO ECONÔMICA
+  PLA · camada 0,28 mm · 2 paredes · 10 % de preenchimento
+  sem suporte · sem borda (brim) · mesa mínima 180 x 180 mm
+  Filamento: cerca de 63 g no total.
+
+Não gire as peças: elas já estão na posição certa para imprimir.
+Para montar: veja o vídeo tutorial_montagem_polia.mp4.
